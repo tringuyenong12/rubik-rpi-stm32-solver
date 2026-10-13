@@ -1,8 +1,8 @@
-# Pipeline Thi Giac May Tinh
+# Pipeline Thị Giác Máy Tính
 
-## Thu Tu Scan
+## Thứ Tự Scan
 
-Dung quy uoc solver `URFDLB`:
+Dùng quy ước solver `URFDLB`:
 
 - U: Up
 - R: Right
@@ -11,49 +11,48 @@ Dung quy uoc solver `URFDLB`:
 - L: Left
 - B: Back
 
-Khi chup 6 mat, can co jig/cach dat cube co lap lai de khong nham huong. Neu dung robot de xoay cube trong luc scan, moi thao tac scan nen duoc log lai.
+Khi chụp 6 mặt, cần có jig/cách đặt cube có lặp lại để không nhầm hướng. Nếu dùng robot để xoay cube trong lúc scan, mỗi thao tác scan nên được log lại.
 
-## Pipeline De Xuat
+## Pipeline Đề Xuất
 
-1. Capture anh.
-2. Can bang trang hoac khoa exposure cua camera.
-3. Tim vung Rubik:
-   - Theo ban ve hien tai, camera duoc gan co dinh tren cao nen uu tien dung grid co dinh.
-   - Them buoc kiem tra tam cube vi cac cum actuator co the che mot phan vien cube.
-   - Nang cao: detect contour/ArUco/reference frame tren jig trung tam.
-4. Lay mau vung trung tam cua 9 sticker.
-5. Chuyen mau sang LAB hoac HSV.
-6. Dung 6 center stickers lam mau tham chieu moi lan scan.
-7. Gan moi sticker vao mau center gan nhat.
-8. Kiem tra moi mau co dung 9 stickers.
-9. Xuat cube string va anh debug overlay.
+1. Capture ảnh.
+2. Cân bằng trắng hoặc khóa exposure của camera.
+3. Tìm vùng Rubik:
+   - Theo bản vẽ hiện tại, camera được gắn cố định trên cao nên ưu tiên dùng grid cố định.
+   - Thêm bước kiểm tra tâm cube vì các cụm actuator có thể che một phần viền cube.
+   - Nâng cao: detect contour/ArUco/reference frame trên jig trung tâm.
+4. Lấy mẫu vùng trung tâm của 9 sticker.
+5. Chuyển màu sang LAB hoặc HSV.
+6. Dùng 6 center stickers làm màu tham chiếu mỗi lần scan.
+7. Gán mỗi sticker vào màu center gần nhất.
+8. Kiểm tra mỗi màu có đúng 9 stickers.
+9. Xuất cube string và ảnh debug overlay.
 
 ## Calibration
 
-Nen luu file `calibration/color_profile.json` gom:
+Nên lưu file `calibration/color_profile.json` gồm:
 
-- Dieu kien anh sang.
+- Điều kiện ánh sáng.
 - Camera id/resolution.
-- Vi tri 9 o tren anh.
-- Mau center trung binh.
-- Threshold khoang cach mau.
+- Vị trí 9 ô trên ảnh.
+- Màu center trung bình.
+- Threshold khoảng cách màu.
 
-## Debug Bat Buoc
+## Debug Bắt Buộc
 
-Moi lan scan nen luu:
+Mỗi lần scan nên lưu:
 
-- Anh goc.
-- Anh overlay danh dau 9 o.
-- Bang RGB/LAB cua 54 stickers.
-- Ket qua phan loai.
+- Ảnh gốc.
+- Ảnh overlay đánh dấu 9 ô.
+- Bảng RGB/LAB của 54 stickers.
+- Kết quả phân loại.
 - Cube string.
 
-Khi solver bao state invalid, dung cac log nay de tim sticker bi nham.
+Khi solver báo state invalid, dùng các log này để tìm sticker bị nhầm.
 
-## Luu Y Theo Ban Ve Co Khi
+## Lưu Ý Theo Bản Vẽ Cơ Khí
 
-- Camera nhin tu tren cao, co the chup mat tren cua cube ro nhat.
-- Neu can quet du 6 mat, robot phai dua cube qua cac `SCAN_POSE` khac nhau hoac nguoi dung xoay cube theo huong dan.
-- Cac cum truot cheo quanh cube co the tao bong do, nen den LED nen dat gan camera hoac dung tan sang.
-- Nen them anh debug overlay de kiem tra dau kep/co cau giu co che sticker nao khong.
-
+- Camera nhìn từ trên cao, có thể chụp mặt trên của cube rõ nhất.
+- Nếu cần quét đủ 6 mặt, robot phải đưa cube qua các `SCAN_POSE` khác nhau hoặc người dùng xoay cube theo hướng dẫn.
+- Các cụm trượt chéo quanh cube có thể tạo bóng đổ, nên đèn LED nên đặt gần camera hoặc dùng tán sáng.
+- Nên thêm ảnh debug overlay để kiểm tra đầu kẹp/cơ cấu giữ có che sticker nào không.

@@ -1,31 +1,31 @@
-# Cau Hinh STM32CubeIDE
+# Cấu Hình STM32CubeIDE
 
-Tai lieu nay thay cho workflow PlatformIO. Muc tieu la de STM32CubeIDE sinh code khoi tao peripheral, con logic robot nam trong `firmware/stm32cubeide/App`.
+Tài liệu này thay cho workflow PlatformIO. Mục tiêu là để STM32CubeIDE sinh code khởi tạo peripheral, còn logic robot nằm trong `firmware/stm32cubeide/App`.
 
-## 1. Tao Project
+## 1. Tạo Project
 
-1. Mo STM32CubeIDE.
+1. Mở STM32CubeIDE.
 2. `File -> New -> STM32 Project`.
-3. Chon MCU/board dung voi phan cung cua ban.
-4. Dat ten project: `RubikServoController`.
-5. Chon `C` project.
+3. Chọn MCU/board đúng với phần cứng của bạn.
+4. Đặt tên project: `RubikServoController`.
+5. Chọn `C` project.
 
-Neu dung Blue Pill pho bien, MCU thuong la `STM32F103C8Tx`.
+Nếu dùng Blue Pill phổ biến, MCU thường là `STM32F103C8Tx`.
 
 ## 2. Clock
 
-Voi STM32F103C8Tx:
+Với STM32F103C8Tx:
 
-- Chon HSE neu board co thach anh 8 MHz.
-- Cau hinh SYSCLK 72 MHz.
+- Chọn HSE nếu board có thạch anh 8 MHz.
+- Cấu hình SYSCLK 72 MHz.
 - APB1 prescaler `/2`.
 - APB2 prescaler `/1`.
 
-Neu board khac, chi can dam bao timer PWM co clock on dinh va UART dat dung 115200 baud.
+Nếu board khác, chỉ cần đảm bảo timer PWM có clock ổn định và UART đặt đúng 115200 baud.
 
 ## 3. UART
 
-Bat `USART1` hoac `USART2`:
+Bật `USART1` hoặc `USART2`:
 
 - Mode: Asynchronous
 - Baudrate: `115200`
@@ -34,28 +34,28 @@ Bat `USART1` hoac `USART2`:
 - Stop Bits: 1
 - NVIC interrupt: Enable
 
-Neu dung `USART1` tren STM32F103 Blue Pill:
+Nếu dùng `USART1` trên STM32F103 Blue Pill:
 
 - TX: PA9
 - RX: PA10
 
-Noi voi Raspberry Pi:
+Nối với Raspberry Pi:
 
 - STM32 TX -> RPi RX
 - STM32 RX -> RPi TX
 - GND chung
 
-Luu y muc logic deu la 3.3V, phu hop voi Raspberry Pi.
+Lưu ý mức logic đều là 3.3V, phù hợp với Raspberry Pi.
 
 ## 4. Timer PWM Cho Servo
 
-Servo RC can PWM 50 Hz, chu ky 20 ms. Pulse thuong dung:
+Servo RC cần PWM 50 Hz, chu kỳ 20 ms. Pulse thường dùng:
 
-- 1000 us: mot dau
+- 1000 us: một đầu
 - 1500 us: home/center
-- 2000 us: dau con lai
+- 2000 us: đầu còn lại
 
-Voi STM32F103 clock timer 72 MHz, cau hinh TIM2:
+Với STM32F103 clock timer 72 MHz, cấu hình TIM2:
 
 - Prescaler: `72 - 1`
 - Counter Period: `20000 - 1`
@@ -63,65 +63,65 @@ Voi STM32F103 clock timer 72 MHz, cau hinh TIM2:
 - PWM Generation CH2: Enable
 - PWM Generation CH3: Enable
 - PWM Generation CH4: Enable
-- Pulse ban dau: `1500`
+- Pulse ban đầu: `1500`
 
-Khi do timer tick la 1 us, nen compare value bang truc tiep `pulse_us`.
+Khi đó timer tick là 1 us, nên compare value bằng trực tiếp `pulse_us`.
 
-Pin mac dinh TIM2 tren STM32F103:
+Pin mặc định TIM2 trên STM32F103:
 
 - CH1: PA0
 - CH2: PA1
 - CH3: PA2
 - CH4: PA3
 
-## 4.1. Luu Y Theo Ban Ve Co Khi
+## 4.1. Lưu Ý Theo Bản Vẽ Cơ Khí
 
-Ban ve hien tai co 4 cum truot cheo quanh cube va mot cum trung tam duoi mat ban. Vi vay phan cung co the can nhieu hon 4 kenh dieu khien:
+Bản vẽ hiện tại có 4 cụm trượt chéo quanh cube và một cụm trung tâm dưới mặt bàn. Vì vậy phần cứng có thể cần nhiều hơn 4 kênh điều khiển:
 
-- 4 kenh cho carriage/rack-pinion neu dung servo lien tuc hoac stepper/DC driver.
-- 4 kenh cho tool/dau kep/dau xoay neu moi cum co mot dau tac dong rieng.
-- 1-2 kenh cho `center_lift` va `center_rotate`.
+- 4 kênh cho carriage/rack-pinion nếu dùng servo liên tục hoặc stepper/DC driver.
+- 4 kênh cho tool/đầu kẹp/đầu xoay nếu mỗi cụm có một đầu tác động riêng.
+- 1-2 kênh cho `center_lift` và `center_rotate`.
 
-Voi STM32F103, co the dung them TIM3/TIM4 hoac driver PWM ngoai nhu PCA9685 neu so servo vuot qua timer channel co san.
+Với STM32F103, có thể dùng thêm TIM3/TIM4 hoặc driver PWM ngoài như PCA9685 nếu số servo vượt quá timer channel có sẵn.
 
-Firmware trong `firmware/stm32cubeide/App` hien la scaffold an toan:
+Firmware trong `firmware/stm32cubeide/App` hiện là scaffold an toàn:
 
-- `SERVO` de test tung kenh PWM.
-- `MOVE` de test pipeline UART.
-- Mapping actuator that se duoc dien sau khi chot motor va cam bien cho tung cum.
+- `SERVO` để test từng kênh PWM.
+- `MOVE` để test pipeline UART.
+- Mapping actuator thật sẽ được điền sau khi chốt motor và cảm biến cho từng cụm.
 
-## 5. Them Code App
+## 5. Thêm Code App
 
-Copy thu muc:
+Copy thư mục:
 
 ```text
 firmware/stm32cubeide/App
 ```
 
-vao project CubeIDE.
+vào project CubeIDE.
 
 Trong project properties:
 
 - `C/C++ General -> Paths and Symbols -> Includes`
-- them duong dan `App`
+- thêm đường dẫn `App`
 
-Hoac trong CubeIDE, click phai project va refresh de IDE tu nhan source moi.
+Hoặc trong CubeIDE, click phải project và refresh để IDE tự nhận source mới.
 
-## 6. Chen Code Vao `main.c`
+## 6. Chèn Code Vào `main.c`
 
-Mo:
+Mở:
 
 ```text
 Core/Src/main.c
 ```
 
-Chen cac doan tu:
+Chèn các đoạn từ:
 
 ```text
 firmware/stm32cubeide/Core_Src_main_user_snippet.c
 ```
 
-vao dung cac block:
+vào đúng các block:
 
 ```c
 /* USER CODE BEGIN Includes */
@@ -140,23 +140,23 @@ vao dung cac block:
 /* USER CODE END 4 */
 ```
 
-Khong viet code ngoai cac block `USER CODE`, vi CubeMX co the ghi de khi regenerate.
+Không viết code ngoài các block `USER CODE`, vì CubeMX có thể ghi đè khi regenerate.
 
 ## 7. Test Nhanh
 
-Sau khi flash, mo Serial Monitor 115200 baud va gui:
+Sau khi flash, mở Serial Monitor 115200 baud và gửi:
 
 ```text
 PING
 ```
 
-STM32 phai tra:
+STM32 phải trả:
 
 ```text
 OK PONG
 ```
 
-Thu calibration servo:
+Thử calibration servo:
 
 ```text
 SERVO 0 1500 300
@@ -164,5 +164,4 @@ SERVO 0 1600 300
 SERVO 0 1400 300
 ```
 
-Neu servo di nguoc/qua goc, dung ngay va cap nhat gioi han trong `servo_controller.c`.
-
+Nếu servo đi ngược/quá góc, dừng ngay và cập nhật giới hạn trong `servo_controller.c`.

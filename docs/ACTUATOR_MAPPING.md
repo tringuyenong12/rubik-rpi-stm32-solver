@@ -1,25 +1,25 @@
 # Actuator Mapping
 
-Tai lieu nay dinh nghia cach dat ten actuator theo ban ve CAD. Day la mapping logic cho phan mem; channel STM32 thuc te se duoc dien sau khi chot motor/driver.
+Tài liệu này định nghĩa cách đặt tên actuator theo bản vẽ CAD. Đây là mapping logic cho phần mềm; channel STM32 thực tế sẽ được điền sau khi chốt motor/driver.
 
-## Ten Actuator
+## Tên Actuator
 
-| Role | Vi Tri Suy Luan | Chuc Nang |
+| Role | Vị Trí Suy Luận | Chức Năng |
 |---|---|---|
-| `carriage_nw` | Cum truot goc tren-trai theo camera top-down | Tien/lui dau tac dong vao cube |
-| `carriage_ne` | Cum truot goc tren-phai theo camera top-down | Tien/lui dau tac dong vao cube |
-| `carriage_sw` | Cum truot goc duoi-trai theo camera top-down | Tien/lui dau tac dong vao cube |
-| `carriage_se` | Cum truot goc duoi-phai theo camera top-down | Tien/lui dau tac dong vao cube |
-| `tool_nw` | Dau tac dong tren carriage_nw | Kep, giu, hoac xoay mat Rubik |
-| `tool_ne` | Dau tac dong tren carriage_ne | Kep, giu, hoac xoay mat Rubik |
-| `tool_sw` | Dau tac dong tren carriage_sw | Kep, giu, hoac xoay mat Rubik |
-| `tool_se` | Dau tac dong tren carriage_se | Kep, giu, hoac xoay mat Rubik |
-| `center_lift` | Cum duoi mat ban | Nang/ha hoac dua cube vao vi tri scan |
-| `center_rotate` | Cum duoi mat ban | Xoay/dinh huong cube neu co |
+| `carriage_nw` | Cụm trượt góc trên-trái theo camera top-down | Tiến/lùi đầu tác động vào cube |
+| `carriage_ne` | Cụm trượt góc trên-phải theo camera top-down | Tiến/lùi đầu tác động vào cube |
+| `carriage_sw` | Cụm trượt góc dưới-trái theo camera top-down | Tiến/lùi đầu tác động vào cube |
+| `carriage_se` | Cụm trượt góc dưới-phải theo camera top-down | Tiến/lùi đầu tác động vào cube |
+| `tool_nw` | Đầu tác động trên carriage_nw | Kẹp, giữ, hoặc xoay mặt Rubik |
+| `tool_ne` | Đầu tác động trên carriage_ne | Kẹp, giữ, hoặc xoay mặt Rubik |
+| `tool_sw` | Đầu tác động trên carriage_sw | Kẹp, giữ, hoặc xoay mặt Rubik |
+| `tool_se` | Đầu tác động trên carriage_se | Kẹp, giữ, hoặc xoay mặt Rubik |
+| `center_lift` | Cụm dưới mặt bàn | Nâng/hạ hoặc đưa cube vào vị trí scan |
+| `center_rotate` | Cụm dưới mặt bàn | Xoay/định hướng cube nếu có |
 
-## Trang Thai De Xuat
+## Trạng Thái Đề Xuất
 
-Moi actuator nen co trang thai logic:
+Mỗi actuator nên có trạng thái logic:
 
 ```text
 UNKNOWN
@@ -32,16 +32,16 @@ ERROR
 STOPPED
 ```
 
-## Lenh UART Mo Rong De Xuat
+## Lệnh UART Mở Rộng Đề Xuất
 
-Lenh debug hien co:
+Lệnh debug hiện có:
 
 ```text
 SERVO <channel> <pulse_us> <duration_ms>
 MOVE <face> <turns> <duration_ms>
 ```
 
-Lenh phu hop hon voi ban ve:
+Lệnh phù hợp hơn với bản vẽ:
 
 ```text
 ACTUATOR <role> <target> <duration_ms>
@@ -52,7 +52,7 @@ HOME
 STOP
 ```
 
-Vi du:
+Ví dụ:
 
 ```text
 ACTUATOR carriage_nw approach 500
@@ -62,18 +62,17 @@ CLAMP tool_nw open
 ACTUATOR carriage_nw retract 500
 ```
 
-## Mapping Cube Face Sang Co Khi
+## Mapping Cube Face Sang Cơ Khí
 
-Chua nen hard-code cho den khi test that. Ban dau dung bang sau:
+Chưa nên hard-code cho đến khi test thật. Ban đầu dùng bảng sau:
 
-| Cube Face | Tool/Carriage Du Kien | Ghi Chu |
+| Cube Face | Tool/Carriage Dự Kiến | Ghi Chú |
 |---|---|---|
-| U | TBD | Co the can center_rotate/reorient |
-| R | TBD | Can test dau tac dong gan mat phai |
-| F | TBD | Can test goc nhin camera va huong cube |
-| D | TBD | Co the lien quan center_lift/rotate |
-| L | TBD | Can test dau tac dong gan mat trai |
-| B | TBD | Co the can reorient cube |
+| U | TBD | Có thể cần center_rotate/reorient |
+| R | TBD | Cần test đầu tác động gần mặt phải |
+| F | TBD | Cần test góc nhìn camera và hướng cube |
+| D | TBD | Có thể liên quan center_lift/rotate |
+| L | TBD | Cần test đầu tác động gần mặt trái |
+| B | TBD | Có thể cần reorient cube |
 
-Sau khi co hardware that, dien bang nay truoc khi toi uu motion planner.
-
+Sau khi có hardware thật, điền bảng này trước khi tối ưu motion planner.

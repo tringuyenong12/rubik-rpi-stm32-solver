@@ -1,162 +1,161 @@
-# Plan Do An: He Thong Giai Rubik 3x3x3
+# Kế Hoạch Đồ Án: Hệ Thống Giải Rubik 3x3x3
 
-## 1. Pham Vi
+## 1. Phạm Vi
 
-He thong gom 3 khoi chinh:
+Hệ thống gồm 3 khối chính:
 
-- Raspberry Pi 4: camera, xu ly anh, solver, motion planner, giao tiep UART.
-- STM32: nhan lenh, dieu khien servo, phan hoi trang thai, bao ve timeout.
-- Co khi: khung giu Rubik, servo kep/xoay, camera mount, den chieu sang on dinh.
+- Raspberry Pi 4: camera, xử lý ảnh, solver, motion planner, giao tiếp UART.
+- STM32: nhận lệnh, điều khiển servo, phản hồi trạng thái, bảo vệ timeout.
+- Cơ khí: khung giữ Rubik, servo kẹp/xoay, camera mount, đèn chiếu sáng ổn định.
 
-Muc tieu thuc te nen la "giai on dinh" truoc, sau do moi toi uu toc do.
+Mục tiêu thực tế nên là "giải ổn định" trước, sau đó mới tối ưu tốc độ.
 
-## 2. Yeu Cau Chuc Nang
+## 2. Yêu Cầu Chức Năng
 
-- Chuc nang 1: Giai Rubik 3x3x3 tu dong.
-  - Quet trang thai Rubik bang camera.
-  - Phan loai mau va tao cube string.
-  - Tim loi giai bang solver.
-  - Chuyen loi giai thanh chuoi action robot.
-  - Gui lenh cho STM32 dieu khien servo de giai Rubik.
+- Chức năng 1: Giải Rubik 3x3x3 tự động.
+  - Quét trạng thái Rubik bằng camera.
+  - Phân loại màu và tạo cube string.
+  - Tìm lời giải bằng solver.
+  - Chuyển lời giải thành chuỗi action robot.
+  - Gửi lệnh cho STM32 điều khiển servo để giải Rubik.
 
-- Chuc nang 2: Tao de bai tron Rubik theo muc do.
-  - Sinh scramble theo muc do `de`, `trung_binh`, `kho`.
-  - Dam bao scramble hop le va co the giai nguoc lai.
-  - Luu thong tin de bai: ten muc do, chuoi tron, cube state sau khi tron, loi giai mau.
-  - Co the dung cho che do luyen tap hoac demo.
+- Chức năng 2: Tạo đề bài trộn Rubik theo mức độ.
+  - Sinh scramble theo mức độ `de`, `trung_binh`, `kho`.
+  - Đảm bảo scramble hợp lệ và có thể giải ngược lại.
+  - Lưu thông tin đề bài: tên mức độ, chuỗi trộn, cube state sau khi trộn, lời giải mẫu.
+  - Có thể dùng cho chế độ luyện tập hoặc demo.
 
-- Chuc nang 3: Huong dan giai va hien thi cac buoc giai Rubik cho nguoi choi.
-  - Hien thi chuoi buoc giai theo ky hieu Rubik, vi du `R U R' U'`.
-  - Giai thich tung buoc bang ngon ngu de hieu.
-  - Cho phep nguoi choi xem tung buoc, quay lai buoc truoc, hoac xem toan bo loi giai.
-  - Tai su dung solver cua che do tu dong, nhung khong gui lenh servo neu nguoi dung chi muon hoc/cam tay giai.
+- Chức năng 3: Hướng dẫn giải và hiển thị các bước giải Rubik cho người chơi.
+  - Hiển thị chuỗi bước giải theo ký hiệu Rubik, ví dụ `R U R' U'`.
+  - Giải thích từng bước bằng ngôn ngữ dễ hiểu.
+  - Cho phép người chơi xem từng bước, quay lại bước trước, hoặc xem toàn bộ lời giải.
+  - Tái sử dụng solver của chế độ tự động, nhưng không gửi lệnh servo nếu người dùng chỉ muốn học/cầm tay giải.
 
-## 3. Yeu Cau Chuc Nang Chi Tiet Cho Che Do Tu Dong
+## 3. Yêu Cầu Chức Năng Chi Tiết Cho Chế Độ Tự Động
 
-- Quet du 6 mat Rubik hoac chup 6 huong cua cube.
-- Phan loai 6 mau: W, Y, R, O, B, G.
-- Sinh cube string 54 ky tu theo thu tu `URFDLB`.
-- Kiem tra trang thai: dung 9 sticker/mau, center hop le, solver chap nhan.
-- Tim loi giai.
-- Chuyen loi giai thanh lenh robot.
-- STM32 thuc thi lenh va bao ACK/NACK.
-- Co che dung khan cap bang nut bam hoac lenh `STOP`.
+- Quét đủ 6 mặt Rubik hoặc chụp 6 hướng của cube.
+- Phân loại 6 màu: W, Y, R, O, B, G.
+- Sinh cube string 54 ký tự theo thứ tự `URFDLB`.
+- Kiểm tra trạng thái: đúng 9 sticker/màu, center hợp lệ, solver chấp nhận.
+- Tìm lời giải.
+- Chuyển lời giải thành lệnh robot.
+- STM32 thực thi lệnh và báo ACK/NACK.
+- Cơ chế dừng khẩn cấp bằng nút bấm hoặc lệnh `STOP`.
 
-## 4. Yeu Cau Phi Chuc Nang
+## 4. Yêu Cầu Phi Chức Năng
 
-- Anh chup on dinh duoi cung mot nguon sang.
-- Sai so servo duoc calibration rieng cho tung truc.
-- Sau moi lenh quan trong co xac nhan trang thai.
-- Log day du: anh dau vao, mau da phan loai, cube string, solution, action list, UART transcript.
+- Ảnh chụp ổn định dưới cùng một nguồn sáng.
+- Sai số servo được calibration riêng cho từng trục.
+- Sau mỗi lệnh quan trọng có xác nhận trạng thái.
+- Log đầy đủ: ảnh đầu vào, màu đã phân loại, cube string, solution, action list, UART transcript.
 
-## 5. De Xuat Phan Cung
+## 5. Đề Xuất Phần Cứng
 
-- Raspberry Pi 4, camera module hoac USB camera.
-- STM32F103/STM32F401/STM32F411 hoac board tuong duong co timer PWM.
-- Servo MG996R/DS3218 cho truc can moment lon.
-- Nguon servo rieng 5-6V, dong du lon; noi chung GND voi STM32/RPi.
-- Den LED vong hoac LED panel de giam bong do.
-- Nut E-STOP cat tin hieu enable servo hoac cat nguon servo.
+- Raspberry Pi 4, camera module hoặc USB camera.
+- STM32F103/STM32F401/STM32F411 hoặc board tương đương có timer PWM.
+- Servo MG996R/DS3218 cho trục cần moment lớn.
+- Nguồn servo riêng 5-6V, dòng đủ lớn; nối chung GND với STM32/RPi.
+- Đèn LED vòng hoặc LED panel để giảm bóng đổ.
+- Nút E-STOP cắt tín hiệu enable servo hoặc cắt nguồn servo.
 
-## 6. Kien Truc Co Khi Theo Ban Ve
+## 6. Kiến Trúc Cơ Khí Theo Bản Vẽ
 
-Theo cac anh CAD da them vao repo, phuong an co khi hien tai la:
+Theo các ảnh CAD đã thêm vào repo, phương án cơ khí hiện tại là:
 
-- Camera gan tren khung nhom cao, nhin xuong cube.
-- 4 cum truot cheo quanh cube, co co cau rack-pinion.
-- Cac dau tac dong/giu mat cube nam gan trung tam.
-- Cum trung tam duoi mat ban co kha nang nang/xoay/dinh vi cube.
+- Camera gắn trên khung nhôm cao, nhìn xuống cube.
+- 4 cụm trượt chéo quanh cube, có cơ cấu rack-pinion.
+- Các đầu tác động/giữ mặt cube nằm gần trung tâm.
+- Cụm trung tâm dưới mặt bàn có khả năng nâng/xoay/định vị cube.
 
-Vi vay repo se uu tien motion planner theo actuator role thay vi phuong an 2 kep don gian. Chi tiet nam trong [MECHANICAL_DESIGN.md](MECHANICAL_DESIGN.md) va [ACTUATOR_MAPPING.md](ACTUATOR_MAPPING.md).
+Vì vậy repo sẽ ưu tiên motion planner theo actuator role thay vì phương án 2 kẹp đơn giản. Chi tiết nằm trong [MECHANICAL_DESIGN.md](MECHANICAL_DESIGN.md) và [ACTUATOR_MAPPING.md](ACTUATOR_MAPPING.md).
 
-## 7. Cac Moc Thuc Hien
+## 7. Các Mốc Thực Hiện
 
-### Giai Doan 1: Nen Tang
+### Giai Đoạn 1: Nền Tảng
 
-- Tao repo, chuan code, docs.
-- Chay demo solver bang cube state co san.
-- Tao UART protocol va loopback test.
-- Viet firmware nhan `PING`, `HOME`, `MOVE`, `STOP`.
+- Tạo repo, chuẩn code, docs.
+- Chạy demo solver bằng cube state có sẵn.
+- Tạo UART protocol và loopback test.
+- Viết firmware nhận `PING`, `HOME`, `MOVE`, `STOP`.
 
-San pham: demo terminal RPi gui lenh, STM32 tra `OK`.
+Sản phẩm: demo terminal RPi gửi lệnh, STM32 trả `OK`.
 
-### Giai Doan 2: Thi Giac May Tinh
+### Giai Đoạn 2: Thị Giác Máy Tính
 
-- Co dinh camera va den.
-- Chup anh tung mat.
-- Xac dinh 9 o sticker bang grid hoac ArUco/reference frame.
-- Chuyen RGB sang HSV/LAB.
-- Calibration mau tu 6 center stickers.
-- Xuat cube string va anh debug co overlay.
+- Cố định camera và đèn.
+- Chụp ảnh từng mặt.
+- Xác định 9 ô sticker bằng grid hoặc ArUco/reference frame.
+- Chuyển RGB sang HSV/LAB.
+- Calibration màu từ 6 center stickers.
+- Xuất cube string và ảnh debug có overlay.
 
-San pham: quet 6 mat va tao cube string hop le.
+Sản phẩm: quét 6 mặt và tạo cube string hợp lệ.
 
-### Giai Doan 3: Solver Va Motion Planner
+### Giai Đoạn 3: Solver Và Motion Planner
 
-- Tich hop solver Kociemba.
+- Tích hợp solver Kociemba.
 - Map move cube `U D L R F B` sang action robot.
-- Them action cost de chon huong giai/motion ngan hon.
-- Mo phong action list tren terminal.
+- Thêm action cost để chọn hướng giải/motion ngắn hơn.
+- Mô phỏng action list trên terminal.
 
-San pham: tu cube string -> solution -> robot actions.
+Sản phẩm: từ cube string -> solution -> robot actions.
 
-### Giai Doan 4: Dieu Khien Servo
+### Giai Đoạn 4: Điều Khiển Servo
 
-- Calibration tung servo: home, grip, release, rotate +90, rotate -90.
-- Tao profile toc do co delay an toan.
-- Test tung action: grip, release, rotate face, reorient cube.
-- Them retry khi STM32 NACK hoac timeout.
+- Calibration từng servo: home, grip, release, rotate +90, rotate -90.
+- Tạo profile tốc độ có delay an toàn.
+- Test từng action: grip, release, rotate face, reorient cube.
+- Thêm retry khi STM32 NACK hoặc timeout.
 
-San pham: robot thuc thi chuoi action ngan, khong lam roi cube.
+Sản phẩm: robot thực thi chuỗi action ngắn, không làm rơi cube.
 
-### Giai Doan 5: Chuc Nang Luyen Tap
+### Giai Đoạn 5: Chức Năng Luyện Tập
 
-- Sinh scramble theo muc do.
-- Tao mode hien thi huong dan giai tung buoc.
-- Them mo ta than thien cho nguoi moi hoc Rubik.
-- Log de bai va loi giai de dung trong bao cao/demo.
+- Sinh scramble theo mức độ.
+- Tạo mode hiển thị hướng dẫn giải từng bước.
+- Thêm mô tả thân thiện cho người mới học Rubik.
+- Log đề bài và lời giải để dùng trong báo cáo/demo.
 
-San pham: nguoi choi co the lay de tron Rubik va xem huong dan giai tung buoc.
+Sản phẩm: người chơi có thể lấy đề trộn Rubik và xem hướng dẫn giải từng bước.
 
-### Giai Doan 6: Full System
+### Giai Đoạn 6: Full System
 
-- Quet cube that.
-- Giai cube voi robot.
-- Tao de bai, tron cube, sau do robot/human co the giai theo solution.
-- Do thoi gian, ti le thanh cong, so buoc, so action.
-- Tinh chinh anh sang, threshold, servo timing.
+- Quét cube thật.
+- Giải cube với robot.
+- Tạo đề bài, trộn cube, sau đó robot/người chơi có thể giải theo solution.
+- Đo thời gian, tỉ lệ thành công, số bước, số action.
+- Tinh chỉnh ánh sáng, threshold, servo timing.
 
-San pham: video demo va so lieu danh gia.
+Sản phẩm: video demo và số liệu đánh giá.
 
-## 8. Ke Hoach 8 Tuan Goi Y
+## 8. Kế Hoạch 8 Tuần Gợi Ý
 
-| Tuan | Muc Tieu | Dau Ra |
+| Tuần | Mục Tiêu | Đầu Ra |
 |---|---|---|
-| 1 | Kien truc, repo, giao tiep co ban | README, UART protocol, demo CLI |
-| 2 | Firmware PWM/servo | Dieu khien tung servo |
-| 3 | Camera capture va calibration mau | Anh debug 6 mat |
-| 4 | Cube state validation va solver | Solution in terminal |
-| 5 | Motion planner | Action list va cost |
-| 6 | Sinh scramble va huong dan tung buoc | Che do luyen tap cho nguoi choi |
-| 7 | Lap rap co khi, calibration | Bang goc servo |
-| 8 | Toi uu, bao cao, video | Demo va report |
+| 1 | Kiến trúc, repo, giao tiếp cơ bản | README, UART protocol, demo CLI |
+| 2 | Firmware PWM/servo | Điều khiển từng servo |
+| 3 | Camera capture và calibration màu | Ảnh debug 6 mặt |
+| 4 | Cube state validation và solver | Solution trong terminal |
+| 5 | Motion planner | Action list và cost |
+| 6 | Sinh scramble và hướng dẫn từng bước | Chế độ luyện tập cho người chơi |
+| 7 | Lắp ráp cơ khí, calibration | Bảng góc servo |
+| 8 | Tối ưu, báo cáo, video | Demo và report |
 
-## 9. Rui Ro Va Cach Giam
+## 9. Rủi Ro Và Cách Giảm
 
-- Anh sang thay doi: dung den co dinh, chup mau center moi lan quet.
-- Servo khong du moment: dung servo kim loai, nguon rieng, giam ma sat co khi.
-- Rubik bi ket: dung cube speed cube, giam toc, can chinh kep.
-- Solver nhan state sai: log anh + overlay + histogram de debug.
-- Giao tiep mat goi: co ACK/NACK, sequence id, timeout, retry.
+- Ánh sáng thay đổi: dùng đèn cố định, chụp màu center mỗi lần quét.
+- Servo không đủ moment: dùng servo kim loại, nguồn riêng, giảm ma sát cơ khí.
+- Rubik bị kẹt: dùng cube speed cube, giảm tốc, căn chỉnh kẹp.
+- Solver nhận state sai: log ảnh + overlay + histogram để debug.
+- Giao tiếp mất gói: có ACK/NACK, sequence id, timeout, retry.
 
-## 10. Tieu Chi Danh Gia
+## 10. Tiêu Chí Đánh Giá
 
-- Ti le nhan dien mau dung tren tap anh test.
-- Ti le cube state hop le sau khi scan.
-- Thoi gian trung binh tu scan den solution.
-- So move solver va so action robot.
-- So luong de bai tao duoc theo tung muc do.
-- Do dung cua loi giai hien thi cho nguoi choi.
-- Ti le giai thanh cong trong 10 lan thu.
-- Thoi gian giai trung binh.
-
+- Tỉ lệ nhận diện màu đúng trên tập ảnh test.
+- Tỉ lệ cube state hợp lệ sau khi scan.
+- Thời gian trung bình từ scan đến solution.
+- Số move solver và số action robot.
+- Số lượng đề bài tạo được theo từng mức độ.
+- Độ đúng của lời giải hiển thị cho người chơi.
+- Tỉ lệ giải thành công trong 10 lần thử.
+- Thời gian giải trung bình.

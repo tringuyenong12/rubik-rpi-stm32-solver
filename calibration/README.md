@@ -1,9 +1,8 @@
 # Calibration Data
 
-Thu muc nay dung de luu file calibration thuc te, vi du:
+Thư mục này dùng để lưu file calibration thực tế, ví dụ:
 
-- `color_profile.json`: mau center, grid sticker, thong so camera.
-- `servo_profile.json`: goc/pulse an toan tung servo.
+- `color_profile.json`: màu center, grid sticker, thông số camera.
+- `servo_profile.json`: góc/pulse an toàn từng servo.
 
-Cac file `.json` trong thu muc nay duoc ignore de tranh commit thong so phan cung rieng.
-
+Các file `.json` trong thư mục này được ignore để tránh commit thông số phần cứng riêng.

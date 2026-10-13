@@ -1,44 +1,44 @@
-# Thiet Ke Co Khi Theo Ban Ve
+# Thiết Kế Cơ Khí Theo Bản Vẽ
 
-Tai lieu nay tong hop tu cac anh CAD trong thu muc `technical drawing/`. Mot so diem ben duoi la suy luan tu hinh anh, can xac nhan lai bang kich thuoc va danh sach linh kien thuc te.
+Tài liệu này tổng hợp từ các ảnh CAD trong thư mục `technical drawing/`. Một số điểm bên dưới là suy luận từ hình ảnh, cần xác nhận lại bằng kích thước và danh sách linh kiện thực tế.
 
-## Tong Quan
+## Tổng Quan
 
-Thiet ke hien tai phu hop voi cau truc robot giai Rubik dang ban may co dinh:
+Thiết kế hiện tại phù hợp với cấu trúc robot giải Rubik dạng bàn máy cố định:
 
-- Camera dat tren khung nhom dinh hinh, nhin xuong Rubik tu phia tren.
-- Rubik nam o trung tam ban may.
-- Bon cum tac dong bo tri cheo quanh Rubik theo dang chu X.
-- Moi cum co ray truot/linear rail va co cau rack-pinion de tien/lui vao Rubik.
-- Gan trung tam co cac cum kep/giu mat cube.
-- Duoi mat ban co mot cum co khi trung tam, co kha nang la co cau nang, xoay hoac dinh vi cube.
-- Khung duoi va mat ban tao thanh mot module co the dat STM32, driver, nguon servo/motor.
+- Camera đặt trên khung nhôm định hình, nhìn xuống Rubik từ phía trên.
+- Rubik nằm ở trung tâm bàn máy.
+- Bốn cụm tác động bố trí chéo quanh Rubik theo dạng chữ X.
+- Mỗi cụm có ray trượt/linear rail và cơ cấu rack-pinion để tiến/lùi vào Rubik.
+- Gần trung tâm có các cụm kẹp/giữ mặt cube.
+- Dưới mặt bàn có một cụm cơ khí trung tâm, có khả năng là cơ cấu nâng, xoay hoặc định vị cube.
+- Khung dưới và mặt bàn tạo thành một module có thể đặt STM32, driver, nguồn servo/motor.
 
-## Cac Cum Chinh
+## Các Cụm Chính
 
-### 1. Cum Camera Tren Cao
+### 1. Cụm Camera Trên Cao
 
-Quan sat tu anh:
+Quan sát từ ảnh:
 
-- Khung nhom dinh hinh dung + ngang tao can gan camera.
-- Camera huong xuong vung Rubik.
-- Vi tri camera co dinh, phu hop voi pipeline grid co dinh.
+- Khung nhôm định hình đứng + ngang tạo cần gắn camera.
+- Camera hướng xuống vùng Rubik.
+- Vị trí camera cố định, phù hợp với pipeline grid cố định.
 
-Y nghia cho phan mem:
+Ý nghĩa cho phần mềm:
 
-- Pipeline thi giac co the uu tien `fixed_grid_scan`.
-- Nen calibration mot lan cac diem 9 sticker tren anh, sau do luu vao `calibration/color_profile.json`.
-- Can them buoc kiem tra cube co nam dung tam truoc khi phan loai mau.
+- Pipeline thị giác có thể ưu tiên `fixed_grid_scan`.
+- Nên calibration một lần các điểm 9 sticker trên ảnh, sau đó lưu vào `calibration/color_profile.json`.
+- Cần thêm bước kiểm tra cube có nằm đúng tâm trước khi phân loại màu.
 
-### 2. Bon Cum Truot Cheo
+### 2. Bốn Cụm Trượt Chéo
 
-Quan sat tu anh top view:
+Quan sát từ ảnh top view:
 
-- Co 4 cum ray truot dat cheo vao tam cube.
-- Moi cum co ban truot va co cau banh rang/thanh rang.
-- Cac cum nay co the dung de dua dau kep/dau xoay vao mat Rubik.
+- Có 4 cụm ray trượt đặt chéo vào tâm cube.
+- Mỗi cụm có bàn trượt và cơ cấu bánh răng/thanh răng.
+- Các cụm này có thể dùng để đưa đầu kẹp/đầu xoay vào mặt Rubik.
 
-Dat ten trong repo:
+Đặt tên trong repo:
 
 ```text
 carriage_nw
@@ -47,45 +47,45 @@ carriage_sw
 carriage_se
 ```
 
-Trong do `nw/ne/sw/se` la cach dat ten theo goc nhin tu camera top-down, chua phai toa do vat ly bat buoc.
+Trong đó `nw/ne/sw/se` là cách đặt tên theo góc nhìn từ camera top-down, chưa phải tọa độ vật lý bắt buộc.
 
-Y nghia cho firmware:
+Ý nghĩa cho firmware:
 
-- Neu dung servo lien tuc/DC motor/stepper cho rack-pinion, can driver rieng va cam bien hanh trinh.
-- Neu dung servo goc cho co cau gan tren carriage, can them kenh PWM.
-- STM32 nen quan ly tung cum nhu mot actuator co trang thai: `HOME`, `APPROACH`, `ENGAGED`, `RETRACTED`, `ERROR`.
+- Nếu dùng servo liên tục/DC motor/stepper cho rack-pinion, cần driver riêng và cảm biến hành trình.
+- Nếu dùng servo góc cho cơ cấu gắn trên carriage, cần thêm kênh PWM.
+- STM32 nên quản lý từng cụm như một actuator có trạng thái: `HOME`, `APPROACH`, `ENGAGED`, `RETRACTED`, `ERROR`.
 
-### 3. Cum Giu/Xoay Gan Cube
+### 3. Cụm Giữ/Xoay Gần Cube
 
-Quan sat tu anh:
+Quan sát từ ảnh:
 
-- Co cac chi tiet mau nau dat quanh cube, giong cum kep/giu mat.
-- Cac cum nay co the giu cube trong luc mat khac xoay, hoac dinh vi cube khi scan.
+- Có các chi tiết màu nâu đặt quanh cube, giống cụm kẹp/giữ mặt.
+- Các cụm này có thể giữ cube trong lúc mặt khác xoay, hoặc định vị cube khi scan.
 
-Y nghia cho motion planner:
+Ý nghĩa cho motion planner:
 
-- Khong nen map truc tiep moi move `R/U/F/...` thanh mot servo duy nhat.
-- Nen co lop trung gian: `cube move -> robot action sequence`.
-- Robot action co the gom: `approach`, `clamp`, `turn_face`, `release`, `retract`, `reorient`.
+- Không nên map trực tiếp mỗi move `R/U/F/...` thành một servo duy nhất.
+- Nên có lớp trung gian: `cube move -> robot action sequence`.
+- Robot action có thể gồm: `approach`, `clamp`, `turn_face`, `release`, `retract`, `reorient`.
 
-### 4. Cum Trung Tam Duoi Mat Ban
+### 4. Cụm Trung Tâm Dưới Mặt Bàn
 
-Quan sat tu anh:
+Quan sát từ ảnh:
 
-- Duoi mat ban co mot module mau xanh/do/xanh duong, lien ket voi truc/gear o trung tam.
-- Co kha nang la co cau nang, xoay cube, hoac ho tro scan/can chinh vi tri.
+- Dưới mặt bàn có một module màu xanh/đỏ/xanh dương, liên kết với trục/gear ở trung tâm.
+- Có khả năng là cơ cấu nâng, xoay cube, hoặc hỗ trợ scan/căn chỉnh vị trí.
 
-Y nghia cho firmware:
+Ý nghĩa cho firmware:
 
-- Can tach actuator trung tam thanh cac role rieng, vi du:
+- Cần tách actuator trung tâm thành các role riêng, ví dụ:
   - `center_lift`
   - `center_rotate`
   - `center_lock`
-- Neu dung co cau nay de doi huong cube, motion planner phai tinh cost cho thao tac reorient.
+- Nếu dùng cơ cấu này để đổi hướng cube, motion planner phải tính cost cho thao tác reorient.
 
-## Kien Truc Dieu Khien Phu Hop
+## Kiến Trúc Điều Khiển Phù Hợp
 
-Thay vi coi STM32 chi dieu khien 4 servo, repo nen theo cau truc:
+Thay vì coi STM32 chỉ điều khiển 4 servo, repo nên theo cấu trúc:
 
 ```text
 RPi solver
@@ -98,24 +98,23 @@ STM32
   -> ACK / DONE / ERR
 ```
 
-## Cac Thong Tin Can Xac Nhan
+## Các Thông Tin Cần Xác Nhận
 
-De chot mapping chinh xac, can bo sung:
+Để chốt mapping chính xác, cần bổ sung:
 
-- Moi cum truot dung motor gi: servo goc, servo lien tuc, DC gear motor hay stepper.
-- Co cam bien hanh trinh/home switch khong.
-- Co bao nhieu kenh servo tong cong.
-- Cum trung tam duoi mat ban co chuc nang chinh xac la nang, xoay, hay ca hai.
-- Cac dau kep co the xoay mat Rubik 90/180 do truc tiep hay chi giu cube.
-- Cube duoc scan bang camera mot lan tu tren, hay robot se xoay cube de chup du 6 mat.
+- Mỗi cụm trượt dùng motor gì: servo góc, servo liên tục, DC gear motor hay stepper.
+- Có cảm biến hành trình/home switch không.
+- Có bao nhiêu kênh servo tổng cộng.
+- Cụm trung tâm dưới mặt bàn có chức năng chính xác là nâng, xoay, hay cả hai.
+- Các đầu kẹp có thể xoay mặt Rubik 90/180 độ trực tiếp hay chỉ giữ cube.
+- Cube được scan bằng camera một lần từ trên, hay robot sẽ xoay cube để chụp đủ 6 mặt.
 
-## Quyet Dinh Thiet Ke Trong Repo
+## Quyết Định Thiết Kế Trong Repo
 
-Theo ban ve, repo se uu tien phuong an:
+Theo bản vẽ, repo sẽ ưu tiên phương án:
 
-- Camera co dinh tren cao.
-- Bon cum actuator cheo quanh cube.
-- STM32 dieu khien actuator theo state machine.
-- RPi van giu vai tro vision, solver, tao de bai, huong dan giai va motion planning.
-- Giao thuc UART mo rong dan tu lenh debug `SERVO` sang cac lenh high-level nhu `ACTUATOR`, `CLAMP`, `TURN`, `SCAN_POSE`.
-
+- Camera cố định trên cao.
+- Bốn cụm actuator chéo quanh cube.
+- STM32 điều khiển actuator theo state machine.
+- RPi vẫn giữ vai trò vision, solver, tạo đề bài, hướng dẫn giải và motion planning.
+- Giao thức UART mở rộng dần từ lệnh debug `SERVO` sang các lệnh high-level như `ACTUATOR`, `CLAMP`, `TURN`, `SCAN_POSE`.

@@ -1,32 +1,32 @@
 # Rubik RPi STM32 Solver
 
-He thong giai Rubik 3x3x3 dung Raspberry Pi 4 de xu ly anh va tim loi giai, STM32 de dieu khien servo/driver co cau kep xoay.
+Hệ thống giải Rubik 3x3x3 dùng Raspberry Pi 4 để xử lý ảnh và tìm lời giải, STM32 để điều khiển servo/driver cơ cấu kẹp xoay.
 
-## Muc Tieu
+## Mục Tiêu
 
-- Ghi nhan 6 mat Rubik bang camera.
-- Phan loai mau va chuan hoa trang thai cube theo dinh dang solver.
-- Kiem tra trang thai hop le truoc khi giai.
-- Tim chuoi buoc giai bang solver 2-phase/Kociemba.
-- Bien chuoi buoc `R U R' U' ...` thanh lenh servo/motion.
-- Gui lenh tu Raspberry Pi 4 sang STM32 qua UART.
-- STM32 dieu khien servo theo chuoi lenh an toan, co ACK/NACK va trang thai loi.
+- Ghi nhận 6 mặt Rubik bằng camera.
+- Phân loại màu và chuẩn hóa trạng thái cube theo định dạng solver.
+- Kiểm tra trạng thái hợp lệ trước khi giải.
+- Tìm chuỗi bước giải bằng solver 2-phase/Kociemba.
+- Biến chuỗi bước `R U R' U' ...` thành lệnh servo/motion.
+- Gửi lệnh từ Raspberry Pi 4 sang STM32 qua UART.
+- STM32 điều khiển servo theo chuỗi lệnh an toàn, có ACK/NACK và trạng thái lỗi.
 
-## Chuc Nang Bat Buoc
+## Chức Năng Bắt Buộc
 
-1. Giai Rubik 3x3x3 tu dong.
-   - He thong tu scan trang thai Rubik, tim loi giai, lap ke hoach chuyen dong va dieu khien servo de giai cube.
+1. Giải Rubik 3x3x3 tự động.
+   - Hệ thống tự scan trạng thái Rubik, tìm lời giải, lập kế hoạch chuyển động và điều khiển servo để giải cube.
 
-2. Tao de bai tron Rubik theo muc do.
-   - Phan mem sinh chuoi tron Rubik theo cac cap do, vi du de, trung binh, kho.
-   - Moi de bai can luu duoc scramble, trang thai cube sau khi tron va dap an giai.
+2. Tạo đề bài trộn Rubik theo mức độ.
+   - Phần mềm sinh chuỗi trộn Rubik theo các cấp độ, ví dụ dễ, trung bình, khó.
+   - Mỗi đề bài cần lưu được scramble, trạng thái cube sau khi trộn và đáp án giải.
 
-3. Huong dan giai va hien thi cac buoc giai Rubik cho nguoi choi.
-   - Giao dien/CLI hien thi tung buoc giai theo ky hieu Rubik.
-   - Co the hien thi mo ta de hieu cho nguoi moi, vi du xoay mat nao, theo chieu nao, bao nhieu lan.
-   - Chuc nang nay dung chung solver voi che do giai tu dong, nhung dau ra la huong dan cho nguoi choi thay vi lenh servo.
+3. Hướng dẫn giải và hiển thị các bước giải Rubik cho người chơi.
+   - Giao diện/CLI hiển thị từng bước giải theo ký hiệu Rubik.
+   - Có thể hiển thị mô tả dễ hiểu cho người mới, ví dụ xoay mặt nào, theo chiều nào, bao nhiêu lần.
+   - Chức năng này dùng chung solver với chế độ giải tự động, nhưng đầu ra là hướng dẫn cho người chơi thay vì lệnh servo.
 
-## Kien Truc Nhanh
+## Kiến Trúc Nhanh
 
 ```text
 Camera
@@ -40,19 +40,19 @@ Camera
       -> Command parser
       -> Servo scheduler
       -> Safety timeout / homing
-  -> Servo + co cau kep/xoay Rubik
+  -> Servo + cơ cấu kẹp/xoay Rubik
 ```
 
-## Cau Truc Repo
+## Cấu Trúc Repo
 
 ```text
-docs/                   Tai lieu plan, kien truc, giao tiep, pipeline CV
-rpi/                    Code chay tren Raspberry Pi 4
+docs/                   Tài liệu plan, kiến trúc, giao tiếp, pipeline CV
+rpi/                    Code chạy trên Raspberry Pi 4
 firmware/stm32cubeide/  Firmware STM32 theo workflow STM32CubeIDE/CubeMX
-mechanical/             Ghi chu co khi, calibration va test motion
-technical drawing/      Anh ban ve/CAD cua thiet ke co khi hien tai
-calibration/            Noi luu thong so mau/servo theo phan cung thuc
-scripts/                Script tien ich cho demo/test
+mechanical/             Ghi chú cơ khí, calibration và test motion
+technical drawing/      Ảnh bản vẽ/CAD của thiết kế cơ khí hiện tại
+calibration/            Nơi lưu thông số màu/servo theo phần cứng thực
+scripts/                Script tiện ích cho demo/test
 ```
 
 ## Quick Start Cho Raspberry Pi
@@ -66,7 +66,7 @@ python -m rubik_robot.main --mode demo
 pytest
 ```
 
-Tren Windows PowerShell:
+Trên Windows PowerShell:
 
 ```powershell
 cd rpi
@@ -77,13 +77,13 @@ python -m rubik_robot.main --mode demo
 pytest
 ```
 
-Theo mapping co khi moi, CLI mac dinh xuat lenh xoay mat bang `TURN`. Neu muon test firmware cu voi lenh `MOVE`:
+Theo mapping cơ khí mới, CLI mặc định xuất lệnh xoay mặt bằng `TURN`. Nếu muốn test firmware cũ với lệnh `MOVE`:
 
 ```bash
 python -m rubik_robot.main --mode demo --face-turn-command MOVE
 ```
 
-Neu muon cai package o che do editable:
+Nếu muốn cài package ở chế độ editable:
 
 ```bash
 cd rpi
@@ -93,9 +93,9 @@ rubik-robot --mode demo
 
 ## Quick Start Cho STM32CubeIDE
 
-Firmware duoc to chuc theo STM32CubeIDE/CubeMX. Tao project CubeIDE, cau hinh UART + TIM PWM, sau do copy `firmware/stm32cubeide/App` vao project.
+Firmware được tổ chức theo STM32CubeIDE/CubeMX. Tạo project CubeIDE, cấu hình UART + TIM PWM, sau đó copy `firmware/stm32cubeide/App` vào project.
 
-Mac dinh firmware nhan frame UART dang ASCII:
+Mặc định firmware nhận frame UART dạng ASCII:
 
 ```text
 MOVE U 1 400
@@ -104,24 +104,23 @@ HOME
 PING
 ```
 
-Xem chi tiet trong [docs/CUBEIDE_SETUP.md](docs/CUBEIDE_SETUP.md) va [docs/UART_PROTOCOL.md](docs/UART_PROTOCOL.md).
+Xem chi tiết trong [docs/CUBEIDE_SETUP.md](docs/CUBEIDE_SETUP.md) và [docs/UART_PROTOCOL.md](docs/UART_PROTOCOL.md).
 
 ## Roadmap
 
-1. Demo pipeline bang anh mau tinh: nhan dien 54 stickers va sinh cube string.
-2. Giai cube string bang solver va in chuoi buoc.
-3. Mo phong motion planner, dem so thao tac servo.
-4. Chay UART loopback RPi <-> STM32.
-5. Dieu khien tung servo rieng, calibration goc.
-6. Chay full cycle voi Rubik that.
+1. Demo pipeline bằng ảnh mẫu tĩnh: nhận diện 54 stickers và sinh cube string.
+2. Giải cube string bằng solver và in chuỗi bước.
+3. Mô phỏng motion planner, đếm số thao tác servo.
+4. Chạy UART loopback RPi <-> STM32.
+5. Điều khiển từng servo riêng, calibration góc.
+6. Chạy full cycle với Rubik thật.
 
-Chi tiet nam trong [docs/PLAN.md](docs/PLAN.md).
+Chi tiết nằm trong [docs/PLAN.md](docs/PLAN.md).
 
-Danh sach vat tu goi y nam trong [docs/BOM.md](docs/BOM.md).
+Danh sách vật tư gợi ý nằm trong [docs/BOM.md](docs/BOM.md).
 
-Thiet ke co khi theo ban ve CAD duoc tong hop trong [docs/MECHANICAL_DESIGN.md](docs/MECHANICAL_DESIGN.md) va mapping actuator trong [docs/ACTUATOR_MAPPING.md](docs/ACTUATOR_MAPPING.md).
+Thiết kế cơ khí theo bản vẽ CAD được tổng hợp trong [docs/MECHANICAL_DESIGN.md](docs/MECHANICAL_DESIGN.md) và mapping actuator trong [docs/ACTUATOR_MAPPING.md](docs/ACTUATOR_MAPPING.md).
 
-## Trang Thai Hien Tai
+## Trạng Thái Hiện Tại
 
-Repo nay la bo khung ban dau cho do an. Code Python co demo solver/motion/protocol, firmware STM32 co parser lenh co ban. Cac thong so camera, mau, servo va co khi can duoc calibration theo phan cung thuc te.
-
+Repo này là bộ khung ban đầu cho đồ án. Code Python có demo solver/motion/protocol, firmware STM32 có parser lệnh cơ bản. Các thông số camera, màu, servo và cơ khí cần được calibration theo phần cứng thực tế.

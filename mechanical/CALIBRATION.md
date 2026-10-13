@@ -1,45 +1,44 @@
-# Calibration Co Khi Va Servo
+# Calibration Cơ Khí Và Servo
 
-## Bang Servo
+## Bảng Servo
 
-Cap nhat bang nay sau khi lap phan cung. Theo ban ve CAD hien tai, nen tach actuator thanh cum truot, dau tac dong va cum trung tam thay vi chi dat ten servo 0-5.
+Cập nhật bảng này sau khi lắp phần cứng. Theo bản vẽ CAD hiện tại, nên tách actuator thành cụm trượt, đầu tác động và cụm trung tâm thay vì chỉ đặt tên servo 0-5.
 
-| Channel | Chuc Nang | Home us | Min us | Max us | Ghi Chu |
+| Channel | Chức Năng | Home us | Min us | Max us | Ghi Chú |
 |---|---|---:|---:|---:|---|
-| 0 | carriage_nw hoac tool_nw | 1500 | 1000 | 2000 | TBD |
-| 1 | carriage_ne hoac tool_ne | 1500 | 1000 | 2000 | TBD |
-| 2 | carriage_sw hoac tool_sw | 1500 | 1000 | 2000 | TBD |
-| 3 | carriage_se hoac tool_se | 1500 | 1000 | 2000 | TBD |
+| 0 | carriage_nw hoặc tool_nw | 1500 | 1000 | 2000 | TBD |
+| 1 | carriage_ne hoặc tool_ne | 1500 | 1000 | 2000 | TBD |
+| 2 | carriage_sw hoặc tool_sw | 1500 | 1000 | 2000 | TBD |
+| 3 | carriage_se hoặc tool_se | 1500 | 1000 | 2000 | TBD |
 | 4 | center_lift | 1500 | 1000 | 2000 | optional/TBD |
 | 5 | center_rotate | 1500 | 1000 | 2000 | optional/TBD |
 
-Xem them [docs/ACTUATOR_MAPPING.md](../docs/ACTUATOR_MAPPING.md).
+Xem thêm [docs/ACTUATOR_MAPPING.md](../docs/ACTUATOR_MAPPING.md).
 
-## Quy Trinh Calibration
+## Quy Trình Calibration
 
-1. Thao Rubik ra khoi robot.
-2. Gui `SERVO <channel> 1500 300`.
-3. Tim gioi han co khi an toan bang buoc nho 20-50 us.
-4. Ghi lai `min`, `home`, `max`.
-5. Lap Rubik vao va thu grip/release voi toc do cham.
-6. Test quay 90 do, sau do 180 do.
-7. Ghi lai thoi gian toi thieu khong truot cube.
+1. Tháo Rubik ra khỏi robot.
+2. Gửi `SERVO <channel> 1500 300`.
+3. Tìm giới hạn cơ khí an toàn bằng bước nhỏ 20-50 us.
+4. Ghi lại `min`, `home`, `max`.
+5. Lắp Rubik vào và thử grip/release với tốc độ chậm.
+6. Test quay 90 độ, sau đó 180 độ.
+7. Ghi lại thời gian tối thiểu không trượt cube.
 
-## Calibration Cho 4 Cum Truot Cheo
+## Calibration Cho 4 Cụm Trượt Chéo
 
-1. Thao Rubik ra khoi ban may.
-2. Home tung cum truot, ghi lai vi tri an toan.
-3. Cho cum truot tien vao cham, dung truoc khi dau tac dong cham vao cube.
-4. Lap Rubik vao, test `approach` voi toc do cham.
-5. Danh dau 3 vi tri:
-   - `home`: lui het ve an toan.
-   - `approach`: gan cube nhung chua tao luc lon.
-   - `engaged`: du giu/xoay mat cube.
-6. Lap lai cho `carriage_nw`, `carriage_ne`, `carriage_sw`, `carriage_se`.
+1. Tháo Rubik ra khỏi bàn máy.
+2. Home từng cụm trượt, ghi lại vị trí an toàn.
+3. Cho cụm trượt tiến vào chậm, dừng trước khi đầu tác động chạm vào cube.
+4. Lắp Rubik vào, test `approach` với tốc độ chậm.
+5. Đánh dấu 3 vị trí:
+   - `home`: lùi hết về an toàn.
+   - `approach`: gần cube nhưng chưa tạo lực lớn.
+   - `engaged`: đủ giữ/xoay mặt cube.
+6. Lặp lại cho `carriage_nw`, `carriage_ne`, `carriage_sw`, `carriage_se`.
 
-Neu co limit switch, moi cum truot phai home thanh cong truoc khi cho phep chay solver.
+Nếu có limit switch, mỗi cụm trượt phải home thành công trước khi cho phép chạy solver.
 
-## Luu Y Nguon
+## Lưu Ý Nguồn
 
-Khong cap servo truc tiep tu chan 5V cua Raspberry Pi. Servo can nguon rieng, dong du lon. GND cua nguon servo, STM32 va Raspberry Pi phai noi chung.
-
+Không cấp servo trực tiếp từ chân 5V của Raspberry Pi. Servo cần nguồn riêng, dòng đủ lớn. GND của nguồn servo, STM32 và Raspberry Pi phải nối chung.

@@ -1,4 +1,4 @@
-# Kien Truc He Thong
+# Kiến Trúc Hệ Thống
 
 ## Data Flow
 
@@ -14,35 +14,35 @@ capture images
   -> STM32 servo scheduler
 ```
 
-## Co Khi Theo Ban Ve Hien Tai
+## Cơ Khí Theo Bản Vẽ Hiện Tại
 
-Theo cac anh CAD trong `technical drawing/`, he thong nen duoc coi la robot co:
+Theo các ảnh CAD trong `technical drawing/`, hệ thống nên được coi là robot có:
 
-- Camera co dinh tren khung nhom, nhin tu tren xuong.
-- 4 cum actuator truot cheo quanh Rubik.
-- Cum giu/xoay gan cube.
-- Cum trung tam duoi mat ban co kha nang nang/xoay/dinh vi.
+- Camera cố định trên khung nhôm, nhìn từ trên xuống.
+- 4 cụm actuator trượt chéo quanh Rubik.
+- Cụm giữ/xoay gần cube.
+- Cụm trung tâm dưới mặt bàn có khả năng nâng/xoay/định vị.
 
-Vi vay kien truc dieu khien nen tach thanh 2 lop:
+Vì vậy kiến trúc điều khiển nên tách thành 2 lớp:
 
-1. `cube move planner`: xu ly cac buoc Rubik `U R F D L B`.
-2. `machine action planner`: chuyen cac buoc Rubik thanh action theo actuator thuc te nhu `approach`, `clamp`, `turn`, `release`, `retract`.
+1. `cube move planner`: xử lý các bước Rubik `U R F D L B`.
+2. `machine action planner`: chuyển các bước Rubik thành action theo actuator thực tế như `approach`, `clamp`, `turn`, `release`, `retract`.
 
-Chi tiet nam trong [MECHANICAL_DESIGN.md](MECHANICAL_DESIGN.md) va [ACTUATOR_MAPPING.md](ACTUATOR_MAPPING.md).
+Chi tiết nằm trong [MECHANICAL_DESIGN.md](MECHANICAL_DESIGN.md) và [ACTUATOR_MAPPING.md](ACTUATOR_MAPPING.md).
 
 ## Raspberry Pi 4
 
 ### Vision
 
-Trach nhiem:
+Trách nhiệm:
 
-- Lay anh tu camera.
-- Cat vung Rubik.
-- Lay mau trung binh cua 9 sticker.
-- Phan loai mau theo calibration.
-- Sinh cube string theo thu tu solver.
+- Lấy ảnh từ camera.
+- Cắt vùng Rubik.
+- Lấy màu trung bình của 9 sticker.
+- Phân loại màu theo calibration.
+- Sinh cube string theo thứ tự solver.
 
-File lien quan:
+File liên quan:
 
 - `rpi/rubik_robot/vision/capture.py`
 - `rpi/rubik_robot/vision/color_classifier.py`
@@ -50,56 +50,56 @@ File lien quan:
 
 ### Solver
 
-Trach nhiem:
+Trách nhiệm:
 
-- Nhan cube string 54 ky tu.
-- Kiem tra format co ban.
-- Goi solver Kociemba neu thu vien co san.
-- Co fallback demo neu chua cai solver.
+- Nhận cube string 54 ký tự.
+- Kiểm tra format cơ bản.
+- Gọi solver Kociemba nếu thư viện có sẵn.
+- Có fallback demo nếu chưa cài solver.
 
-File lien quan:
+File liên quan:
 
 - `rpi/rubik_robot/solver/kociemba_solver.py`
 
 ### Motion Planner
 
-Trach nhiem:
+Trách nhiệm:
 
-- Chuyen cube moves thanh robot actions.
-- Uoc luong cost cho tung chuoi action.
-- La noi mo rong de toi uu "huong giai nhanh nhat" theo co khi thuc te.
-- Voi ban ve hien tai, motion planner phai tinh them cost cho 4 cum truot cheo va cum trung tam, khong chi dem so buoc Rubik.
+- Chuyển cube moves thành robot actions.
+- Ước lượng cost cho từng chuỗi action.
+- Là nơi mở rộng để tối ưu "hướng giải nhanh nhất" theo cơ khí thực tế.
+- Với bản vẽ hiện tại, motion planner phải tính thêm cost cho 4 cụm trượt chéo và cụm trung tâm, không chỉ đếm số bước Rubik.
 
-File lien quan:
+File liên quan:
 
 - `rpi/rubik_robot/motion/planner.py`
 
 ### Transport
 
-Trach nhiem:
+Trách nhiệm:
 
-- Dong goi lenh ASCII.
-- Gui qua UART.
-- Doi ACK/NACK va retry.
+- Đóng gói lệnh ASCII.
+- Gửi qua UART.
+- Đợi ACK/NACK và retry.
 
-File lien quan:
+File liên quan:
 
 - `rpi/rubik_robot/transport/serial_link.py`
 - `rpi/rubik_robot/protocol.py`
 
 ## STM32
 
-STM32 nen chi lam cac viec thoi gian thuc, don gian va chac chan:
+STM32 nên chỉ làm các việc thời gian thực, đơn giản và chắc chắn:
 
-- Nhan lenh UART.
-- Parse lenh.
-- Dieu khien PWM servo.
-- Quan ly trang thai `IDLE`, `BUSY`, `ERROR`, `STOPPED`.
-- Tra loi `OK`, `ERR`, `DONE`.
+- Nhận lệnh UART.
+- Parse lệnh.
+- Điều khiển PWM servo.
+- Quản lý trạng thái `IDLE`, `BUSY`, `ERROR`, `STOPPED`.
+- Trả lời `OK`, `ERR`, `DONE`.
 
-Khong nen dua solver hoac xu ly anh vao STM32.
+Không nên đưa solver hoặc xử lý ảnh vào STM32.
 
-## Chuoi Trang Thai De Xuat
+## Chuỗi Trạng Thái Đề Xuất
 
 ```text
 BOOT
@@ -111,20 +111,19 @@ BOOT
   -> ERROR or STOPPED
 ```
 
-## Toi Uu Huong Giai Nhanh
+## Tối Ưu Hướng Giải Nhanh
 
-Kociemba toi uu so buoc cube, nhung robot can toi uu thoi gian co khi. Nen tach thanh 2 tang:
+Kociemba tối ưu số bước cube, nhưng robot cần tối ưu thời gian cơ khí. Nên tách thành 2 tầng:
 
-1. Solver sinh mot hoac nhieu solution ung vien.
-2. Motion planner tinh cost robot cho tung solution/hurong dat cube.
+1. Solver sinh một hoặc nhiều solution ứng viên.
+2. Motion planner tính cost robot cho từng solution/hướng đặt cube.
 
-Cost co the gom:
+Cost có thể gồm:
 
-- So lan reorient cube.
-- So lan grip/release.
-- Tong goc quay servo.
-- Delay an toan.
-- Penalty cho mat kho thao tac.
+- Số lần reorient cube.
+- Số lần grip/release.
+- Tổng góc quay servo.
+- Delay an toàn.
+- Penalty cho mặt khó thao tác.
 
-Ban dau co the chon solution dau tien. Khi co hardware that, cap nhat cost model theo thoi gian do duoc.
-
+Ban đầu có thể chọn solution đầu tiên. Khi có hardware thật, cập nhật cost model theo thời gian đo được.
