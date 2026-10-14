@@ -11,6 +11,11 @@
 
 ## Lệnh
 
+Firmware hiện tại yêu cầu profile PWM thực tế trước khi khởi động servo. Thiếu
+profile sẽ báo `ERR CONFIG servo_not_ready`. `MOVE`, `TURN`, `SCAN_POSE` chưa có
+sequence cơ khí và trả `ERR UNSUPPORTED`, không phát `DONE`. Các ví dụ hoàn tất
+chuyển động bên dưới mô tả giao thức khi sequence đã được triển khai.
+
 ### PING
 
 ```text
@@ -78,6 +83,10 @@ SERVO 0 1500 300
 ```
 
 ### STOP
+
+Khóa lệnh servo mới và giữ PWM cuối; servo có thể vẫn đi tới đích đã nhận.
+Đây không phải dừng khẩn cấp. Gọi `HOME` để bỏ khóa và phát lệnh home.
+Snippet xử lý lệnh trong vòng lặp, nên STOP phải chờ các `HAL_Delay` hiện tại kết thúc.
 
 ```text
 STOP
@@ -186,6 +195,8 @@ Code đề xuất:
 - `BUSY`: STM32 đang thực thi.
 - `LIMIT`: góc servo vượt giới hạn.
 - `TIMEOUT`: action quá thời gian an toàn.
+- `CONFIG`: thiếu/sai cấu hình servo hoặc khởi động PWM thất bại.
+- `UNSUPPORTED`: chưa có sequence chuyển động cho lệnh.
 
 ## Nâng Cấp Sau
 

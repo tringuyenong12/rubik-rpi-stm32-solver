@@ -35,4 +35,12 @@ SCAN_POSE <face>
 STOP
 ```
 
-`MOVE` và `SERVO` dùng để bring-up/debug. Khi tích hợp theo bản vẽ cơ khí, ưu tiên dùng `ACTUATOR`, `CLAMP`, `TURN` và `SCAN_POSE`.
+Trước khi bật PWM, cấu hình từng timer/kênh và profile bằng số đo thực tế theo
+[hướng dẫn servo](App/SERVO_CONTROLLER_GUIDE.md). Chưa có profile thì snippet báo
+`ERR CONFIG servo_not_ready`; không tự đưa servo về 1500 µs.
+
+`SERVO`, `ACTUATOR`, `CLAMP` dùng các profile đã cấu hình. `MOVE`, `TURN` và
+`SCAN_POSE` hiện trả `ERR UNSUPPORTED` vì chưa có sequence cơ khí. `STOP` chỉ khóa
+lệnh mới và giữ PWM cuối, không phải dừng khẩn cấp.
+
+Kiểm thử driver với HAL giả lập từ thư mục gốc: `python firmware/tests/run_tests.py`.
