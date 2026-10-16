@@ -1,130 +1,75 @@
 /*
- * Day la snippet de chen vao Core/Src/main.c do STM32CubeIDE sinh ra.
- * Khong copy file nay de thay the main.c nguyen file.
+ * Insert these blocks into the matching USER CODE regions of Core/Src/main.c.
+ * This is for STM32F411CEU6 USART2 (PA2/PA3) and the 8-servo mechanism.
+ * Do not replace a CubeMX-generated main.c with this file.
  */
 
 /* USER CODE BEGIN Includes */
-#include "rubik_protocol.h"
-#include "servo_controller.h"
+#include "rubik_binary_protocol.h"
+#include "rubik_motion.h"
 /* USER CODE END Includes */
 
+/* USER CODE BEGIN PFP */
+/* This function is supplied by the project's PWM/PCA9685 servo driver.
+ * It must accept indexes 0..7 and angles 0..180 degrees. */
+extern void servoAngle(int servo_index, int angle_deg);
+/* USER CODE END PFP */
+
 /* USER CODE BEGIN PV */
-static RubikProtocol rubik_protocol;
-static ServoController servo_controller;
+static RubikBinaryProtocol rubik_protocol;
 /* USER CODE END PV */
 
-/*
- * Trong main(), sau MX_USARTx_UART_Init() va MX_TIMx_Init().
- * Neu ban dung USART2/TIM3, doi huart1/htim2 thanh handle tuong ung.
- */
+/* In main(), after MX_USART2_UART_Init() and after the servo driver init: */
 /* USER CODE BEGIN 2 */
-RubikProtocol_Init(&rubik_protocol, &huart1);
-ServoController_Init(&servo_controller, &htim2);
-ServoController_Start(&servo_controller);
-RubikProtocol_StartReceive(&rubik_protocol);
-RubikProtocol_SendLine(&rubik_protocol, "OK BOOT");
+RubikMotion_Init(servoAngle);
+RubikBinaryProtocol_Init(&rubik_protocol, &huart2);
+RubikBinaryProtocol_StartReceive(&rubik_protocol);
 /* USER CODE END 2 */
 
-/*
- * Trong while (1), thay noi dung block USER CODE WHILE bang vong lap nay.
- */
+/* Replace the body in USER CODE BEGIN WHILE with this loop. */
 /* USER CODE BEGIN WHILE */
 while (1)
 {
-    RubikCommand command;
-    if (RubikProtocol_ReadCommand(&rubik_protocol, &command)) {
-        switch (command.type) {
-        case RUBIK_CMD_PING:
-            RubikProtocol_SendLine(&rubik_protocol, "OK PONG");
-            break;
+    uint8_t sequence;
+    uint8_t command;
 
-        case RUBIK_CMD_HOME:
-            RubikProtocol_SendLine(&rubik_protocol, "OK HOME");
-            ServoController_Home(&servo_controller);
-            HAL_Delay(500);
-            RubikProtocol_SendLine(&rubik_protocol, "DONE HOME");
-            break;
-
-        case RUBIK_CMD_STOP:
-            ServoController_Stop(&servo_controller);
-            RubikProtocol_SendLine(&rubik_protocol, "OK STOP");
-            break;
-
-        case RUBIK_CMD_SERVO:
-            if (ServoController_WriteUs(&servo_controller, command.channel, command.pulse_us)) {
-                RubikProtocol_SendLine(&rubik_protocol, "OK SERVO");
-                HAL_Delay(command.duration_ms);
-                RubikProtocol_SendLine(&rubik_protocol, "DONE SERVO");
+    if (RubikBinaryProtocol_TakeCommand(&rubik_protocol, &sequence, &command)) {
+        if (!RubikMotion_IsSupported(command)) {
+            RubikBinaryProtocol_SendStatus(&rubik_protocol, sequence, RUBIK_UART_ERROR);
+            RubikBinaryProtocol_AbortActive(&rubik_protocol);
+        } else {
+            /* ACK is sent before motion; DONE is sent only after every servo
+             * delay in the move has finished. */
+            RubikBinaryProtocol_SendStatus(&rubik_protocol, sequence, RUBIK_UART_ACK);
+            if (RubikMotion_Execute(command)) {
+                RubikBinaryProtocol_MarkCompleted(&rubik_protocol, sequence, command);
+                RubikBinaryProtocol_SendStatus(&rubik_protocol, sequence, RUBIK_UART_DONE);
             } else {
-                RubikProtocol_SendError(&rubik_protocol, "LIMIT", "servo_range");
+                RubikBinaryProtocol_SendStatus(&rubik_protocol, sequence, RUBIK_UART_ERROR);
+                RubikBinaryProtocol_AbortActive(&rubik_protocol);
             }
-            break;
-
-        case RUBIK_CMD_MOVE:
-            if (ServoController_MoveFace(&servo_controller, command.face, command.turns, command.duration_ms)) {
-                RubikProtocol_SendLine(&rubik_protocol, "OK MOVE");
-                RubikProtocol_SendLine(&rubik_protocol, "DONE MOVE");
-            } else {
-                RubikProtocol_SendError(&rubik_protocol, "BAD_ARG", "move");
-            }
-            break;
-
-        case RUBIK_CMD_ACTUATOR:
-            /*
-             * Placeholder cho 4 cum truot cheo va cum trung tam.
-             * Sau khi chot motor/driver, map command.role + command.target
-             * sang stepper/DC/servo sequence that.
-             */
-            RubikProtocol_SendLine(&rubik_protocol, "OK ACTUATOR");
-            HAL_Delay(command.duration_ms);
-            RubikProtocol_SendLine(&rubik_protocol, "DONE ACTUATOR");
-            break;
-
-        case RUBIK_CMD_CLAMP:
-            /*
-             * Placeholder cho tool_nw/tool_ne/tool_sw/tool_se open/close.
-             */
-            RubikProtocol_SendLine(&rubik_protocol, "OK CLAMP");
-            RubikProtocol_SendLine(&rubik_protocol, "DONE CLAMP");
-            break;
-
-        case RUBIK_CMD_TURN:
-            if (ServoController_MoveFace(&servo_controller, command.face, command.turns, command.duration_ms)) {
-                RubikProtocol_SendLine(&rubik_protocol, "OK TURN");
-                RubikProtocol_SendLine(&rubik_protocol, "DONE TURN");
-            } else {
-                RubikProtocol_SendError(&rubik_protocol, "BAD_ARG", "turn");
-            }
-            break;
-
-        case RUBIK_CMD_SCAN_POSE:
-            /*
-             * Placeholder de dua cube ve tu the chup mat U/R/F/D/L/B.
-             */
-            RubikProtocol_SendLine(&rubik_protocol, "OK SCAN_POSE");
-            RubikProtocol_SendLine(&rubik_protocol, "DONE SCAN_POSE");
-            break;
-
-        case RUBIK_CMD_ERROR:
-        default:
-            RubikProtocol_SendError(&rubik_protocol, "BAD_CMD", command.error);
-            break;
         }
     }
 
+    /* A duplicate sequence received after a lost DONE is answered with DONE,
+     * not performed a second time. */
+    if (RubikBinaryProtocol_TakeDoneReplay(&rubik_protocol, &sequence)) {
+        RubikBinaryProtocol_SendStatus(&rubik_protocol, sequence, RUBIK_UART_DONE);
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 }
 /* USER CODE END 3 */
 
-/*
- * Them callback nay vao Core/Src/main.c.
- */
 /* USER CODE BEGIN 4 */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    RubikProtocol_OnRxCplt(&rubik_protocol, huart);
+    RubikBinaryProtocol_OnRxCplt(&rubik_protocol, huart);
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+    RubikBinaryProtocol_OnError(&rubik_protocol, huart);
 }
 /* USER CODE END 4 */
-

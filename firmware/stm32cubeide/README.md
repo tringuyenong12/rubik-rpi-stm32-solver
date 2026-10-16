@@ -1,5 +1,10 @@
 # STM32CubeIDE Firmware
 
+> Với STM32F411CEU6, 8 servo, và Raspberry Pi 4, dùng firmware nhị phân mới:
+> [UART binary cho STM32F411](../../docs/STM32F411_UART_BINARY.md). Nó thay thế
+> callback nhận byte cũ bằng frame CRC + ACK/DONE và dùng
+> `Core_Src_main_user_snippet.c` hiện tại.
+
 Thư mục này được thiết kế cho workflow STM32CubeIDE/CubeMX.
 
 ## Cách Dùng

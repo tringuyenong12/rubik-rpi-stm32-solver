@@ -66,6 +66,13 @@ python -m rubik_robot.main --mode demo
 pytest
 ```
 
+Tạo trạng thái trộn 54 ký tự hợp lệ và thực thi chính chuỗi trộn đó qua UART
+nhị phân có ACK/DONE:
+
+```bash
+python -m rubik_robot.main --mode scramble --length 25 --execute --port /dev/serial0
+```
+
 Trên Windows PowerShell:
 
 ```powershell
@@ -92,6 +99,10 @@ rubik-robot --mode demo
 ```
 
 ## Quick Start Cho STM32CubeIDE
+
+Với bộ cơ khí 8 servo và STM32F411CEU6, xem hướng dẫn tích hợp thực tế tại
+[UART binary cho STM32F411](docs/STM32F411_UART_BINARY.md). Pi dùng frame CRC,
+sequence, ACK/DONE; callback UART không trực tiếp xoay servo.
 
 Firmware được tổ chức theo STM32CubeIDE/CubeMX. Tạo project CubeIDE, cấu hình UART + TIM PWM, sau đó copy `firmware/stm32cubeide/App` vào project.
 
