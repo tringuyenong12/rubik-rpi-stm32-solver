@@ -1,6 +1,6 @@
 # UART Protocol RPi <-> STM32
 
-## Cau Hinh Mac Dinh
+## Cấu Hình Mặc Định
 
 - Baudrate: 115200
 - Data bits: 8
@@ -9,7 +9,12 @@
 - Line ending: `\n`
 - Encoding: ASCII/UTF-8
 
-## Lenh
+## Lệnh
+
+Firmware hiện tại yêu cầu profile PWM thực tế trước khi khởi động servo. Thiếu
+profile sẽ báo `ERR CONFIG servo_not_ready`. `MOVE`, `TURN`, `SCAN_POSE` chưa có
+sequence cơ khí và trả `ERR UNSUPPORTED`, không phát `DONE`. Các ví dụ hoàn tất
+chuyển động bên dưới mô tả giao thức khi sequence đã được triển khai.
 
 ### PING
 
@@ -17,7 +22,7 @@
 PING
 ```
 
-Phan hoi:
+Phản hồi:
 
 ```text
 OK PONG
@@ -29,7 +34,7 @@ OK PONG
 HOME
 ```
 
-Phan hoi:
+Phản hồi:
 
 ```text
 OK HOME
@@ -42,13 +47,13 @@ DONE HOME
 MOVE <face> <turns> <duration_ms>
 ```
 
-Trong do:
+Trong đó:
 
 - `face`: `U`, `R`, `F`, `D`, `L`, `B`
-- `turns`: `1` la 90 do thuan, `-1` la 90 do nghich, `2` la 180 do
-- `duration_ms`: thoi gian servo thuc hien action
+- `turns`: `1` là 90 độ thuận, `-1` là 90 độ nghịch, `2` là 180 độ
+- `duration_ms`: thời gian servo thực hiện action
 
-Vi du:
+Ví dụ:
 
 ```text
 MOVE R 1 450
@@ -56,7 +61,7 @@ MOVE U -1 450
 MOVE F 2 700
 ```
 
-Phan hoi:
+Phản hồi:
 
 ```text
 OK MOVE
@@ -65,13 +70,13 @@ DONE MOVE
 
 ### SERVO
 
-Dung cho calibration tung servo.
+Dùng cho calibration từng servo.
 
 ```text
 SERVO <channel> <pulse_us> <duration_ms>
 ```
 
-Vi du:
+Ví dụ:
 
 ```text
 SERVO 0 1500 300
@@ -79,29 +84,33 @@ SERVO 0 1500 300
 
 ### STOP
 
+Khóa lệnh servo mới và giữ PWM cuối; servo có thể vẫn đi tới đích đã nhận.
+Đây không phải dừng khẩn cấp. Gọi `HOME` để bỏ khóa và phát lệnh home.
+Snippet xử lý lệnh trong vòng lặp, nên STOP phải chờ các `HAL_Delay` hiện tại kết thúc.
+
 ```text
 STOP
 ```
 
-Phan hoi:
+Phản hồi:
 
 ```text
 OK STOP
 ```
 
-## Lenh Mo Rong Theo Ban Ve Co Khi
+## Lệnh Mở Rộng Theo Bản Vẽ Cơ Khí
 
-Theo ban ve CAD hien tai, robot co 4 cum truot cheo va cum trung tam. Cac lenh duoi day phu hop hon cho giai doan tich hop co khi.
+Theo bản vẽ CAD hiện tại, robot có 4 cụm trượt chéo và cụm trung tâm. Các lệnh dưới đây phù hợp hơn cho giai đoạn tích hợp cơ khí.
 
 ### ACTUATOR
 
-Di chuyen mot actuator logic den target.
+Di chuyển một actuator logic đến target.
 
 ```text
 ACTUATOR <role> <target> <duration_ms>
 ```
 
-Vi du:
+Ví dụ:
 
 ```text
 ACTUATOR carriage_nw home 800
@@ -109,7 +118,7 @@ ACTUATOR carriage_ne approach 500
 ACTUATOR center_lift scan 700
 ```
 
-Role de xuat:
+Role đề xuất:
 
 - `carriage_nw`
 - `carriage_ne`
@@ -118,7 +127,7 @@ Role de xuat:
 - `center_lift`
 - `center_rotate`
 
-Target de xuat:
+Target đề xuất:
 
 - `home`
 - `approach`
@@ -130,13 +139,13 @@ Target de xuat:
 
 ### CLAMP
 
-Dong/mo dau kep hoac dau tac dong.
+Đóng/mở đầu kẹp hoặc đầu tác động.
 
 ```text
 CLAMP <role> <open|close>
 ```
 
-Vi du:
+Ví dụ:
 
 ```text
 CLAMP tool_nw close
@@ -145,13 +154,13 @@ CLAMP tool_nw open
 
 ### TURN
 
-Lenh xoay mot mat Rubik theo abstraction co khi. `TURN` nen thay the `MOVE` khi bat dau tich hop co khi that.
+Lệnh xoay một mặt Rubik theo abstraction cơ khí. `TURN` nên thay thế `MOVE` khi bắt đầu tích hợp cơ khí thật.
 
 ```text
 TURN <face> <turns> <duration_ms>
 ```
 
-Vi du:
+Ví dụ:
 
 ```text
 TURN R 1 450
@@ -160,36 +169,38 @@ TURN U -1 450
 
 ### SCAN_POSE
 
-Dua cube ve tu the de camera chup mot mat.
+Đưa cube về tư thế để camera chụp một mặt.
 
 ```text
 SCAN_POSE <face>
 ```
 
-Vi du:
+Ví dụ:
 
 ```text
 SCAN_POSE U
 SCAN_POSE F
 ```
 
-## Loi
+## Lỗi
 
 ```text
 ERR <code> <message>
 ```
 
-Code de xuat:
+Code đề xuất:
 
-- `BAD_CMD`: sai lenh.
-- `BAD_ARG`: sai tham so.
-- `BUSY`: STM32 dang thuc thi.
-- `LIMIT`: goc servo vuot gioi han.
-- `TIMEOUT`: action qua thoi gian an toan.
+- `BAD_CMD`: sai lệnh.
+- `BAD_ARG`: sai tham số.
+- `BUSY`: STM32 đang thực thi.
+- `LIMIT`: góc servo vượt giới hạn.
+- `TIMEOUT`: action quá thời gian an toàn.
+- `CONFIG`: thiếu/sai cấu hình servo hoặc khởi động PWM thất bại.
+- `UNSUPPORTED`: chưa có sequence chuyển động cho lệnh.
 
-## Nang Cap Sau
+## Nâng Cấp Sau
 
-ASCII de debug. Khi he thong on dinh, co the them binary frame:
+ASCII để debug. Khi hệ thống ổn định, có thể thêm binary frame:
 
 - Start byte
 - Sequence id
@@ -197,4 +208,3 @@ ASCII de debug. Khi he thong on dinh, co the them binary frame:
 - Payload length
 - Payload
 - CRC16
-
