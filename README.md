@@ -48,11 +48,13 @@ Camera
 ```text
 docs/                   Tài liệu plan, kiến trúc, giao tiếp, pipeline CV
 rpi/                    Code chạy trên Raspberry Pi 4
+  rubik_robot/          Package điều khiển robot chính (Vision, State, Motion, Transport)
+  twophase/             Package giải Rubik 2-Phase thuần Python (Herbert Kociemba) tích hợp sẵn
 firmware/stm32cubeide/  Firmware STM32 theo workflow STM32CubeIDE/CubeMX
 mechanical/             Ghi chú cơ khí, calibration và test motion
 technical drawing/      Ảnh bản vẽ/CAD của thiết kế cơ khí hiện tại
 calibration/            Nơi lưu thông số màu/servo theo phần cứng thực
-scripts/                Script tiện ích cho demo/test
+scripts/                Script tiện ích cho demo/test (demo_pipeline.py, run_vision_gui.py)
 ```
 
 ## Quick Start Cho Raspberry Pi
@@ -63,7 +65,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m rubik_robot.main --mode demo
-pytest
+python -m unittest discover tests
 ```
 
 Trên Windows PowerShell:
@@ -74,7 +76,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python -m rubik_robot.main --mode demo
-pytest
+python -m unittest discover tests
 ```
 
 Theo mapping cơ khí mới, CLI mặc định xuất lệnh xoay mặt bằng `TURN`. Nếu muốn test firmware cũ với lệnh `MOVE`:
