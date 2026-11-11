@@ -1,2 +1,0 @@
-"""Computer vision pipeline."""
-
