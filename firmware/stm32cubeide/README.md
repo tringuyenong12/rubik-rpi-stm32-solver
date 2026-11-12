@@ -36,3 +36,7 @@ STOP
 ```
 
 `MOVE` và `SERVO` dùng để bring-up/debug. Khi tích hợp theo bản vẽ cơ khí, ưu tiên dùng `ACTUATOR`, `CLAMP`, `TURN` và `SCAN_POSE`.
+
+## Project STM32F411 + PCA9685
+
+Mo project [rubik_stm32_ver1](rubik_stm32_ver1/README.md) de dung firmware tu nhanh `stm32_firmware`. Project co san Core, Drivers, Hardware va file CubeMX. Parser hien nhan `#ID TEST_RUBIK MOVE R` va cac mat dao dung hau to `_`. Can dong bo giao thuc va ACK voi Raspberry Pi truoc khi chay tu dong end-to-end.
