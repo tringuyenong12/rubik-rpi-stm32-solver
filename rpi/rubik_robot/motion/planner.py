@@ -48,7 +48,7 @@ class MotionPlanner:
             raise ValueError(f"Invalid move face: {token}")
         if suffix == "":
             return face, 1
-        if suffix == "'":
+        if suffix in {"'", "_"}:
             return face, -1
         if suffix == "2":
             return face, 2

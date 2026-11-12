@@ -93,18 +93,17 @@ rubik-robot --mode demo
 
 ## Quick Start Cho STM32CubeIDE
 
-Firmware được tổ chức theo STM32CubeIDE/CubeMX. Tạo project CubeIDE, cấu hình UART + TIM PWM, sau đó copy `firmware/stm32cubeide/App` vào project.
+Import project có sẵn tại `firmware/stm32cubeide` vào STM32CubeIDE. Project dùng STM32F411CEUx, I2C1 + PCA9685 và USART1. Xem [hướng dẫn firmware](firmware/stm32cubeide/README.md).
 
-Mặc định firmware nhận frame UART dạng ASCII:
+Frame UART dùng ASCII, kết thúc bằng LF hoặc CRLF, có phản hồi cùng tag.
 
 ```text
-MOVE U 1 400
-MOVE R -1 400
-HOME
-PING
+#1 RUBIK PING
+#2 RUBIK TURN R 1 450
+#3 RUBIK MOVE R_ -1 450
 ```
 
-Xem chi tiết trong [docs/CUBEIDE_SETUP.md](docs/CUBEIDE_SETUP.md) và [docs/UART_PROTOCOL.md](docs/UART_PROTOCOL.md).
+PING trả ACK, chuyển động thành công trả ACK rồi DONE. Các chuỗi U đảo và D chưa hoàn thiện trả NACK. Xem [giao thức UART](docs/UART_PROTOCOL.md).
 
 ## Roadmap
 
@@ -124,7 +123,3 @@ Thiết kế cơ khí theo bản vẽ CAD được tổng hợp trong [docs/MECH
 ## Trạng Thái Hiện Tại
 
 Repo này là bộ khung ban đầu cho đồ án. Code Python có demo solver/motion/protocol, firmware STM32 có parser lệnh cơ bản. Các thông số camera, màu, servo và cơ khí cần được calibration theo phần cứng thực tế.
-
-## Project STM32F411 tu nhanh stm32_firmware
-
-Project STM32CubeIDE cho STM32F411 + PCA9685 nam tai [firmware/stm32cubeide/rubik_stm32_ver1](firmware/stm32cubeide/rubik_stm32_ver1/README.md). Huong dan import, wiring, lenh UART va gioi han kiem thu nam trong README cua project.

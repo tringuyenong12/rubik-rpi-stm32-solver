@@ -6,7 +6,7 @@ def test_plan_parses_standard_moves():
 
     assert [action.to_wire() for action in actions] == [
         "MOVE R 1 100",
-        "MOVE U -1 100",
+        "MOVE U_ -1 100",
         "MOVE F 2 200",
     ]
 
@@ -16,7 +16,7 @@ def test_plan_can_emit_turn_commands_for_mechanical_protocol():
 
     assert [action.to_wire() for action in actions] == [
         "TURN R 1 100",
-        "TURN U -1 100",
+        "TURN U_ -1 100",
         "TURN F 2 200",
     ]
 

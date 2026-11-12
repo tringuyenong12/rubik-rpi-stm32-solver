@@ -14,7 +14,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Rubik solver robot controller")
     parser.add_argument(
         "--mode",
-        choices=["demo", "solve", "send"],
+        choices=["demo", "solve", "send", "connect"],
         default="demo",
         help="demo: print pipeline, solve: solve cube string, send: send commands over UART",
     )
@@ -52,6 +52,7 @@ def run_send(cube: str, port: str, baudrate: int, duration_ms: int, face_turn_co
     actions = planner.plan(solution)
 
     with SerialLink(port=port, baudrate=baudrate, timeout_s=2.0) as link:
+        print("KET NOI THANH CONG: Raspberry Pi <-> STM32")
         print(link.request(Command("PING")))
         print(link.request(Command("HOME")))
         for action in actions:
@@ -63,8 +64,16 @@ def main() -> None:
     args = build_parser().parse_args()
     if args.mode in {"demo", "solve"}:
         run_demo(args.cube, args.duration_ms, args.face_turn_command)
-    elif args.mode == "send":
-        run_send(args.cube, args.port, args.baudrate, args.duration_ms, args.face_turn_command)
+    else:
+        try:
+            if args.mode == "connect":
+                with SerialLink(port=args.port, baudrate=args.baudrate):
+                    print("KET NOI THANH CONG: Raspberry Pi <-> STM32")
+            elif args.mode == "send":
+                run_send(args.cube, args.port, args.baudrate, args.duration_ms, args.face_turn_command)
+        except (OSError, RuntimeError) as exc:
+            print(f"KET NOI/LENH THAT BAI: {exc}")
+            raise SystemExit(1) from exc
 
 
 if __name__ == "__main__":
