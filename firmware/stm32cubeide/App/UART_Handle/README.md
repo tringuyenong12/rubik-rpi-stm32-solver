@@ -55,7 +55,7 @@ Các lệnh trong nhóm CALIB trả ACK rồi DONE khi thành công. Lệnh sai 
 | --- | --- | --- |
 | CALIB SERVO | channel pulse_us duration_ms | Thử xung trực tiếp, kênh 0–15, xung 500–2500 us |
 | CALIB SET | servo_id position angle_deg | Cập nhật góc cuối của một vị trí trong cấu hình RAM |
-| CALIB TEST | servo_id position duration_ms | Chạy servo đến vị trí đã chỉnh rồi chờ duration_ms |
+| CALIB TEST | servo_id position duration_ms | Gọi Servo_Rotate/Servo_Move rồi chờ ít nhất thời gian driver và duration_ms |
 
 SERVO cũng chấp nhận tên thao tác viết thường `servo` để tương thích với ví dụ Python đã có. SET và TEST dùng tên viết hoa. Duration nhận số nguyên 0–60000 ms, angle_deg nhận số thập phân 0–180 độ.
 
@@ -71,6 +71,16 @@ SERVO cũng chấp nhận tên thao tác viết thường `servo` để tương 
 | 7 | Trượt LEFT | FULL_RELEASE, HALF_RELEASE, CLAMP, TIGHT_CLAMP |
 
 SET và TEST chọn servo theo ID trong mảng `servo[]`. TEST dùng kênh PCA9685 đã được gán tại `servo[id].channel`. SERVO chọn trực tiếp số kênh vật lý.
+
+TEST gọi `waitUntilServosDone()` sau khi gửi góc, hiện chờ `Delay_Servo_Move = 1000 ms`.
+Thời gian chờ trước DONE là `max(1000, duration_ms)` với driver hiện tại; ví dụ
+`TEST 0 HOME 0` hoặc `TEST 0 HOME 500` đều chờ ít nhất 1 giây, còn
+`TEST 0 HOME 1500` chờ ít nhất 1,5 giây. Đây là thời gian chờ phần mềm,
+không phải cảm biến xác nhận servo đã đến vị trí.
+
+CALIB SERVO là lệnh xung thô: đi thẳng đến PCA9685, không đổi các góc/offset
+trong Servo_Control và vẫn chỉ chờ duration_ms. Dùng SET rồi TEST để chỉnh
+và thử một vị trí logic HOME/CLAMP của servo.
 
 Ví dụ HOME mặc định là 90 độ. Lệnh SET HOME 92.5 đặt offset HOME thành +2.5 độ. Các lệnh RUBIK sau đó tự dùng giá trị mới vì các hàm Servo_Rotate và Servo_Move đọc cùng cấu hình. SET chỉ cập nhật cấu hình, lệnh TEST áp dụng vị trí ra servo.
 

@@ -108,6 +108,104 @@ STOP khóa MOVE, TURN và SERVO cho đến khi HOME được thực hiện. Các
 
 ## Các thao tác CALIB
 
+CALIB là nhóm hiệu chỉnh servo. Có ba thao tác với cú pháp sau; dấu `<...>`
+chỉ tên tham số, không gõ dấu ngoặc khi gửi lệnh:
+
+```text
+#<tag> CALIB SET <servo_id> <position> <angle_deg>
+#<tag> CALIB TEST <servo_id> <position> <duration_ms>
+#<tag> CALIB SERVO <channel> <pulse_us> <duration_ms>
+```
+
+### Ý nghĩa từng tham số
+
+| Tham số | Ý nghĩa | Giá trị hợp lệ |
+| --- | --- | --- |
+| `tag` | Mã yêu cầu do bên gửi đặt, để đối chiếu ACK/DONE/NACK; không phải ID servo | 1–32 ký tự chữ ASCII, số, `_`, `-` |
+| `servo_id` | ID logic của servo trong mảng `servo[]` của Servo_Control.c | Số nguyên 0–7, xem bảng bên dưới |
+| `position` | Tên vị trí cần chỉnh hoặc chạy thử; phải đúng loại servo | Tên viết hoa trong bảng bên dưới |
+| `angle_deg` | Góc cuối mong muốn tại vị trí đó, tính bằng độ; không phải số độ xoay thêm và không phải offset | Số 0–180, cho phép thập phân bằng dấu chấm, ví dụ `92.5` |
+| `duration_ms` | Thời gian chờ sau khi gửi góc/xung, tính bằng mili giây; 1000 ms = 1 giây; không điều chỉnh tốc độ quay | Số nguyên 0–60000 |
+| `channel` | Kênh vật lý trên PCA9685, chỉ dùng với CALIB SERVO | Số nguyên 0–15 |
+| `pulse_us` | Độ rộng xung điều khiển servo, tính bằng micro giây; 1500 us = 1,5 ms | Số nguyên 500–2500 tại tần số PWM 50 Hz |
+
+Mọi tham số trong mỗi dạng lệnh đều bắt buộc. `SET`, `TEST` và tên vị trí
+phải viết hoa. `SERVO` có thêm tên tương thích viết thường là `servo`.
+
+### Chọn servo và vị trí
+
+| `servo_id` | Servo được chọn | Các giá trị `position` |
+| --- | --- | --- |
+| 0 | Xoay mặt FRONT | HOME, CLOCKWISE, ANTICLOCKWISE |
+| 1 | Xoay mặt RIGHT | HOME, CLOCKWISE, ANTICLOCKWISE |
+| 2 | Xoay mặt BACK | HOME, CLOCKWISE, ANTICLOCKWISE |
+| 3 | Xoay mặt LEFT | HOME, CLOCKWISE, ANTICLOCKWISE |
+| 4 | Trượt tay FRONT | FULL_RELEASE, HALF_RELEASE, CLAMP, TIGHT_CLAMP |
+| 5 | Trượt tay RIGHT | FULL_RELEASE, HALF_RELEASE, CLAMP, TIGHT_CLAMP |
+| 6 | Trượt tay BACK | FULL_RELEASE, HALF_RELEASE, CLAMP, TIGHT_CLAMP |
+| 7 | Trượt tay LEFT | FULL_RELEASE, HALF_RELEASE, CLAMP, TIGHT_CLAMP |
+
+| `position` | Ý nghĩa | Góc cơ sở mặc định trong Servo_Control.c |
+| --- | --- | --- |
+| HOME | Vị trí ban đầu của servo xoay | 90° |
+| CLOCKWISE | Vị trí quay thuận của servo xoay | 180° |
+| ANTICLOCKWISE | Vị trí quay ngược của servo xoay | 0° |
+| FULL_RELEASE | Nhả hoàn toàn tay trượt | 180° |
+| HALF_RELEASE | Nhả một phần tay trượt | 90° |
+| CLAMP | Kẹp Rubik | 10° |
+| TIGHT_CLAMP | Kẹp chặt hơn để giữ Rubik | 0° |
+
+Góc thực tế cần hiệu chỉnh theo cách lắp servo và cơ cấu của bạn. Ví dụ,
+`SET 4 HOME 90` bị từ chối vì ID 4 là servo trượt, không có vị trí HOME.
+
+SET/TEST dùng `servo_id`, sau đó driver lấy kênh từ `servo[servo_id].channel`.
+CALIB SERVO dùng trực tiếp `channel`. Cấu hình mặc định gán ID 0–7 cho kênh
+0–7, nhưng nếu đổi `.channel` trong Servo_Control.c thì hai số này có thể khác nhau.
+
+### Cách SET và TEST hoạt động
+
+`SET` gọi `Servo_SetRotateCalibration()` hoặc `Servo_SetMoveCalibration()`.
+Lệnh chỉ sửa offset của đúng vị trí đã chọn trong RAM, không gửi PWM và không
+làm servo chuyển động ngay. Công thức là:
+
+```text
+offset = angle_deg - góc cơ sở của position
+```
+
+Ví dụ `#c2 CALIB SET 0 HOME 92.5`: `c2` là mã yêu cầu; `0` chọn servo xoay
+FRONT; `HOME` chọn góc ban đầu; `92.5` đặt góc cuối thành 92,5°. Với góc
+cơ sở HOME là 90°, offset được lưu là +2,5°. Gửi lại SET sẽ thay offset,
+không cộng dồn nó và không sửa các vị trí khác của servo.
+
+`TEST` gọi `Servo_Rotate()` cho ID 0–3 hoặc `Servo_Move()` cho ID 4–7,
+để chạy đến góc cơ sở cộng offset đã lưu. Sau đó gọi `waitUntilServosDone()`.
+Driver hiện chờ `Delay_Servo_Move = 1000 ms`; nếu `duration_ms` lớn hơn,
+CALIB chờ thêm phần còn lại. Vì vậy thời gian chờ trước DONE là ít nhất
+`max(1000, duration_ms)` với driver hiện tại:
+
+| Ví dụ | Tác dụng |
+| --- | --- |
+| `#c3 CALIB TEST 0 HOME 500` | Servo xoay FRONT đến HOME đã chỉnh; chờ ít nhất 1 giây |
+| `#c6 CALIB TEST 0 HOME 1500` | Servo xoay FRONT đến HOME đã chỉnh; chờ ít nhất 1,5 giây |
+| `#c5 CALIB TEST 4 CLAMP 0` | Servo trượt FRONT đến CLAMP đã chỉnh; vẫn chờ ít nhất 1 giây |
+
+TEST cũng dùng được khi chưa gửi SET; lúc đó nó dùng các góc/offset hiện có
+trong Servo_Control.c. DONE xác nhận phần mềm đã gửi lệnh và chờ xong;
+không có cảm biến xác nhận servo đã đến đúng vị trí hoặc phản hồi lỗi I2C.
+
+### Thử xung trực tiếp bằng SERVO
+
+`#c1 CALIB SERVO 0 1500 300` có nghĩa: gửi xung 1500 us đến kênh PCA9685
+số 0 ở 50 Hz, rồi chờ 300 ms trước DONE. Lệnh này đi thẳng đến PCA9685,
+không dùng các vị trí HOME/CLAMP và không sửa góc/offset hoặc trạng thái
+góc trong Servo_Control. Sau 300 ms, PWM vẫn giữ xung đã đặt; đây không
+phải lệnh tắt servo sau 300 ms. Quy tắc chờ tối thiểu 1 giây của TEST
+không áp dụng cho SERVO.
+
+### Ví dụ gửi lần lượt
+
+Chờ DONE hoặc NACK của từng lệnh trước khi gửi lệnh kế tiếp:
+
 ```text
 #c1 CALIB SERVO 0 1500 300
 #c2 CALIB SET 0 HOME 92.5
@@ -116,13 +214,12 @@ STOP khóa MOVE, TURN và SERVO cho đến khi HOME được thực hiện. Các
 #c5 CALIB TEST 4 CLAMP 500
 ```
 
-SERVO thử xung 500–2500 us trên kênh PCA9685 0–15. SET cập nhật góc cuối
-0–180 độ của một vị trí servo trong RAM. TEST áp dụng vị trí đã chỉnh rồi
-chờ thời gian yêu cầu. Các lệnh đều trả ACK rồi DONE khi thành công.
+Các lệnh đều trả ACK rồi DONE khi thành công. Ví dụ phản hồi của lệnh SET:
 
-SET/TEST dùng servo_id 0–7. ID 0–3 là servo xoay FRONT, RIGHT, BACK, LEFT,
-có các vị trí HOME, CLOCKWISE, ANTICLOCKWISE. ID 4–7 là servo trượt theo cùng
-thứ tự, có FULL_RELEASE, HALF_RELEASE, CLAMP, TIGHT_CLAMP.
+```text
+#c2 ACK
+#c2 DONE
+```
 
 ```python
 link.request(Command("SET", (0, "HOME", 92.5), function="CALIB"))

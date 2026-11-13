@@ -26,6 +26,7 @@ static uint16_t pwm_off;
 static HAL_StatusTypeDef transmit_result;
 static HAL_StatusTypeDef receive_result;
 static unsigned abort_count;
+static unsigned clear_error_count;
 static Servo_t default_servos[SERVO_COUNT];
 static unsigned angle_count;
 static float last_angle;
@@ -35,6 +36,10 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *handle,
 {
     CHECK(handle == &uart && size == 1);
     rx = byte;
+    if (receive_result == HAL_OK) {
+        /* The real HAL clears ErrorCode when starting a new RX transfer. */
+        handle->ErrorCode = HAL_UART_ERROR_NONE;
+    }
     return receive_result;
 }
 
@@ -56,8 +61,13 @@ HAL_StatusTypeDef HAL_UART_AbortReceive(UART_HandleTypeDef *handle)
 {
     CHECK(handle == &uart);
     ++abort_count;
-    handle->ErrorCode = 0;
     return HAL_OK;
+}
+
+void test_clear_uart_errors(UART_HandleTypeDef *handle)
+{
+    CHECK(handle == &uart);
+    ++clear_error_count;
 }
 
 void HAL_Delay(uint32_t delay_ms) { CHECK(!in_isr); ticks += delay_ms; }
@@ -123,6 +133,7 @@ static void reset(void)
     angle_count = 0;
     memcpy(servo, default_servos, sizeof(default_servos));
     abort_count = 0;
+    clear_error_count = 0;
     during_move = NULL;
     transmit_result = HAL_OK;
     receive_result = HAL_OK;
@@ -259,8 +270,27 @@ int main(void)
     uart.ErrorCode = 8;
     *rx = '\n';
     UART_Command_RxCallback(&uart);
+    /* HAL's IRQ handler calls RX-complete first, then handles the error. */
+    CHECK(abort_count == 0 && uart.ErrorCode == 8);
+    UART_Command_ErrorCallback(&uart);
     request("\n#2 RUBIK PING\n");
-    CHECK(abort_count == 1 && count == 0 && strcmp(replies, "#2 ACK\n") == 0);
+    CHECK(abort_count == 1 && clear_error_count == 1 && count == 0 &&
+          strcmp(replies, "#2 ACK\n") == 0);
+    /* An error without RXNE must also clear the hardware error flags. */
+    reset();
+    uart.ErrorCode = 8;
+    UART_Command_ErrorCallback(&uart);
+    CHECK(clear_error_count == 1 && uart.ErrorCode == HAL_UART_ERROR_NONE);
+    request("\n#2 RUBIK PING\n");
+    CHECK(strcmp(replies, "#2 ACK\n") == 0);
+    /* Preserve a complete pending request while discarding a damaged tail. */
+    reset();
+    feed("#1 RUBIK PING\n");
+    uart.ErrorCode = 8;
+    UART_Command_ErrorCallback(&uart);
+    UART_Command_Process();
+    request("damaged tail\n#2 RUBIK PING\n");
+    CHECK(strcmp(replies, "#1 ACK\n#2 ACK\n") == 0);
     reset();
     transmit_result = HAL_ERROR;
     request("#1 RUBIK MOVE R\n");
@@ -284,14 +314,14 @@ int main(void)
     CHECK(servo[0].state.rotate.offset_calib_home_angle == 2.5f);
     CHECK(strcmp(replies, "#1 ACK\n#1 DONE\n") == 0);
     request("#2 CALIB TEST 0 HOME 300\n");
-    CHECK(angle_count == 1 && last_angle == 92.5f && ticks == 300);
+    CHECK(angle_count == 1 && last_angle == 92.5f && ticks == Delay_Servo_Move);
     CHECK(servo[0].state.rotate.current_angle == 92.5f);
     reset();
     request("#1 CALIB SET 4 CLAMP 12\n");
     CHECK(servo[4].state.move.offset_calib_clamp_angle == 2.0f);
     servo[4].channel = 11;
     request("#2 CALIB TEST 4 CLAMP 250\n");
-    CHECK(angle_count == 1 && last_angle == 12.0f && pwm_channel == 11 && ticks == 250);
+    CHECK(angle_count == 1 && last_angle == 12.0f && pwm_channel == 11 && ticks == Delay_Servo_Move);
     request("#3 CALIB SET 4 FULL_RELEASE 175\n");
     request("#4 CALIB TEST 4 FULL_RELEASE 0\n");
     CHECK(last_angle == 175.0f);
@@ -308,6 +338,54 @@ int main(void)
     request("#3 CALIB SET 3 ANTICLOCKWISE 5\n");
     request("#4 CALIB TEST 3 ANTICLOCKWISE 0\n");
     CHECK(last_angle == 5.0f);
+
+    /* TEST must respect the driver's settling time, including zero duration. */
+    const unsigned durations[] = {0, 500, 1000, 1500, 60000};
+    for (unsigned i = 0; i < sizeof(durations) / sizeof(durations[0]); ++i) {
+        reset();
+        snprintf(line, sizeof(line), "#wait CALIB TEST 0 HOME %u\n", durations[i]);
+        request(line);
+        uint32_t expected_wait = durations[i] < Delay_Servo_Move ? Delay_Servo_Move : durations[i];
+        CHECK(ticks == expected_wait && angle_count == 1);
+        CHECK(strcmp(replies, "#wait ACK\n#wait DONE\n") == 0);
+    }
+    /* Logical IDs must use the configured PCA channel for every servo. */
+    for (unsigned id = 0; id < SERVO_COUNT; ++id) {
+        reset();
+        servo[id].channel = (uint8_t)(15 - id);
+        const char *position = id < SERVO_MOVE_FRONT ? "HOME" : "CLAMP";
+        snprintf(line, sizeof(line), "#set CALIB SET %u %s 93\n", id, position);
+        request(line);
+        CHECK(angle_count == 0 && ticks == 0);
+        snprintf(line, sizeof(line), "#test CALIB TEST %u %s 0\n", id, position);
+        request(line);
+        CHECK(angle_count == 1 && last_angle == 93.0f && pwm_channel == 15 - id);
+        CHECK(ticks == Delay_Servo_Move);
+        for (unsigned other = 0; other < SERVO_COUNT; ++other) {
+            if (other != id) {
+                CHECK(memcmp(&servo[other], &default_servos[other], sizeof(Servo_t)) == 0);
+            }
+        }
+    }
+    /* SET stores angle-base, not an accumulating delta; no PWM is sent. */
+    reset();
+    servo[0].state.rotate.home_angle = 80.0f;
+    request("#1 CALIB SET 0 HOME 92.5\n");
+    CHECK(servo[0].state.rotate.offset_calib_home_angle == 12.5f);
+    request("#2 CALIB SET 0 HOME 93\n");
+    CHECK(servo[0].state.rotate.offset_calib_home_angle == 13.0f);
+    CHECK(angle_count == 0 && ticks == 0);
+    request("#3 CALIB TEST 0 HOME 0\n");
+    CHECK(last_angle == 93.0f);
+    reset();
+    servo[4].channel = 16;
+    request("#1 CALIB TEST 4 CLAMP 0\n");
+    CHECK(angle_count == 0 && pwm_count == 0 && ticks == 0);
+    CHECK(strcmp(replies, "#1 ACK\n#1 NACK LIMIT calib_servo\n") == 0);
+    reset();
+    transmit_result = HAL_ERROR;
+    request("#1 CALIB TEST 0 HOME 0\n");
+    CHECK(angle_count == 0 && ticks == 0);
 
     const char *invalid_calibration[] = {
         "SET 8 HOME 90", "SET -1 HOME 90", "SET 0 HOME -1", "SET 0 HOME 180.1",

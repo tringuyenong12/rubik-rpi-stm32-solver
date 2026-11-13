@@ -62,3 +62,12 @@ target_link_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE
   # Add additional linker libraries here
 )
+
+# Also generate images usable directly with STM32CubeProgrammer.
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_OBJCOPY} -O ihex $<TARGET_FILE:${PROJECT_NAME}>
+          ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.hex
+  COMMAND ${CMAKE_OBJCOPY} -O binary $<TARGET_FILE:${PROJECT_NAME}>
+          ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.bin
+  VERBATIM
+)
