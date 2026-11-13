@@ -65,11 +65,3 @@ python tests/run_tests.py
 Test UART kiểm tra frame, tham số, phản hồi, dispatch, STOP/HOME và phục hồi RX. Test chuyển động toàn bộ hiện còn thất bại ở chuỗi U đảo. Rubik_Down_ToFront đang trống và chuỗi D thuận cần xác nhận lại. UART đã từ chối các chuỗi này.
 
 Build/flash bằng toolchain STM32 và kiểm tra cơ cấu thật vẫn cần xác nhận. Bản mẫu TIM PWM cũ cùng các thay đổi có sẵn trên máy nằm tại [examples/timer_pwm](examples/timer_pwm/README.md).
-
-## Bản mẫu timer PWM
-
-Driver ServoController và snippet dùng timer PWM nằm riêng tại `examples/timer_pwm/`.
-Đọc [hướng dẫn servo](App/SERVO_CONTROLLER_GUIDE.md) để cấu hình profile thực tế
-trước khi bật PWM cho bản mẫu này. Đây là driver khác với PCA9685 của project chính.
-Chạy test driver và biên dịch kiểm tra snippet từ thư mục gốc:
-`python firmware/tests/run_tests.py`.
