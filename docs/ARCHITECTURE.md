@@ -37,29 +37,37 @@ Chi tiết nằm trong [MECHANICAL_DESIGN.md](MECHANICAL_DESIGN.md) và [ACTUATO
 Trách nhiệm:
 
 - Lấy ảnh từ camera.
-- Cắt vùng Rubik.
-- Lấy màu trung bình của 9 sticker.
+- Cắt vùng Rubik / tìm lưới 9 ô sticker.
+- Lấy màu trung bình của 9 sticker (qua CIELAB hoặc HSV filter).
 - Phân loại màu theo calibration.
-- Sinh cube string theo thứ tự solver.
+- Sinh cube string theo thứ tự solver (`URFDLB`).
+- Hỗ trợ công cụ tinh chỉnh tương tác webcam qua `twophase.vision2` và `twophase.client_gui2`.
 
 File liên quan:
 
 - `rpi/rubik_robot/vision/capture.py`
 - `rpi/rubik_robot/vision/color_classifier.py`
+- `rpi/twophase/vision2.py`
+- `rpi/twophase/vision_params.py`
+- `rpi/twophase/client_gui2.py`
+- `scripts/run_vision_gui.py`
 - `rpi/rubik_robot/cube/state.py`
 
 ### Solver
 
 Trách nhiệm:
 
-- Nhận cube string 54 ký tự.
-- Kiểm tra format cơ bản.
-- Gọi solver Kociemba nếu thư viện có sẵn.
-- Có fallback demo nếu chưa cài solver.
+- Nhận cube string 54 ký tự định dạng `URFDLB`.
+- Kiểm tra tính hợp lệ cơ bản (đúng 54 ô, mỗi mặt đúng 9 ô).
+- Gọi thuật toán Two-Phase thuần Python từ package tích hợp sẵn `rpi/twophase` (Herbert Kociemba 2-phase algorithm) với các bảng pruning table nạp cực nhanh.
+- Chuẩn hóa đầu ra từ ký hiệu numbered (`R1, R2, R3`) sang chuẩn xoay Rubik (`R, R2, R'`).
+- Có fallback sang thư viện C `kociemba` nếu cần.
 
 File liên quan:
 
-- `rpi/rubik_robot/solver/kociemba_solver.py`
+- `rpi/twophase/` (Gói solver Two-Phase độc lập)
+- `rpi/rubik_robot/solver/kociemba_solver.py` (Adapter kết nối solver với robot)
+
 
 ### Motion Planner
 

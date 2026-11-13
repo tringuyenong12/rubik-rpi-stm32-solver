@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+# Add rpi directory to sys.path so rubik_robot and twophase can be imported
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "rpi"))
+
 from rubik_robot.cube.state import SOLVED_CUBE
 from rubik_robot.motion.planner import MotionPlanner
 from rubik_robot.solver.kociemba_solver import solve_cube
