@@ -1,6 +1,14 @@
 # Cấu Hình STM32CubeIDE
 
-Tài liệu này thay cho workflow PlatformIO. Mục tiêu là để STM32CubeIDE sinh code khởi tạo peripheral, còn logic robot nằm trong `firmware/stm32cubeide/App`.
+Project chính nằm tại `firmware/stm32cubeide`. Import bằng `File > Import > General > Existing Projects into Workspace`, chọn project `rubik_stm32_ver1`, rồi build Debug hoặc Release.
+
+Cấu hình hiện tại dùng STM32F411CEUx, HSI 16 MHz, USART1 PA9/PA10 115200 baud và I2C1 PB6/PB7 400 kHz nối PCA9685. Logic UART nằm trong App, driver và chuyển động nằm trong Hardware. Chi tiết trong [README firmware](../firmware/stm32cubeide/README.md).
+
+## Bản mẫu timer PWM
+
+Phần bên dưới hướng dẫn tạo project mới theo bản mẫu tại `firmware/stm32cubeide/examples/timer_pwm`. Bản mẫu này dùng timer PWM và giao thức RUBIK có ACK/DONE.
+
+Tài liệu này thay cho workflow PlatformIO. Mục tiêu là để STM32CubeIDE sinh code khởi tạo peripheral, còn logic robot nằm trong `firmware/stm32cubeide/examples/timer_pwm/App`.
 
 ## 1. Tạo Project
 
@@ -84,22 +92,18 @@ Bản vẽ hiện tại có 4 cụm trượt chéo quanh cube và một cụm tr
 
 Với STM32F103, có thể dùng thêm TIM3/TIM4 hoặc driver PWM ngoài như PCA9685 nếu số servo vượt quá timer channel có sẵn.
 
-Firmware trong `firmware/stm32cubeide/App` hiện là scaffold an toàn:
+Firmware trong `firmware/stm32cubeide/examples/timer_pwm/App` hiện là scaffold an toàn:
 
 - `SERVO` để test từng kênh PWM.
-- `MOVE`, `TURN`, `SCAN_POSE` trả lỗi chưa hỗ trợ cho đến khi có sequence cơ khí.
+- `MOVE` để test pipeline UART.
 - Mapping actuator thật sẽ được điền sau khi chốt motor và cảm biến cho từng cụm.
-
-Phải gọi `ServoController_ConfigProfile()` với số đo thực tế trước `Start()`.
-Không có profile thì PWM không bật. Cấu hình nhiều timer và ba mốc góc theo
-[hướng dẫn thư viện](../firmware/stm32cubeide/App/SERVO_CONTROLLER_GUIDE.md).
 
 ## 5. Thêm Code App
 
 Copy thư mục:
 
 ```text
-firmware/stm32cubeide/App
+firmware/stm32cubeide/examples/timer_pwm/App
 ```
 
 vào project CubeIDE.
@@ -122,7 +126,7 @@ Core/Src/main.c
 Chèn các đoạn từ:
 
 ```text
-firmware/stm32cubeide/Core_Src_main_user_snippet.c
+firmware/stm32cubeide/examples/timer_pwm/Core_Src_main_user_snippet.c
 ```
 
 vào đúng các block:
@@ -151,22 +155,21 @@ Không viết code ngoài các block `USER CODE`, vì CubeMX có thể ghi đè 
 Sau khi flash, mở Serial Monitor 115200 baud và gửi:
 
 ```text
-PING
+#1 RUBIK PING
 ```
 
 STM32 phải trả:
 
 ```text
-OK PONG
+#1 ACK
 ```
 
-Sau khi đã cấu hình profile cho kênh 0, thử pulse nằm trong giới hạn đã đo
-(các số dưới đây chỉ minh họa):
+Thử calibration servo:
 
 ```text
-SERVO 0 1500 300
-SERVO 0 1600 300
-SERVO 0 1400 300
+#2 RUBIK SERVO 0 1500 300
+#3 RUBIK SERVO 0 1600 300
+#4 RUBIK SERVO 0 1400 300
 ```
 
 Nếu servo đi ngược/quá góc, dừng ngay và cập nhật giới hạn trong `servo_controller.c`.

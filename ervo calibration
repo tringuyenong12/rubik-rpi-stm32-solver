@@ -1,0 +1,256 @@
+ .gitignore                                         |    2 [32m+[m[31m-[m
+ README.md                                          |   17 [32m+[m[31m-[m
+ docs/CUBEIDE_SETUP.md                              |   26 [32m+[m[31m-[m
+ docs/UART_PROTOCOL.md                              |  262 [32m+[m[31m-[m
+ .../stm32cubeide/{rubik_stm32_ver1 => }/.cproject  |    4 [32m+[m[31m-[m
+ .../stm32cubeide/{rubik_stm32_ver1 => }/.mxproject |    0
+ .../stm32cubeide/{rubik_stm32_ver1 => }/.project   |    0
+ .../.settings/language.settings.xml                |    0
+ .../.settings/org.eclipse.core.resources.prefs     |    0
+ .../.settings/stm32cubeide.project.prefs           |    0
+ firmware/stm32cubeide/App/UART_Handle/README.md    |   97 [32m+[m
+ .../stm32cubeide/App/UART_Handle/UART_Handle.c     |  176 [32m+[m
+ .../Hardware => App}/UART_Handle/UART_Handle.h     |    3 [32m+[m[31m-[m
+ firmware/stm32cubeide/App/rubik_protocol.c         |  306 [32m+[m[31m-[m
+ firmware/stm32cubeide/App/rubik_protocol.h         |   18 [32m+[m[31m-[m
+ .../{rubik_stm32_ver1 => }/Core/Inc/main.h         |    0
+ .../Core/Inc/stm32f4xx_hal_conf.h                  |    0
+ .../{rubik_stm32_ver1 => }/Core/Inc/stm32f4xx_it.h |    0
+ .../{rubik_stm32_ver1 => }/Core/Src/main.c         |   13 [32m+[m[31m-[m
+ .../Core/Src/stm32f4xx_hal_msp.c                   |    0
+ .../{rubik_stm32_ver1 => }/Core/Src/stm32f4xx_it.c |    0
+ .../{rubik_stm32_ver1 => }/Core/Src/syscalls.c     |    0
+ .../{rubik_stm32_ver1 => }/Core/Src/sysmem.c       |    0
+ .../Core/Src/system_stm32f4xx.c                    |    0
+ .../Core/Startup/startup_stm32f411ceux.s           |    0
+ .../Device/ST/STM32F4xx/Include/stm32f411xe.h      |    0
+ .../CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h  |    0
+ .../Device/ST/STM32F4xx/Include/system_stm32f4xx.h |    0
+ .../Drivers/CMSIS/Device/ST/STM32F4xx/LICENSE.txt  |    0
+ .../Drivers/CMSIS/Include/cachel1_armv7.h          |    0
+ .../Drivers/CMSIS/Include/cmsis_armcc.h            |    0
+ .../Drivers/CMSIS/Include/cmsis_armclang.h         |    0
+ .../Drivers/CMSIS/Include/cmsis_armclang_ltm.h     |    0
+ .../Drivers/CMSIS/Include/cmsis_compiler.h         |    0
+ .../Drivers/CMSIS/Include/cmsis_gcc.h              |    0
+ .../Drivers/CMSIS/Include/cmsis_iccarm.h           |    0
+ .../Drivers/CMSIS/Include/cmsis_version.h          |    0
+ .../Drivers/CMSIS/Include/core_armv81mml.h         |    0
+ .../Drivers/CMSIS/Include/core_armv8mbl.h          |    0
+ .../Drivers/CMSIS/Include/core_armv8mml.h          |    0
+ .../Drivers/CMSIS/Include/core_cm0.h               |    0
+ .../Drivers/CMSIS/Include/core_cm0plus.h           |    0
+ .../Drivers/CMSIS/Include/core_cm1.h               |    0
+ .../Drivers/CMSIS/Include/core_cm23.h              |    0
+ .../Drivers/CMSIS/Include/core_cm3.h               |    0
+ .../Drivers/CMSIS/Include/core_cm33.h              |    0
+ .../Drivers/CMSIS/Include/core_cm35p.h             |    0
+ .../Drivers/CMSIS/Include/core_cm4.h               |    0
+ .../Drivers/CMSIS/Include/core_cm55.h              |    0
+ .../Drivers/CMSIS/Include/core_cm7.h               |    0
+ .../Drivers/CMSIS/Include/core_cm85.h              |    0
+ .../Drivers/CMSIS/Include/core_sc000.h             |    0
+ .../Drivers/CMSIS/Include/core_sc300.h             |    0
+ .../Drivers/CMSIS/Include/core_starmc1.h           |    0
+ .../Drivers/CMSIS/Include/mpu_armv7.h              |    0
+ .../Drivers/CMSIS/Include/mpu_armv8.h              |    0
+ .../Drivers/CMSIS/Include/pac_armv81.h             |    0
+ .../Drivers/CMSIS/Include/pmu_armv8.h              |    0
+ .../Drivers/CMSIS/Include/tz_context.h             |    0
+ .../Drivers/CMSIS/LICENSE.txt                      |    0
+ .../Inc/Legacy/stm32_hal_legacy.h                  |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h       |    0
+ .../Inc/stm32f4xx_hal_cortex.h                     |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h   |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h   |    0
+ .../Inc/stm32f4xx_hal_dma_ex.h                     |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h  |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h |    0
+ .../Inc/stm32f4xx_hal_flash_ex.h                   |    0
+ .../Inc/stm32f4xx_hal_flash_ramfunc.h              |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h  |    0
+ .../Inc/stm32f4xx_hal_gpio_ex.h                    |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h   |    0
+ .../Inc/stm32f4xx_hal_i2c_ex.h                     |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h   |    0
+ .../Inc/stm32f4xx_hal_pwr_ex.h                     |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h   |    0
+ .../Inc/stm32f4xx_hal_rcc_ex.h                     |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h  |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_bus.h    |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_cortex.h |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_dma.h    |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_exti.h   |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h   |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_i2c.h    |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_pwr.h    |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_rcc.h    |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_system.h |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h  |    0
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_utils.h  |    0
+ .../Drivers/STM32F4xx_HAL_Driver/LICENSE.txt       |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c       |    0
+ .../Src/stm32f4xx_hal_cortex.c                     |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c   |    0
+ .../Src/stm32f4xx_hal_dma_ex.c                     |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c  |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c |    0
+ .../Src/stm32f4xx_hal_flash_ex.c                   |    0
+ .../Src/stm32f4xx_hal_flash_ramfunc.c              |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c  |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c   |    0
+ .../Src/stm32f4xx_hal_i2c_ex.c                     |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c   |    0
+ .../Src/stm32f4xx_hal_pwr_ex.c                     |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c   |    0
+ .../Src/stm32f4xx_hal_rcc_ex.c                     |    0
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c  |    0
+ .../Hardware/PCA9685/PCA9685.c                     |    0
+ .../Hardware/PCA9685/PCA9685.h                     |    0
+ .../Hardware/Rubik_Control/Rubik_Control.c         |    0
+ .../Hardware/Rubik_Control/Rubik_Control.h         |    0
+ .../Hardware/Servo_Control/Servo_Control.c         |   68 [32m+[m
+ .../Hardware/Servo_Control/Servo_Control.h         |    3 [32m+[m
+ firmware/stm32cubeide/README.md                    |   81 [32m+[m[31m-[m
+ .../{rubik_stm32_ver1 => }/STM32F411CEUX_FLASH.ld  |    0
+ .../{rubik_stm32_ver1 => }/STM32F411CEUX_RAM.ld    |    0
+ .../{rubik_stm32_ver1 => }/Testing/Testing.c       |    0
+ .../{rubik_stm32_ver1 => }/Testing/Testing.h       |    0
+ .../stm32cubeide/examples/timer_pwm/App/PCA9685.h  |   78 [32m+[m
+ .../examples/timer_pwm/App/rubik_protocol.c        |  250 [32m+[m
+ .../examples/timer_pwm/App/rubik_protocol.h        |   68 [32m+[m
+ .../timer_pwm}/App/servo_controller.c              |    0
+ .../timer_pwm}/App/servo_controller.h              |    0
+ .../timer_pwm}/Core_Src_main_user_snippet.c        |   42 [32m+[m[31m-[m
+ firmware/stm32cubeide/examples/timer_pwm/README.md |   38 [32m+[m
+ .../{rubik_stm32_ver1 => }/rubik_stm32_ver1.ioc    |    0
+ .../Hardware/UART_Handle/README.md                 |   39 [31m-[m
+ .../Hardware/UART_Handle/UART_Handle.c             |  199 [31m-[m
+ firmware/stm32cubeide/rubik_stm32_ver1/README.md   |   46 [31m-[m
+ .../rubik_stm32_ver1/tests/test_uart_handle.c      |  156 [31m-[m
+ .../tests/host/stm32f4xx_hal.h                     |    3 [32m+[m
+ .../{rubik_stm32_ver1 => }/tests/run_tests.py      |   12 [32m+[m[31m-[m
+ .../tests/test_rubik_moves.c                       |   23 [32m+[m[31m-[m
+ firmware/stm32cubeide/tests/test_uart_handle.c     |  342 [32m+[m
+ firmware/vscode-f411/rubik_stm32_ver1/.clangd      |    2 [32m+[m
+ firmware/vscode-f411/rubik_stm32_ver1/.gitignore   |    3 [32m+[m
+ .../.settings/bundles-lock.store.json              |  162 [32m+[m
+ .../rubik_stm32_ver1/.settings/bundles.store.json  |   24 [32m+[m
+ .../rubik_stm32_ver1/.settings/ide.store.json      |    9 [32m+[m
+ .../rubik_stm32_ver1/App/UART_Handle/UART_Handle.c |  176 [32m+[m
+ .../rubik_stm32_ver1/App/UART_Handle/UART_Handle.h |   14 [32m+[m
+ .../rubik_stm32_ver1/App/rubik_protocol.c          |  262 [32m+[m
+ .../rubik_stm32_ver1/App/rubik_protocol.h          |   75 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/CMakeLists.txt    |   64 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/CMakePresets.json |   35 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/Core/Inc/main.h   |   69 [32m+[m
+ .../rubik_stm32_ver1/Core/Inc/stm32f4xx_hal_conf.h |  495 [32m++[m
+ .../rubik_stm32_ver1/Core/Inc/stm32f4xx_it.h       |   69 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/Core/Src/main.c   |  291 [32m+[m
+ .../rubik_stm32_ver1/Core/Src/stm32f4xx_hal_msp.c  |  229 [32m+[m
+ .../rubik_stm32_ver1/Core/Src/stm32f4xx_it.c       |  246 [32m+[m
+ .../rubik_stm32_ver1/Core/Src/syscalls.c           |  176 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/Core/Src/sysmem.c |   79 [32m+[m
+ .../rubik_stm32_ver1/Core/Src/system_stm32f4xx.c   |  747 [32m++[m
+ .../Core/Startup/startup_stm32f411ceux.s           |  438 [32m+[m
+ .../Device/ST/STM32F4xx/Include/stm32f411xe.h      | 8684 [32m++++++++++++++++++++[m
+ .../CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h  |  301 [32m+[m
+ .../Device/ST/STM32F4xx/Include/system_stm32f4xx.h |  104 [32m+[m
+ .../Drivers/CMSIS/Include/cachel1_armv7.h          |  411 [32m+[m
+ .../Drivers/CMSIS/Include/cmsis_armcc.h            |  888 [32m++[m
+ .../Drivers/CMSIS/Include/cmsis_armclang.h         | 1503 [32m++++[m
+ .../Drivers/CMSIS/Include/cmsis_armclang_ltm.h     | 1928 [32m+++++[m
+ .../Drivers/CMSIS/Include/cmsis_compiler.h         |  283 [32m+[m
+ .../Drivers/CMSIS/Include/cmsis_gcc.h              | 2211 [32m+++++[m
+ .../Drivers/CMSIS/Include/cmsis_iccarm.h           | 1002 [32m+++[m
+ .../Drivers/CMSIS/Include/cmsis_version.h          |   39 [32m+[m
+ .../Drivers/CMSIS/Include/core_armv81mml.h         | 4228 [32m++++++++++[m
+ .../Drivers/CMSIS/Include/core_armv8mbl.h          | 2222 [32m+++++[m
+ .../Drivers/CMSIS/Include/core_armv8mml.h          | 3209 [32m++++++++[m
+ .../Drivers/CMSIS/Include/core_cm0.h               |  952 [32m+++[m
+ .../Drivers/CMSIS/Include/core_cm0plus.h           | 1087 [32m+++[m
+ .../Drivers/CMSIS/Include/core_cm1.h               |  979 [32m+++[m
+ .../Drivers/CMSIS/Include/core_cm23.h              | 2297 [32m++++++[m
+ .../Drivers/CMSIS/Include/core_cm3.h               | 1943 [32m+++++[m
+ .../Drivers/CMSIS/Include/core_cm33.h              | 3277 [32m++++++++[m
+ .../Drivers/CMSIS/Include/core_cm35p.h             | 3277 [32m++++++++[m
+ .../Drivers/CMSIS/Include/core_cm4.h               | 2129 [32m+++++[m
+ .../Drivers/CMSIS/Include/core_cm55.h              | 4817 [32m+++++++++++[m
+ .../Drivers/CMSIS/Include/core_cm7.h               | 2366 [32m++++++[m
+ .../Drivers/CMSIS/Include/core_cm85.h              | 4672 [32m+++++++++++[m
+ .../Drivers/CMSIS/Include/core_sc000.h             | 1030 [32m+++[m
+ .../Drivers/CMSIS/Include/core_sc300.h             | 1917 [32m+++++[m
+ .../Drivers/CMSIS/Include/core_starmc1.h           | 3592 [32m++++++++[m
+ .../Drivers/CMSIS/Include/mpu_armv7.h              |  275 [32m+[m
+ .../Drivers/CMSIS/Include/mpu_armv8.h              |  352 [32m+[m
+ .../Drivers/CMSIS/Include/pac_armv81.h             |  206 [32m+[m
+ .../Drivers/CMSIS/Include/pmu_armv8.h              |  337 [32m+[m
+ .../Drivers/CMSIS/Include/tz_context.h             |   70 [32m+[m
+ .../Inc/Legacy/stm32_hal_legacy.h                  | 4422 [32m++++++++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h       |  297 [32m+[m
+ .../Inc/stm32f4xx_hal_cortex.h                     |  410 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h   |  212 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h   |  802 [32m++[m
+ .../Inc/stm32f4xx_hal_dma_ex.h                     |  102 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_exti.h  |  366 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h |  425 [32m+[m
+ .../Inc/stm32f4xx_hal_flash_ex.h                   | 1063 [32m+++[m
+ .../Inc/stm32f4xx_hal_flash_ramfunc.h              |   76 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h  |  325 [32m+[m
+ .../Inc/stm32f4xx_hal_gpio_ex.h                    | 1590 [32m++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h   |  741 [32m++[m
+ .../Inc/stm32f4xx_hal_i2c_ex.h                     |  115 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h   |  436 [32m+[m
+ .../Inc/stm32f4xx_hal_pwr_ex.h                     |  340 [32m+[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h   | 1458 [32m++++[m
+ .../Inc/stm32f4xx_hal_rcc_ex.h                     | 7190 [32m++++++++++++++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h  |  909 [32m++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_bus.h    | 2105 [32m+++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_cortex.h |  647 [32m++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_dma.h    | 2868 [32m+++++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_exti.h   |  954 [32m+++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_gpio.h   |  981 [32m+++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_i2c.h    | 1890 [32m+++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_pwr.h    |  985 [32m+++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_rcc.h    | 7101 [32m++++++++++++++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_system.h | 1711 [32m++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usart.h  | 2521 [32m++++++[m
+ .../STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_utils.h  |  307 [32m+[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c       |  616 [32m++[m
+ .../Src/stm32f4xx_hal_cortex.c                     |  538 [32m++[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c   | 1305 [32m+++[m
+ .../Src/stm32f4xx_hal_dma_ex.c                     |  313 [32m+[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c  |  553 [32m++[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c |  776 [32m++[m
+ .../Src/stm32f4xx_hal_flash_ex.c                   | 1344 [32m+++[m
+ .../Src/stm32f4xx_hal_flash_ramfunc.c              |  172 [32m+[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c  |  533 [32m++[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c   | 7567 [32m+++++++++++++++++[m
+ .../Src/stm32f4xx_hal_i2c_ex.c                     |  182 [32m+[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c   |  598 [32m++[m
+ .../Src/stm32f4xx_hal_pwr_ex.c                     |  600 [32m++[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c   | 1124 [32m+++[m
+ .../Src/stm32f4xx_hal_rcc_ex.c                     | 3833 [32m+++++++++[m
+ .../STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c  | 3807 [32m+++++++++[m
+ .../rubik_stm32_ver1/Hardware/PCA9685/PCA9685.c    |   81 [32m+[m
+ .../rubik_stm32_ver1/Hardware/PCA9685/PCA9685.h    |   37 [32m+[m
+ .../Hardware/Rubik_Control/Rubik_Control.c         |  424 [32m+[m
+ .../Hardware/Rubik_Control/Rubik_Control.h         |   32 [32m+[m
+ .../Hardware/Servo_Control/Servo_Control.c         |  278 [32m+[m
+ .../Hardware/Servo_Control/Servo_Control.h         |  121 [32m+[m
+ .../rubik_stm32_ver1/STM32F411CEUX_FLASH.ld        |  187 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/Testing/Testing.c |    8 [32m+[m
+ .../rubik_stm32_ver1/cmake/components.cmake        |    1 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/cmake/files.cmake |   36 [32m+[m
+ .../vscode-f411/rubik_stm32_ver1/cmake/flags.cmake |  126 [32m+[m
+ .../rubik_stm32_ver1/cmake/gcc-arm-none-eabi.cmake |  152 [32m+[m
+ .../rubik_stm32_ver1/cmake/target.cmake            |   16 [32m+[m
+ .../rubik_stm32_ver1/stm32cubeide-export.json      |  392 [32m+[m
+ rpi/rubik_robot/main.py                            |   15 [32m+[m[31m-[m
+ rpi/rubik_robot/motion/planner.py                  |    2 [32m+[m[31m-[m
+ rpi/rubik_robot/protocol.py                        |   38 [32m+[m[31m-[m
+ rpi/rubik_robot/transport/serial_link.py           |  112 [32m+[m[31m-[m
+ rpi/tests/test_inverse_notation.py                 |   36 [32m+[m
+ rpi/tests/test_motion_planner.py                   |    4 [32m+[m[31m-[m
+ rpi/tests/test_serial_link.py                      |  174 [32m+[m
+ 255 files changed, 137293 insertions(+), 814 deletions(-)

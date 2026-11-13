@@ -46,9 +46,9 @@ class MotionPlanner:
         suffix = token[1:]
         if face not in "URFDLB":
             raise ValueError(f"Invalid move face: {token}")
-        if suffix in {"", "1"}:
+        if suffix == "":
             return face, 1
-        if suffix in {"'", "3"}:
+        if suffix in {"'", "_"}:
             return face, -1
         if suffix == "2":
             return face, 2
