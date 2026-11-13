@@ -124,7 +124,3 @@ Thiết kế cơ khí theo bản vẽ CAD được tổng hợp trong [docs/MECH
 ## Trạng Thái Hiện Tại
 
 Repo này là bộ khung ban đầu cho đồ án. Code Python có demo solver/motion/protocol, firmware STM32 có parser lệnh cơ bản. Các thông số camera, màu, servo và cơ khí cần được calibration theo phần cứng thực tế.
-
-## Project STM32F411 tu nhanh stm32_firmware
-
-Project STM32CubeIDE cho STM32F411 + PCA9685 nam tai [firmware/stm32cubeide/rubik_stm32_ver1](firmware/stm32cubeide/rubik_stm32_ver1/README.md). Huong dan import, wiring, lenh UART va gioi han kiem thu nam trong README cua project.
