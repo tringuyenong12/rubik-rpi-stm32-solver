@@ -126,3 +126,34 @@ Thiết kế cơ khí theo bản vẽ CAD được tổng hợp trong [docs/MECH
 ## Trạng Thái Hiện Tại
 
 Repo này là bộ khung ban đầu cho đồ án. Code Python có demo solver/motion/protocol, firmware STM32 có parser lệnh cơ bản. Các thông số camera, màu, servo và cơ khí cần được calibration theo phần cứng thực tế.
+
+## Quét Camera Và Hướng Dẫn Trên Client–Server
+
+Chạy các lệnh dưới đây từ thư mục gốc project, với môi trường Python ở `.venv`.
+
+Terminal thứ nhất chạy server Two-Phase.
+
+```powershell
+.\.venv\Scripts\python.exe -B rpi\twophase\start_server.py 8080 20 3
+```
+
+Terminal thứ hai mở Solver Client và Logitech ID 1.
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts\run_vision_gui.py --camera 1 --backend dshow
+```
+
+- Bật `Auto scan` và `Auto guide after 6 faces`. Giữ mỗi mặt ngay ngắn để tự lưu, có thể quét khác thứ tự.
+- Quy ước tâm là U vàng, R xanh lá, F đỏ, D trắng, L xanh biển, B cam. Khi quét U, cạnh trên giáp cam. Khi quét D, cạnh trên giáp đỏ. Bốn mặt bên có cạnh trên giáp vàng.
+- Đủ sáu mặt, client kiểm tra màu theo mẫu tâm, tìm hướng mặt hợp lệ và gọi server. Màu hoặc hướng còn mâu thuẫn được báo để sửa trên sơ đồ hoặc dùng `Rescan shown face`, rồi `Solve`.
+- Một mũi tên chỉ thao tác xoay một tầng 90°. Ba mũi tên song song chỉ xoay cả khối để đổi mặt quan sát. Nước 180° được chia thành hai lần 90°.
+- Giữ mặt theo thông báo để camera xác nhận từng bước. Sơ đồ Solver Client cập nhật theo trạng thái đã xác nhận, hoàn tất hiện `CUBE SOLVED!`.
+- `New scan` hủy hướng dẫn và bắt đầu quét lại. `--show-masks` mở thêm bộ lọc để hiệu chỉnh màu.
+
+Chạy bộ kiểm thử Python từ thư mục gốc.
+
+```powershell
+Push-Location rpi
+..\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
+Pop-Location
+```

@@ -6,13 +6,18 @@
 import sys
 from pathlib import Path
 from tkinter import *
-import socket
+from queue import Queue
+from threading import Thread
+from collections import Counter
 
 # Ensure parent directory is in sys.path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import twophase.cubie as cubie
 import twophase.vision_params as vision_params
+from twophase import vision2
+from rubik_robot.vision.face_scanner import COLORS, scanner
+from rubik_robot.vision.solve_guide import cube_faces, guide, prepare_cube, request_solution
 
 
 # ################################## some global variables and constants ###############################################
@@ -79,41 +84,80 @@ def get_definition_string():
 # ############################### Solve the displayed cube with a local or remote server ###############################
 
 
-def solve():
-    """Connect to the server and return the solving maneuver."""
-    display.delete(1.0, END)  # clear output window
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error:
-        show_text('Failed to create socket')
-        return
-    # host = 'f9f0b2jt6zmzyo6b.myfritz.net'  # my RaspberryPi, if online
-    host = txt_host.get(1.0, END).rstrip()  # default is localhost
-    port = int(txt_port.get(1.0, END))  # default is port 8080
+solve_results = Queue()
+solve_generation = 0
+solving = False
+last_auto_revision = None
 
+
+def cancel_guidance():
+    """Input: none. Output: invalidate pending requests and stop the camera guide."""
+    global solve_generation, solving, last_auto_revision
+    solve_generation += 1
+    solving = False
+    last_auto_revision = scanner.snapshot()['revision']
+    guide.reset()
+
+
+def solve_in_background(generation, revision, faces, samples, host, port):
+    """Input: captured snapshot/endpoint. Output: a result queued for the Tk thread."""
     try:
-        remote_ip = socket.gethostbyname(host)
-    except socket.gaierror:
-        show_text('Hostname could not be resolved.')
+        cube, _, centers, note = prepare_cube(faces, samples)
+        solution = request_solution(host, port, cube)
+        result = (cube, centers, note, solution)
+        solve_results.put((generation, revision, result, None))
+    except Exception as error:
+        solve_results.put((generation, revision, None, str(error)))
+
+
+def solve():
+    """Input: editor cube/server address. Output: asynchronously start verified guidance."""
+    global solving, last_auto_revision
+    if solving:
         return
     try:
-        s.connect((remote_ip, port))
-    except BaseException as e:
-        show_text('Cannot connect to server! ' + e.__doc__)
+        definition = get_definition_string()
+        faces = cube_faces(definition)
+        host = txt_host.get(1.0, END).strip()
+        port = int(txt_port.get(1.0, END))
+    except (KeyError, ValueError):
+        show_text('Complete all six faces and check the server port.\n')
         return
-    show_text('Connected with ' + remote_ip + '\n')
-    try:
-        defstr = get_definition_string() + '\n'
-    except BaseException as e:
-        show_text('Invalid facelet configuration.\nWrong or missing colors. ' + e.__doc__)
-        return
-    show_text(defstr)
-    try:
-        s.sendall((defstr + '\n').encode())
-    except BaseException as e:
-        show_text('Cannot send cube configuration to server. ' + e.__doc__)
-        return
-    show_text(s.recv(2048).decode())
+    state = scanner.snapshot()
+    samples = state['hsv_faces'] if faces == state['faces'] else None
+    cancel_guidance()
+    pause_scan()
+    solving = True
+    last_auto_revision = state['revision']
+    display.delete(1.0, END)
+    show_text('Checking 54 colors and face directions, then requesting the TCP solver...\n')
+    Thread(target=solve_in_background,
+           args=(solve_generation, state['revision'], faces, samples, host, port), daemon=True).start()
+
+
+def receive_solution():
+    """Input: worker queue. Output: start current results and discard stale replies."""
+    global solving
+    while not solve_results.empty():
+        generation, revision, result, error = solve_results.get_nowait()
+        if generation != solve_generation:
+            continue
+        if revision != scanner.snapshot()['revision']:
+            solving = False
+            continue
+        solving = False
+        if error:
+            guide.fail(error)
+            show_text(f'Check scan: {error}\nUse Rescan shown face or correct the editor, then Solve.\n')
+            continue
+        cube, centers, note, solution = result
+        try:
+            guide.begin(cube, solution, centers)
+            show_text(f'{note}\n{cube}\nSolution: {solution or "<already solved>"}\n')
+        except ValueError as failure:
+            guide.fail(failure)
+            show_text(f'Cannot start guide: {failure}\n')
+
 ########################################################################################################################
 
 # ################################# Functions to change the facelet colors #############################################
@@ -121,23 +165,45 @@ def solve():
 
 def clean():
     """Restore the cube to a clean cube."""
+    global last_saved
+    cancel_guidance()
+    display.delete(1.0, END)
+    scanner.reset()
+    last_saved = {}
+    pause_scan()
     for f in range(6):
         for row in range(3):
             for col in range(3):
-                canvas.itemconfig(facelet_id[f][row][col], fill=canvas.itemcget(facelet_id[f][1][1], "fill"))
+                canvas.itemconfig(facelet_id[f][row][col], fill=canvas.itemcget(facelet_id[f][1][1], "fill"), outline='black', width=1)
 
 
 def empty():
     """Remove the facelet colors except the center facelets colors."""
+    global last_saved
+    cancel_guidance()
+    display.delete(1.0, END)
+    orientation_status.set('Reference: yellow U, red F, green R. Rotate the whole cube while scanning.')
+    scanner.reset()
+    last_saved = {}
+    auto_scan.set(True)
+    vision_params.cube_col.clear()
+    vision_params.cube_hsv.clear()
     for f in range(6):
         for row in range(3):
             for col in range(3):
+                canvas.itemconfig(facelet_id[f][row][col], outline='black', width=1)
                 if row != 1 or col != 1:
                     canvas.itemconfig(facelet_id[f][row][col], fill="grey")
 
 
 def random():
     """Generate a random cube and sets the corresponding facelet colors."""
+    global last_saved
+    cancel_guidance()
+    display.delete(1.0, END)
+    scanner.reset()
+    last_saved = {}
+    pause_scan()
     cc = cubie.CubieCube()
     cc.randomize()
     fc = cc.to_facelet_cube()
@@ -145,7 +211,7 @@ def random():
     for f in range(6):
         for row in range(3):
             for col in range(3):
-                canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]])
+                canvas.itemconfig(facelet_id[f][row][col], fill=cols[fc.f[idx]], outline='black', width=1)
                 idx += 1
 ########################################################################################################################
 
@@ -154,7 +220,7 @@ def random():
 
 def click(_event):
     """Define how to react on left mouse clicks"""
-    global curcol
+    global curcol, last_auto_revision
     idlist = canvas.find_withtag("current")
     if len(idlist) > 0:
         if idlist[0] in colorpick_id:
@@ -163,7 +229,16 @@ def click(_event):
                 canvas.itemconfig(colorpick_id[i], width=1)
             canvas.itemconfig("current", width=5)
         else:
-            canvas.itemconfig("current", fill=curcol)
+            if solving or guide.snapshot()['phase'] not in ('idle', 'solved'):
+                return
+            for face_index in range(6):
+                for sticker in range(9):
+                    if idlist[0] == facelet_id[face_index][sticker // 3][sticker % 3] and sticker != 4:
+                        cancel_guidance()
+                        pause_scan()
+                        canvas.itemconfig("current", fill=curcol)
+                        scanner.edit(cols[face_index], sticker, curcol)
+                        last_auto_revision = scanner.snapshot()['revision']
 ########################################################################################################################
 
 
@@ -210,19 +285,110 @@ def set_delta_C(val):
 
 def transfer():
     """Transfer the facelet colors detected by the opencv vision to the GUI editor."""
-    if len(vision_params.face_col) == 0:
-        return
-    centercol = vision_params.face_col[1][1]
+    cancel_guidance()
+    scanner.save_current()
+    refresh_scan()
 
-    vision_params.cube_col[centercol] = vision_params.face_col
-    vision_params.cube_hsv[centercol] = vision_params.face_hsv
 
-    dc = {}
-    for i in range(6):
-        dc[canvas.itemcget(facelet_id[i][1][1], "fill")] = i  # map color to face number
-    for i in range(3):
-        for j in range(3):
-            canvas.itemconfig(facelet_id[dc[centercol]][i][j], fill=vision_params.face_col[i][j])
+def pause_scan():
+    """Input: none. Output: pause acquisition while editing or solving a cube."""
+    auto_scan.set(False)
+    scanner.set_enabled(False)
+
+
+def toggle_scan():
+    """Input: checkbox value. Output: enable or pause automatic face capture."""
+    if auto_scan.get():
+        cancel_guidance()
+    scanner.set_enabled(auto_scan.get())
+
+
+def rescan_current():
+    """Input: current camera face. Output: clear that saved face and resume capture."""
+    state = scanner.snapshot()
+    if state['current']:
+        cancel_guidance()
+        scanner.forget(state['current'][4])
+        auto_scan.set(True)
+        scanner.set_enabled(True)
+
+
+def rotate_current():
+    """Input: current camera face. Output: rotate its saved grid clockwise."""
+    state = scanner.snapshot()
+    if state['current']:
+        cancel_guidance()
+        scanner.rotate(state['current'][4])
+
+
+last_saved = {}
+
+
+def refresh_scan():
+    """Input: scanner snapshot. Output: update Tk widgets on the GUI thread."""
+    global last_saved
+    state = scanner.snapshot()
+    guidance = guide.snapshot()
+    faces = cube_faces(guidance['cube']) if guidance['cube'] else state['faces']
+    if guidance['phase'] == 'solved' and state['faces'] != faces:
+        scanner.set_verified_faces(faces)
+        state = scanner.snapshot()
+    for center in COLORS:
+        face = faces.get(center)
+        if face == last_saved.get(center):
+            continue
+        index = cols.index(center)
+        values = face or ('grey',) * 4 + (center,) + ('grey',) * 4
+        for sticker, color in enumerate(values):
+            canvas.itemconfig(facelet_id[index][sticker // 3][sticker % 3], fill=color)
+        if face:
+            vision_params.cube_col[center] = [list(face[row:row+3]) for row in (0, 3, 6)]
+        else:
+            vision_params.cube_col.pop(center, None)
+    last_saved = faces
+    counts = Counter(color for values in faces.values() for color in values)
+    for face_index, center in enumerate(COLORS):
+        for sticker, color in enumerate(faces.get(center, ())):
+            conflict = counts[color] > 9 and guidance['phase'] in ('idle', 'error')
+            canvas.itemconfig(facelet_id[face_index][sticker // 3][sticker % 3],
+                              outline='darkorange' if conflict else 'black', width=3 if conflict else 1)
+    text = vision2.camera_error or f"{len(state['faces'])}/6 - {state['message']}"
+    if solving:
+        text = 'Checking scan and waiting for the TCP solver...'
+    elif guidance['phase'] != 'idle':
+        text = guidance['message']
+    if vision2.camera_error:
+        text = vision2.camera_error
+    scan_status.set(text)
+    active = guidance['phase'] in ('align', 'turn', 'verify')
+    bsolve.config(state=DISABLED if solving or active else NORMAL)
+    for button in (btransfer, bclean, brandom, rescan_button, rotate_button, auto_scan_button):
+        button.config(state=DISABLED if solving or active else NORMAL)
+    if active:
+        orientation_status.set('One arrow: turn one layer 90 degrees. Three arrows: rotate the whole cube.')
+    elif state['current']:
+        center = state['current'][4]
+        top = {'yellow': 'orange', 'white': 'red', 'red': 'yellow',
+               'green': 'yellow', 'blue': 'yellow', 'orange': 'yellow'}[center]
+        orientation_status.set(f"Showing {center}: the adjacent {top} face must be at the top edge.")
+
+
+def poll_scan():
+    """Input: none. Output: refresh scan widgets every 100 milliseconds."""
+    receive_solution()
+    refresh_scan()
+    state = scanner.snapshot()
+    if auto_guide.get() and len(state['faces']) == 6 and not solving and guide.snapshot()['phase'] == 'idle':
+        if state['revision'] != last_auto_revision:
+            solve()
+    root.after(100, poll_scan)
+
+
+def close_client():
+    """Input: close-window event. Output: stop camera acquisition and close Tk."""
+    cancel_guidance()
+    vision2.camera_stop.set()
+    root.destroy()
 
 # ######################################################################################################################
 
@@ -308,6 +474,24 @@ s_delta_C.set(vision_params.delta_C)
 btransfer = Button(text="Webcam import", height=2, width=13, relief=RAISED, command=transfer)
 canvas.create_window(10 + 0.5 * width, 10 + 2.1 * width, anchor=NW, window=btransfer)
 
+scan_controls = Frame(root)
+scan_controls.pack(fill=X, padx=10, pady=4)
+auto_scan = BooleanVar(value=True)
+auto_scan_button = Checkbutton(scan_controls, text="Auto scan", variable=auto_scan, command=toggle_scan)
+auto_scan_button.pack(side=LEFT)
+rescan_button = Button(scan_controls, text="Rescan shown face", command=rescan_current)
+rescan_button.pack(side=LEFT, padx=4)
+rotate_button = Button(scan_controls, text="Rotate saved face 90", command=rotate_current)
+rotate_button.pack(side=LEFT, padx=4)
+Button(scan_controls, text="New scan", command=empty).pack(side=LEFT, padx=4)
+auto_guide = BooleanVar(value=True)
+Checkbutton(scan_controls, text="Auto guide after 6 faces", variable=auto_guide).pack(side=LEFT, padx=4)
+scan_status = StringVar(value="Show a face and hold still")
+Label(root, textvariable=scan_status, wraplength=720).pack(padx=10, pady=3)
+orientation_status = StringVar(value="Reference: yellow U, red F, green R. Rotate the whole cube while scanning.")
+Label(root, textvariable=orientation_status, wraplength=720).pack(padx=10, pady=(0, 8))
+root.protocol("WM_DELETE_WINDOW", close_client)
+root.after(100, poll_scan)
 
 root.mainloop()
 ########################################################################################################################
