@@ -193,3 +193,22 @@ Gửi trực tiếp qua cổng COM đã chọn.
 ```
 
 `--seed 7` tái tạo cùng bộ đề để kiểm thử. `--duration-ms` và `--face-turn-command` điều chỉnh thời gian hoặc chọn `MOVE` cho firmware tương ứng.
+
+## Tự Động Quét Và Giải Qua UART
+
+Chọn tab thứ ba `Auto Solve` trong cùng Solver Client. Đặt Rubik xáo trộn vào
+máy với hướng màu bất kỳ, chọn cổng UART và bấm `Start`. Camera nhận diện mặt
+đầu tiên tại chỗ và cập nhật theo màu tâm trước khi kết nối UART.
+
+Chương trình gửi bảy tư thế `SCAN_POSE` cố định sau lần chụp đầu, chờ `DONE` rồi
+tự chụp các phía còn lại. U/F/D/B/R/L biểu thị vị trí của khối trong máy lúc Start.
+Các mặt xuất hiện dần theo màu tâm, có kiểm tra trùng. Đủ sáu mặt sẽ thông báo,
+đưa khối về tư thế ban đầu, kiểm tra trạng thái, gọi server Two-Phase và xuất/gửi
+từng lệnh giải `TURN` theo hệ tọa độ máy qua UART. Nút dừng ngừng các bước tiếp
+theo sau thao tác hiện tại.
+
+Lệnh mở server và client vẫn giống phần hướng dẫn giải phía trên. Firmware cần
+thực hiện đúng hợp đồng tư thế toàn khối và trả `DONE`; firmware hiện có thể trả
+`ERR UNSUPPORTED` khi sequence cơ khí chưa được triển khai. Phần mới chỉ xử lý
+camera, solver và UART ở PC. Hướng đặt camera, bảng tư thế, phản hồi và lệnh kiểm
+thử đầy đủ nằm trong [AUTO_SOLVE.md](docs/AUTO_SOLVE.md).

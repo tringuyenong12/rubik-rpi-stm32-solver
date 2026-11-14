@@ -496,5 +496,8 @@ root.after(100, poll_scan)
 from rubik_robot.scramble_panel import ScrambleWorkspace
 scramble_workspace = ScrambleWorkspace(root, sys.modules[__name__])
 
+from rubik_robot.auto_solve_panel import AutoSolveWorkspace
+auto_solve_workspace = AutoSolveWorkspace(root, sys.modules[__name__], scramble_workspace)
+
 root.mainloop()
 ########################################################################################################################
