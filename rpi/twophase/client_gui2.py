@@ -493,5 +493,8 @@ Label(root, textvariable=orientation_status, wraplength=720).pack(padx=10, pady=
 root.protocol("WM_DELETE_WINDOW", close_client)
 root.after(100, poll_scan)
 
+from rubik_robot.scramble_panel import ScrambleWorkspace
+scramble_workspace = ScrambleWorkspace(root, sys.modules[__name__])
+
 root.mainloop()
 ########################################################################################################################

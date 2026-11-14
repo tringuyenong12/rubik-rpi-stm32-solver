@@ -26,6 +26,8 @@ def main() -> None:
 
     print(f"Starting camera {args.camera}. Hold each face still to capture it automatically.")
     thr = Thread(target=grab_colors, args=(args.camera, backend, args.show_masks), daemon=True)
+    vision2.camera_options = (args.camera, backend, args.show_masks)
+    vision2.camera_thread = thr
     thr.start()
 
     print("Server address: localhost:8080. Guidance starts automatically after 6 validated faces.")
@@ -33,7 +35,7 @@ def main() -> None:
         import twophase.client_gui2
     finally:
         vision2.camera_stop.set()
-        thr.join(timeout=2)
+        vision2.camera_thread.join(timeout=2)
 
 
 if __name__ == "__main__":

@@ -157,3 +157,39 @@ Push-Location rpi
 ..\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
 Pop-Location
 ```
+
+## Trộn Bộ Đề Từ Rubik Đã Giải
+
+Trong Solver Client, chọn tab `Scramble` ở thanh lựa chọn phía trên để mở chức năng trộn.
+
+| Mức độ | Số nước trộn |
+| --- | --- |
+| Dễ | 5 |
+| Trung bình | 12 |
+| Khó | 22 |
+
+Mức độ được chia theo độ dài chuỗi sinh ra. Mỗi bộ đề được tính từ trạng thái đã giải, tránh hai nước liên tiếp trên cùng trục. Độ dài lời giải tối ưu của bộ đề có thể khác số nước trộn.
+
+1. Đặt Rubik đã giải theo U vàng, F đỏ, R xanh lá.
+2. Chọn `Easy`, `Medium` hoặc `Hard`, rồi bấm `Generate scramble` để xem chuỗi xoay, lệnh UART và sơ đồ sáu mặt của trạng thái đích.
+3. Dùng `Copy UART` hoặc `Save .txt` để xuất đúng các bước trộn.
+4. Chọn cổng COM, baud rate và bấm `Send UART` để gửi trực tiếp.
+5. Mỗi lệnh `TURN` chờ `OK TURN` rồi `DONE TURN`. Lỗi hoặc timeout sẽ dừng chuỗi và báo số bước đã xác nhận. Nút dừng chờ bước đang chạy hoàn tất rồi ngừng gửi các bước tiếp theo.
+
+Trước mỗi lần gửi lại hoặc tạo bộ đề mới để thực hiện trên robot, đưa Rubik về trạng thái đã giải. Chuyển về `Solve Guide` sẽ mở một lượt quét mới. Khi firmware báo `ERR UNSUPPORTED`, cần triển khai sequence xoay tương ứng để thực thi lệnh đã xuất. Giao thức chi tiết nằm trong [UART_PROTOCOL.md](docs/UART_PROTOCOL.md).
+
+Tạo và xuất bộ đề bằng terminal từ thư mục gốc project.
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level easy
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level medium
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level hard --output scramble_hard.txt
+```
+
+Gửi trực tiếp qua cổng COM đã chọn.
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level easy --port COM5 --baudrate 115200
+```
+
+`--seed 7` tái tạo cùng bộ đề để kiểm thử. `--duration-ms` và `--face-turn-command` điều chỉnh thời gian hoặc chọn `MOVE` cho firmware tương ứng.
