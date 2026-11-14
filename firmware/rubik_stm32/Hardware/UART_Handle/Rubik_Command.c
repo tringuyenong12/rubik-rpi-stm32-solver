@@ -1,5 +1,6 @@
 #include "Rubik_Command.h"
 #include "../Rubik_Control/Rubik_Control.h"
+#include <string.h>
 
 static const char *RubikMove(const UART_Command *command)
 {
@@ -12,8 +13,8 @@ static const char *RubikMove(const UART_Command *command)
     };
     uint32_t duration;
     if (command->count != 3U) return "BAD_ARG";
-    int face = UART_FindKeyword(command->args[1], faces, 12U);
-    if (face < 0 || !UART_ParseUnsigned(command->args[2], &duration)) return "BAD_ARG";
+    int face = UART_FindKeyword(command->argv[3], faces, 12U);
+    if (face < 0 || !UART_ParseUnsigned(command->argv[4], &duration)) return "BAD_ARG";
     if (!duration || duration > UART_MAX_DURATION_MS) return "LIMIT";
     /* Rubik_Down_ToFront() is empty in the current library. Do not report success. */
     if (face == MOVE_D_INV) return "NOT_IMPLEMENTED";
@@ -39,28 +40,45 @@ static const char *RubikMove(const UART_Command *command)
 
 void Rubik_CommandHandler(const UART_Command *command)
 {
-    enum { RUBIK_PING, RUBIK_RESET, RUBIK_MOVE, RUBIK_STOP };
-    static const UART_Keyword actions[] = {
-        {"PING", RUBIK_PING}, {"RESET", RUBIK_RESET},
-        {"MOVE", RUBIK_MOVE}, {"STOP", RUBIK_STOP}
-    };
-    const char *error;
-    int action = UART_FindKeyword(command->args[0], actions, 4U);
-    if (action < 0) { UART_Error(command->id, "UNKNOWN_CMD"); return; }
-    if (action != RUBIK_MOVE && command->count != 1U)
-    { UART_Error(command->id, "BAD_ARG"); return; }
-    switch (action)
+    enum { RUBIK_UNKNOWN, RUBIK_PING, RUBIK_RESET, RUBIK_MOVE, RUBIK_STOP };
+    /* argv[0]=ID, argv[1]=GROUP, argv[2]=ACTION. */
+    if (!command->count)
     {
-    case RUBIK_PING:  UART_Accept(command->id); UART_Done(command->id);  break;
+        UART_Error(command->id, "BAD_ARG");
+        return;
+    }
+    const char *action = command->argv[2];
+    int code = RUBIK_UNKNOWN;
+    if (strcmp(action, "PING") == 0) code = RUBIK_PING;
+    else if (strcmp(action, "RESET") == 0) code = RUBIK_RESET;
+    else if (strcmp(action, "MOVE") == 0) code = RUBIK_MOVE;
+    else if (strcmp(action, "STOP") == 0) code = RUBIK_STOP;
+
+    switch (code)
+    {
+    case RUBIK_MOVE:
+    {
+        const char *error = RubikMove(command);
+        if (error) UART_Error(command->id, error);
+        break;
+    }
+    case RUBIK_PING:
+        if (command->count != 1U) { UART_Error(command->id, "BAD_ARG"); return; }
+        UART_Accept(command->id);
+        UART_Done(command->id);
+        break;
     case RUBIK_RESET:
+        if (command->count != 1U) { UART_Error(command->id, "BAD_ARG"); return; }
         UART_Accept(command->id);
         Rubik_Hold_Start_Position();
         UART_Done(command->id);
         break;
-    case RUBIK_MOVE:
-        error = RubikMove(command);
-        if (error) UART_Error(command->id, error);
+    case RUBIK_STOP:
+        if (command->count != 1U) { UART_Error(command->id, "BAD_ARG"); return; }
+        UART_Command_Stop(command->id);
         break;
-    case RUBIK_STOP: UART_Command_Stop(command->id); break;
+    default:
+        UART_Error(command->id, "UNKNOWN_CMD");
+        break;
     }
 }

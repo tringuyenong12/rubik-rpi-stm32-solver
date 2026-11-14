@@ -13,6 +13,11 @@ static unsigned rx_index;
 static bool receiving;
 static volatile bool command_ready;
 static uint32_t last_rx_tick;
+#if UART_COMMAND_TRACE
+static volatile bool rx_seen;
+static volatile uint8_t first_rx_byte;
+static bool rx_reported;
+#endif
 
 void UART_Command_Init(UART_HandleTypeDef *huart)
 {
@@ -20,6 +25,10 @@ void UART_Command_Init(UART_HandleTypeDef *huart)
     rx_index = 0;
     receiving = false;
     command_ready = false;
+#if UART_COMMAND_TRACE
+    rx_seen = false;
+    rx_reported = false;
+#endif
     Calibration_CommandInit();
     Config_CommandInit();
     if (uart_cmd) HAL_UART_Receive_IT(uart_cmd, &rx_byte, 1U);
@@ -28,6 +37,14 @@ void UART_Command_Init(UART_HandleTypeDef *huart)
 void UART_Command_RxCallback(UART_HandleTypeDef *huart)
 {
     if (!uart_cmd || huart != uart_cmd) return;
+
+#if UART_COMMAND_TRACE
+    if (!rx_seen)
+    {
+        first_rx_byte = rx_byte;
+        rx_seen = true;
+    }
+#endif
 
     /* One request at a time. Keep the command buffer unchanged until DONE. */
     if (command_ready || huart->ErrorCode != HAL_UART_ERROR_NONE)
@@ -85,7 +102,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 void UART_Reply(uint16_t id, const char *status, const char *value)
 {
     char reply[96];
-    HAL_UART_Transmit(uart_cmd, (uint8_t *)"ok\r\n", 4U, 20U);
     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
                           status, value ? " " : "", value ? value : "");
     HAL_UART_Transmit(uart_cmd, (uint8_t *)reply, (uint16_t)length, 20U);
@@ -111,12 +127,48 @@ void UART_Command_Stop(uint16_t id)
 
 void UART_Command_Process(void)
 {
+#if UART_COMMAND_TRACE
+    char trace[128];
+    int length;
+    /* Transmit diagnostics in main, never inside the RX interrupt. */
+    if (rx_seen && !rx_reported)
+    {
+        rx_reported = true;
+        length = snprintf(trace, sizeof(trace), "UART RX FIRST=0x%02X\r\n",
+                          (unsigned)first_rx_byte);
+        HAL_UART_Transmit(uart_cmd, (uint8_t *)trace, (uint16_t)length, 20U);
+    }
+#endif
     if (!command_ready) return;
     __DMB();
+#if UART_COMMAND_TRACE
+    length = snprintf(trace, sizeof(trace), "UART LINE=#%s\r\n", command_buffer);
+    HAL_UART_Transmit(uart_cmd, (uint8_t *)trace, (uint16_t)length, 20U);
+#endif
     UART_Command command;
     const char *error = UART_ParseCommand(command_buffer, &command);
-    if (error) UART_Error(command.id, error);
-    else UART_DispatchCommand(&command);
+    if (error) {
+        
+        UART_Error(command.id, error);
+    
+    }
+    else
+    {
+#if UART_COMMAND_TRACE
+        for (unsigned i = 0; i < command.argc; ++i)
+        {
+            length = snprintf(trace, sizeof(trace), "UART argv[%u]=%s\r\n",
+                              i, command.argv[i]);
+            HAL_UART_Transmit(uart_cmd, (uint8_t *)trace, (uint16_t)length, 20U);
+        }
+        length = snprintf(trace, sizeof(trace),
+                          "UART PARSE ID=%u GROUP=%u ACTION=%s PARAMS=%u\r\n",
+                          (unsigned)command.id, (unsigned)command.group,
+                          command.args[0], command.count - 1U);
+        HAL_UART_Transmit(uart_cmd, (uint8_t *)trace, (uint16_t)length, 20U);
+#endif
+        UART_DispatchCommand(&command);
+    }
     __DMB();
     command_ready = false;
 }

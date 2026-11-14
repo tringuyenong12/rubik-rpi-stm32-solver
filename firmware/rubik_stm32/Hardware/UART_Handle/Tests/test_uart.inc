@@ -13,6 +13,8 @@ static UART_HandleTypeDef uart;
 static uint8_t *rx;
 static uint32_t tick;
 static char replies[32768];
+static char traces[32768];
+static unsigned trace_length;
 static unsigned output_length, writes, moves;
 #ifndef UART_TEST_REAL_RUBIK
 static unsigned last_move;
@@ -31,6 +33,14 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *h, uint8_t *buffer, ui
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *h, uint8_t *buffer, uint16_t n, uint32_t timeout)
 {
     assert(!isr && h == &uart && timeout == 20U);
+    if (n >= 5U && !memcmp(buffer, "UART ", 5U))
+    {
+        assert(trace_length + n < sizeof(traces));
+        memcpy(traces + trace_length, buffer, n);
+        trace_length += n;
+        traces[trace_length] = 0;
+        return HAL_OK;
+    }
     assert(output_length + n < sizeof(replies));
     memcpy(replies + output_length, buffer, n);
     output_length += n;
@@ -92,13 +102,37 @@ void Rubik_Back_(void) { move(11); }
 void Rubik_Hold_Start_Position(void) { move(12); }
 #endif
 
-static void clear_output(void) { output_length = 0; replies[0] = 0; }
+static void clear_output(void)
+{
+    output_length = 0; replies[0] = 0;
+    trace_length = 0; traces[0] = 0;
+}
+static bool replies_match(const char *expected)
+{
+    char wire[32768];
+    unsigned length = 0;
+    while (*expected)
+    {
+        const char *end = strchr(expected, '\n');
+        assert(end);
+        unsigned n = (unsigned)(end - expected);
+        assert(length + n + 7U < sizeof(wire));
+        memcpy(wire + length, expected, n);
+        length += n;
+        memcpy(wire + length, "\r\n", 2U);
+        length += 2U;
+        expected = end + 1;
+    }
+    wire[length] = 0;
+    return !strcmp(replies, wire);
+}
+
 static void command(const char *line, const char *expected)
 {
     clear_output();
     feed(line);
     UART_Command_Process();
-    if (strcmp(replies, expected))
+    if (!replies_match(expected))
     {
         fprintf(stderr, "Command: %sExpected: %sActual: %s", line, expected, replies);
         assert(0);
@@ -112,6 +146,20 @@ int main(void)
     UART_Command_Init(NULL);
     UART_Command_Process();
     UART_Command_Init(&uart);
+    UART_Command parsed;
+    char ping[] = "#1 RUBIK PING";
+    assert(UART_ParseCommand(ping, &parsed) == NULL);
+    assert(parsed.id == 1U && parsed.group == UART_GROUP_RUBIK);
+    assert(parsed.count == 1U && !strcmp(parsed.args[0], "PING"));
+    assert(parsed.argc == 3U && parsed.argv[3] == NULL);
+    assert(!strcmp(parsed.argv[0], "1"));
+    assert(!strcmp(parsed.argv[1], "RUBIK"));
+    assert(!strcmp(parsed.argv[2], "PING"));
+    char move_line[] = "#12 RUBIK MOVE L 500";
+    assert(UART_ParseCommand(move_line, &parsed) == NULL);
+    assert(parsed.id == 12U && parsed.argc == 5U && parsed.count == 3U);
+    assert(!strcmp(parsed.argv[3], "L") && !strcmp(parsed.argv[4], "500"));
+    assert(parsed.args == &parsed.argv[2]);
     for (unsigned i = 0; i < 12U; ++i)
     {
         unsigned before = moves;
@@ -125,8 +173,15 @@ int main(void)
     }
     command("#1 RUBIK RESET\n", "#1 OK\n#1 DONE\n");
     command("#2 RUBIK PING\n", "#2 OK\n#2 DONE\n");
+    UART_Command_Init(&uart);
     command("\x23\x31\x20\x52\x55\x42\x49\x4B\x20\x50\x49\x4E\x47\x0A",
             "#1 OK\n#1 DONE\n"); /* Exact bytes sent from a hex terminal. */
+    assert(!strcmp(traces, "UART RX FIRST=0x23\r\n"
+                           "UART LINE=#1 RUBIK PING\r\n"
+                           "UART argv[0]=1\r\n"
+                           "UART argv[1]=RUBIK\r\n"
+                           "UART argv[2]=PING\r\n"
+                           "UART PARSE ID=1 GROUP=1 ACTION=PING PARAMS=0\r\n"));
     command("#1 RUBIK PING\r\n", "#1 OK\n#1 DONE\n");
     /* CRLF may arrive across separate main-loop iterations. */
     command("#1 RUBIK PING\r", "");
@@ -147,8 +202,8 @@ int main(void)
     command("#65536 RUBIK PING\n", "#0 ERR BAD_FORMAT\n");
     command("#-1 RUBIK PING\n", "#0 ERR BAD_FORMAT\n");
     command("#1 RUBIK\n", "#1 ERR BAD_FORMAT\n");
-    command("#1 RUBIK PING\001\n", "#1 ERR BAD_FORMAT\n");
-    command("#1 RUBIK PI\rNG\n", "#1 ERR BAD_FORMAT\n");
+    command("#1 RUBIK PING\001\n", "#1 ERR UNKNOWN_CMD\n");
+    command("#1 RUBIK PI\rNG\n", "#1 ERR UNKNOWN_CMD\n");
     memset(line, ' ', sizeof(line));
     memcpy(line, "#1 RUBIK PING", 13);
     line[sizeof(line) - 2] = '\n'; line[sizeof(line) - 1] = 0;
@@ -227,11 +282,11 @@ int main(void)
     feed("#1 RUBIK PING\n#2 RUBIK MOVE R 500\n");
     UART_Command_Process();
     UART_Command_Process();
-    assert(!strcmp(replies, "#1 OK\n#1 DONE\n")); /* No queue. */
+    assert(replies_match("#1 OK\n#1 DONE\n")); /* No queue. */
     during_move = "#2 RUBIK MOVE R 500\n";
     clear_output(); feed("#1 RUBIK MOVE L 500\n"); UART_Command_Process();
     UART_Command_Process();
-    assert(!strcmp(replies, "#1 OK\n#1 DONE\n")); /* Busy input is ignored. */
+    assert(replies_match("#1 OK\n#1 DONE\n")); /* Busy input is ignored. */
     during_move = "#2 RUBIK MO";
     clear_output(); feed("#1 RUBIK MOVE L 500\n"); UART_Handle_Process();
     command("VE R 500\n#3 RUBIK PING\n", "#3 OK\n#3 DONE\n");

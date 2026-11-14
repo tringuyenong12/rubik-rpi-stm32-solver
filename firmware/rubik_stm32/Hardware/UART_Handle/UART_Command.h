@@ -17,8 +17,10 @@ typedef struct
 {
     uint16_t id;
     UART_Group group;
+    unsigned argc;
+    char *argv[UART_MAX_TOKENS + 3U]; /* ID, GROUP, ACTION, parameters, NULL. */
     unsigned count;
-    char *args[UART_MAX_TOKENS]; /* ACTION and arguments, excludes ID/GROUP. */
+    char **args; /* Points to argv[2]: ACTION followed by parameters. */
 } UART_Command;
 
 typedef struct { const char *name; int code; } UART_Keyword;

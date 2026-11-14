@@ -41,6 +41,36 @@ Trong tab Send, dùng **Send ASCII** với `#1 RUBIK PING` và bật thêm LF. H
 
 Với Send Numbers, dùng tiền tố `0x` để chỉ rõ số hex; không nhập dãy hex trần `23 31 20 ...`. Phản hồi mong đợi là `#1 OK` rồi `#1 DONE`. Dòng `I am alive` chỉ xác nhận đường phát từ STM32; chưa xác nhận đường nhận vào PA10.
 
+### Chẩn đoán nhận và tách lệnh
+
+`UART_COMMAND_TRACE` trong `UART_Handle.h` hiện bằng `1` để kiểm tra trên bo. Khi gửi `#1 RUBIK PING` kèm LF, kết quả mong đợi:
+
+```text
+UART RX FIRST=0x23
+UART LINE=#1 RUBIK PING
+UART argv[0]=1
+UART argv[1]=RUBIK
+UART argv[2]=PING
+UART PARSE ID=1 GROUP=1 ACTION=PING PARAMS=0
+#1 OK
+#1 DONE
+```
+
+`RX FIRST` chỉ xuất hiện một lần sau khởi tạo UART; `GROUP=1` là nhóm RUBIK. Không thấy `RX FIRST` sau khi vòng lặp chính đã chạy nghĩa là callback chưa nhận byte nào. Có `RX FIRST` nhưng thiếu `LINE` nghĩa là chưa ghép được dòng hoàn chỉnh (cần kiểm tra byte LF, timeout hoặc lỗi nhận). `LINE` cho biết chuỗi trước khi parse; `PARSE` cho biết các trường đã tách thành công. Các thông báo đều gửi từ vòng lặp chính. Đặt `UART_COMMAND_TRACE` về `0` khi kết thúc chẩn đoán để chỉ gửi phản hồi giao thức.
+
+### Mảng trường lệnh `argv[]`
+
+Parser chỉ chạy sau khi bộ nhận ghép đủ dòng kết thúc bằng LF. Dấu `#` không nằm trong các phần tử. `argc` là tổng số từ; `argv[argc]` bằng NULL.
+
+| Phần tử | Ý nghĩa | Ví dụ `#1 RUBIK MOVE L 500` |
+|---|---|---|
+| `argv[0]` | ID | `1` |
+| `argv[1]` | Nhóm lệnh | `RUBIK` |
+| `argv[2]` | Hành động | `MOVE` |
+| `argv[3]` trở đi | Tham số | `L`, `500` |
+
+Parser dùng `switch` theo vị trí trường để đọc ID và nhóm, sau đó dispatcher dùng `switch` theo nhóm. Handler RUBIK so sánh chuỗi hành động rồi chọn `case PING/RESET/MOVE/STOP`. Các handler khác tiếp tục dùng `args`, trỏ vào `argv[2]`, nên `args[0]` chính là hành động.
+
 ## 2. Nhóm RUBIK — Điều khiển toàn bộ cơ cấu
 
 ### Cú pháp

@@ -98,7 +98,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   UART_Command_Init(&huart1);
-  static const uint8_t uart_alive[] = "I am alive\r\n";
+  static const uint8_t uart_alive[] = "Hello from alive STM32 USART1\r\n";
   HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
   PCA9685_Init(50); // 50Hz for servo
   Servo_Init();
@@ -117,7 +117,11 @@ int main(void)
     //UART_Handle_Process();
 	  //Rubik_Left();
 	  //HAL_Delay(3000);
-	   UART_Command_Process();
+	 UART_Command_Process();
+     //UART_Accept(1);
+     //UART_Done(1);
+     //UART_Error(1, "Test error");
+     //HAL_Delay(1000);
 
   }
   /* USER CODE END 3 */

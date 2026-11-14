@@ -1,2 +1,2 @@
-../Hardware/UART_Handle/Rubik_Command.c:4:20:RubikMove	18
-../Hardware/UART_Handle/Rubik_Command.c:40:6:Rubik_CommandHandler	9
+../Hardware/UART_Handle/Rubik_Command.c:5:20:RubikMove	18
+../Hardware/UART_Handle/Rubik_Command.c:41:6:Rubik_CommandHandler	14

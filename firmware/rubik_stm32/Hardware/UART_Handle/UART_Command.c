@@ -30,42 +30,49 @@ bool UART_ParseUnsigned(const char *text, uint32_t *value)
 
 const char *UART_ParseCommand(char *line, UART_Command *command)
 {
-    char *tokens[UART_MAX_TOKENS + 2U];
-    unsigned count = 0;
+    char *token;
     uint32_t id;
     static const UART_Keyword groups[] = {
         {"RUBIK", UART_GROUP_RUBIK}, {"CONTROL", UART_GROUP_CONTROL},
         {"CALIB", UART_GROUP_CALIB}, {"CONFIG", UART_GROUP_CONFIG},
         {"SYSTEM", UART_GROUP_SYSTEM}
     };
-    command->id = 0;
-    command->count = 0;
-    command->group = UART_GROUP_UNKNOWN;
-    while (*line)
+    *command = (UART_Command){0};
+    command->args = &command->argv[2];
+
+    /* RX removes '#'; also accept a complete line when calling the parser directly. */
+    if (*line == '#') ++line;
+    token = strtok(line, " \t\r\n");
+    while (token)
     {
-        while (*line == ' ' || *line == '\t') ++line;
-        if (!*line) break;
-        if (count == UART_MAX_TOKENS + 2U) return "BAD_ARG";
-        tokens[count++] = line;
-        while (*line && *line != ' ' && *line != '\t')
+        if (command->argc == UART_MAX_TOKENS + 2U) return "BAD_ARG";
+        command->argv[command->argc++] = token;
+        token = strtok(NULL, " \t\r\n");
+    }
+
+    for (unsigned field = 0; field < command->argc; ++field)
+    {
+        switch (field)
         {
-            if ((unsigned char)*line < 0x21U || (unsigned char)*line > 0x7eU)
+        case 0: /* argv[0]: request ID */
+            if (!UART_ParseUnsigned(command->argv[0], &id) || id > 65535U)
                 return "BAD_FORMAT";
-            ++line;
-        }
-        if (*line) *line++ = '\0';
-        if (count == 1U)
-        {
-            if (!UART_ParseUnsigned(tokens[0], &id) || id > 65535U) return "BAD_FORMAT";
             command->id = (uint16_t)id;
+            break;
+        case 1: /* argv[1]: command group */
+        {
+            int group = UART_FindKeyword(command->argv[1], groups,
+                                        sizeof(groups) / sizeof(groups[0]));
+            if (group < 0) return "UNKNOWN_CMD";
+            command->group = (UART_Group)group;
+            break;
+        }
+        default: /* argv[2] and later: action and parameters for the handler */
+            break;
         }
     }
-    if (count < 3U) return "BAD_FORMAT";
-    int group = UART_FindKeyword(tokens[1], groups, sizeof(groups) / sizeof(groups[0]));
-    if (group < 0) return "UNKNOWN_CMD";
-    command->group = (UART_Group)group;
-    command->count = count - 2U;
-    memcpy(command->args, tokens + 2, command->count * sizeof(tokens[0]));
+    if (command->argc < 3U) return "BAD_FORMAT";
+    command->count = command->argc - 2U;
     return NULL;
 }
 
