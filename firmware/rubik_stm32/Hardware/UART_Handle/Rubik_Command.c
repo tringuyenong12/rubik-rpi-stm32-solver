@@ -51,7 +51,7 @@ void Rubik_CommandHandler(const UART_Command *command)
     { UART_Error(command->id, "BAD_ARG"); return; }
     switch (action)
     {
-    case RUBIK_PING: UART_Accept(command->id); UART_Done(command->id); break;
+    case RUBIK_PING:  UART_Accept(command->id); UART_Done(command->id);  break;
     case RUBIK_RESET:
         UART_Accept(command->id);
         Rubik_Hold_Start_Position();

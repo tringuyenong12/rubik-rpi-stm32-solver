@@ -85,11 +85,10 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 void UART_Reply(uint16_t id, const char *status, const char *value)
 {
     char reply[96];
-    if (!uart_cmd) return;
-    int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\n", (unsigned)id,
+    HAL_UART_Transmit(uart_cmd, (uint8_t *)"ok\r\n", 4U, 20U);
+    int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
                           status, value ? " " : "", value ? value : "");
-    if (length > 0 && (unsigned)length < sizeof(reply))
-        HAL_UART_Transmit(uart_cmd, (uint8_t *)reply, (uint16_t)length, 20U);
+    HAL_UART_Transmit(uart_cmd, (uint8_t *)reply, (uint16_t)length, 20U);
 }
 
 void UART_ReplyValue(uint16_t id, uint32_t value)

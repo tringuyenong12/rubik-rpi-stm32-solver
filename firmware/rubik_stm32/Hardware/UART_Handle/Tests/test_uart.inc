@@ -125,6 +125,15 @@ int main(void)
     }
     command("#1 RUBIK RESET\n", "#1 OK\n#1 DONE\n");
     command("#2 RUBIK PING\n", "#2 OK\n#2 DONE\n");
+    command("\x23\x31\x20\x52\x55\x42\x49\x4B\x20\x50\x49\x4E\x47\x0A",
+            "#1 OK\n#1 DONE\n"); /* Exact bytes sent from a hex terminal. */
+    command("#1 RUBIK PING\r\n", "#1 OK\n#1 DONE\n");
+    /* CRLF may arrive across separate main-loop iterations. */
+    command("#1 RUBIK PING\r", "");
+    command("\n", "#1 OK\n#1 DONE\n");
+    command("\n", ""); /* Do not execute the completed command twice. */
+    command("#1 RUBIK PING", ""); /* A delimiter is still required. */
+    command("\n", "#1 OK\n#1 DONE\n");
     command("#0\tSYSTEM   VERSION\n", "#0 VALUE UART_1.0\n");
     command("#1 SYSTEM STATUS\n", "#1 VALUE IDLE\n");
     command("#1 UNKNOWN GET\n", "#1 ERR UNKNOWN_CMD\n");

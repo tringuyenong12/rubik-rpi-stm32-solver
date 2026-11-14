@@ -28,9 +28,9 @@ Hardware/UART_Handle/UART_Handle.o: ../Hardware/UART_Handle/UART_Handle.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/main.h \
- ../Hardware/UART_Handle/../Rubik_Control/Rubik_Control.h \
- ../Hardware/UART_Handle/../Rubik_Control/../Servo_Control/Servo_Control.h
+ ../Hardware/UART_Handle/UART_Command.h \
+ ../Hardware/UART_Handle/Calibration_Command.h \
+ ../Hardware/UART_Handle/Config_Command.h
 ../Hardware/UART_Handle/UART_Handle.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -60,6 +60,6 @@ Hardware/UART_Handle/UART_Handle.o: ../Hardware/UART_Handle/UART_Handle.c \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
-../Core/Inc/main.h:
-../Hardware/UART_Handle/../Rubik_Control/Rubik_Control.h:
-../Hardware/UART_Handle/../Rubik_Control/../Servo_Control/Servo_Control.h:
+../Hardware/UART_Handle/UART_Command.h:
+../Hardware/UART_Handle/Calibration_Command.h:
+../Hardware/UART_Handle/Config_Command.h:

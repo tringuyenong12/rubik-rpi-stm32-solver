@@ -1,5 +1,12 @@
-../Hardware/UART_Handle/UART_Handle.c:25:6:UART_Command_Init	16	static
-../Hardware/UART_Handle/UART_Handle.c:40:6:UART_Command_RxCallback	16	static
-../Hardware/UART_Handle/UART_Handle.c:97:13:Rubik_HandleMove	16	static
-../Hardware/UART_Handle/UART_Handle.c:153:13:UART_ParseCommand	96	static
-../Hardware/UART_Handle/UART_Handle.c:188:6:UART_Command_Process	8	static
+../Hardware/UART_Handle/UART_Handle.c:17:6:UART_Command_Init	16	static
+../Hardware/UART_Handle/UART_Handle.c:28:6:UART_Command_RxCallback	32	static,ignoring_inline_asm
+../Hardware/UART_Handle/UART_Handle.c:71:6:UART_Command_ErrorCallback	16	static
+../Hardware/UART_Handle/UART_Handle.c:80:6:HAL_UART_ErrorCallback	16	static
+../Hardware/UART_Handle/UART_Handle.c:85:6:UART_Reply	144	static
+../Hardware/UART_Handle/UART_Handle.c:94:6:UART_ReplyValue	32	static
+../Hardware/UART_Handle/UART_Handle.c:101:6:UART_Accept	16	static
+../Hardware/UART_Handle/UART_Handle.c:102:6:UART_Done	16	static
+../Hardware/UART_Handle/UART_Handle.c:103:6:UART_Error	16	static
+../Hardware/UART_Handle/UART_Handle.c:105:6:UART_Command_Stop	16	static
+../Hardware/UART_Handle/UART_Handle.c:112:6:UART_Command_Process	56	static,ignoring_inline_asm
+../Hardware/UART_Handle/UART_Handle.c:124:6:UART_Handle_Process	8	static

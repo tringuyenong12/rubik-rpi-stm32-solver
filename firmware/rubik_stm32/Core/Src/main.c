@@ -98,6 +98,8 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   UART_Command_Init(&huart1);
+  static const uint8_t uart_alive[] = "I am alive\r\n";
+  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
   PCA9685_Init(50); // 50Hz for servo
   Servo_Init();
   Servo_Start_Position();

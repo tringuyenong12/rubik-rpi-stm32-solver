@@ -27,6 +27,20 @@ Ví dụ:
 
 **Quy ước:** `ID` là số thứ tự giao dịch, **không phải mã nhóm lệnh**. Không tái sử dụng ID khi yêu cầu cũ chưa kết thúc. Chuỗi lệnh dùng ASCII, phân tách bằng khoảng trắng; từ khóa viết hoa. Mỗi lệnh kết thúc bằng byte `0A` (`\n`).
 
+### Kiểm tra bằng RealTerm
+
+Chọn đúng cổng COM, 115200 baud, 8N1, không flow control. Nối TX của USB–UART vào PA10 (STM32 RX), RX vào PA9 (STM32 TX), và nối chung GND.
+
+Sau reset, STM32 gửi `I am alive` trước khi khởi tạo servo. Chờ khoảng 7 giây để khởi tạo cơ cấu hoàn tất rồi thử `PING`.
+
+Trong tab Send, dùng **Send ASCII** với `#1 RUBIK PING` và bật thêm LF. Hoặc dùng **Send Numbers** với dãy sau (đã có LF ở cuối, không cần thêm EOL):
+
+```text
+0x23 0x31 0x20 0x52 0x55 0x42 0x49 0x4B 0x20 0x50 0x49 0x4E 0x47 0x0A
+```
+
+Với Send Numbers, dùng tiền tố `0x` để chỉ rõ số hex; không nhập dãy hex trần `23 31 20 ...`. Phản hồi mong đợi là `#1 OK` rồi `#1 DONE`. Dòng `I am alive` chỉ xác nhận đường phát từ STM32; chưa xác nhận đường nhận vào PA10.
+
 ## 2. Nhóm RUBIK — Điều khiển toàn bộ cơ cấu
 
 ### Cú pháp

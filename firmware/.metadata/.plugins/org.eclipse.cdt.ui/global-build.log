@@ -63,3 +63,125 @@ Finished building: default.size.stdout
  
 Finished building: rubik_stm32.list
  
+22:02:01 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Calibration_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Calibration_Command.d" -MT"Hardware/UART_Handle/Calibration_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Calibration_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/Config_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Config_Command.d" -MT"Hardware/UART_Handle/Config_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Config_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/Control_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Control_Command.d" -MT"Hardware/UART_Handle/Control_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Control_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/System_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/System_Command.d" -MT"Hardware/UART_Handle/System_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/System_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Command.d" -MT"Hardware/UART_Handle/UART_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32.elf
+ 
+arm-none-eabi-size  rubik_stm32.elf 
+arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
+   text	   data	    bss	    dec	    hex	filename
+  35792	    452	   2340	  38584	   96b8	rubik_stm32.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32.list
+ 
+22:21:14 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32.elf
+ 
+arm-none-eabi-size  rubik_stm32.elf 
+arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
+   text	   data	    bss	    dec	    hex	filename
+  35824	    452	   2340	  38616	   96d8	rubik_stm32.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32.list
+ 
+22:25:24 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-size  rubik_stm32.elf 
+   text	   data	    bss	    dec	    hex	filename
+  35824	    452	   2340	  38616	   96d8	rubik_stm32.elf
+Finished building: default.size.stdout
+ 
+22:30:45 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
+../Hardware/UART_Handle/Rubik_Command.c:54:23: warning: implicit declaration of function 'HAL_UART_Transmit' [-Wimplicit-function-declaration]
+   54 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
+      |                       ^~~~~~~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:54:42: error: 'huart1' undeclared (first use in this function)
+   54 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
+      |                                          ^~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:54:42: note: each undeclared identifier is reported only once for each function it appears in
+../Hardware/UART_Handle/Rubik_Command.c:54:50: error: 'uart_alive' undeclared (first use in this function)
+   54 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
+      |                                                  ^~~~~~~~~~
+make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+22:31:16 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
+../Hardware/UART_Handle/Rubik_Command.c:55:42: error: 'huart1' undeclared (first use in this function)
+   55 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
+      |                                          ^~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:55:42: note: each undeclared identifier is reported only once for each function it appears in
+../Hardware/UART_Handle/Rubik_Command.c:55:50: error: 'uart_alive' undeclared (first use in this function)
+   55 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
+      |                                                  ^~~~~~~~~~
+make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+22:32:27 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
+../Hardware/UART_Handle/Rubik_Command.c:59:42: error: 'huart1' undeclared (first use in this function)
+   59 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_ping) - 1U, 20U);
+      |                                          ^~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:59:42: note: each undeclared identifier is reported only once for each function it appears in
+../Hardware/UART_Handle/Rubik_Command.c:59:50: error: 'uart_alive' undeclared (first use in this function)
+   59 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_ping) - 1U, 20U);
+      |                                                  ^~~~~~~~~~
+make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+22:32:43 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
+../Hardware/UART_Handle/Rubik_Command.c:59:42: error: 'huart1' undeclared (first use in this function)
+   59 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_ping, sizeof(uart_ping) - 1U, 20U);
+      |                                          ^~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:59:42: note: each undeclared identifier is reported only once for each function it appears in
+make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+22:35:37 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32.elf
+ 
+arm-none-eabi-size  rubik_stm32.elf 
+arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
+   text	   data	    bss	    dec	    hex	filename
+  35824	    452	   2340	  38616	   96d8	rubik_stm32.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32.list
+ 
+22:38:27 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
+arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32.elf
+ 
+arm-none-eabi-size  rubik_stm32.elf 
+arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
+   text	   data	    bss	    dec	    hex	filename
+  35832	    452	   2340	  38624	   96e0	rubik_stm32.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32.list
+ 
