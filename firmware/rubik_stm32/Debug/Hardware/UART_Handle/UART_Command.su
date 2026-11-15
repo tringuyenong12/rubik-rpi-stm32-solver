@@ -1,5 +1,0 @@
-../Hardware/UART_Handle/UART_Command.c:10:5:UART_FindKeyword	32	static
-../Hardware/UART_Handle/UART_Command.c:17:6:UART_ParseUnsigned	24	static
-../Hardware/UART_Handle/UART_Command.c:31:13:UART_ParseCommand	96	static
-../Hardware/UART_Handle/UART_Command.c:79:6:UART_DispatchCommand	16	static
-../Hardware/UART_Handle/UART_Command.c:92:5:UART_ServoPosition	16	static

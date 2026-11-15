@@ -1,334 +1,537 @@
-03:52:52 **** Clean-only build of configuration Debug for project rubik_stm32 ****
-make -j12 clean 
-rm -rf ./Testing/Testing.cyclo ./Testing/Testing.d ./Testing/Testing.o ./Testing/Testing.su
-rm -rf ./Hardware/UART_Handle/UART_Handle.cyclo ./Hardware/UART_Handle/UART_Handle.d ./Hardware/UART_Handle/UART_Handle.o ./Hardware/UART_Handle/UART_Handle.su
-rm -rf ./Hardware/Servo_Control/Servo_Control.cyclo ./Hardware/Servo_Control/Servo_Control.d ./Hardware/Servo_Control/Servo_Control.o ./Hardware/Servo_Control/Servo_Control.su
-rm -rf ./Hardware/Rubik_Control/Rubik_Control.cyclo ./Hardware/Rubik_Control/Rubik_Control.d ./Hardware/Rubik_Control/Rubik_Control.o ./Hardware/Rubik_Control/Rubik_Control.su
-rm -rf ./Hardware/PCA9685/PCA9685.cyclo ./Hardware/PCA9685/PCA9685.d ./Hardware/PCA9685/PCA9685.o ./Hardware/PCA9685/PCA9685.su
-rm -rf ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.su ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.cyclo ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.d ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o ./Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.su
-rm -rf ./Core/Startup/startup_stm32f411ceux.d ./Core/Startup/startup_stm32f411ceux.o
-rm -rf ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/stm32f4xx_hal_msp.cyclo ./Core/Src/stm32f4xx_hal_msp.d ./Core/Src/stm32f4xx_hal_msp.o ./Core/Src/stm32f4xx_hal_msp.su ./Core/Src/stm32f4xx_it.cyclo ./Core/Src/stm32f4xx_it.d ./Core/Src/stm32f4xx_it.o ./Core/Src/stm32f4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32f4xx.cyclo ./Core/Src/system_stm32f4xx.d ./Core/Src/system_stm32f4xx.o ./Core/Src/system_stm32f4xx.su
-rm -rf default.size.stdout rubik_stm32_ver1.elf rubik_stm32_ver1.list rubik_stm32_ver1.map
- 
-03:52:56 **** Build of configuration Debug for project rubik_stm32 ****
+11:54:31 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
-arm-none-eabi-gcc "../Testing/Testing.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Testing/Testing.d" -MT"Testing/Testing.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Testing/Testing.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
 arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
-arm-none-eabi-gcc "../Hardware/Servo_Control/Servo_Control.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/Servo_Control/Servo_Control.d" -MT"Hardware/Servo_Control/Servo_Control.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/Servo_Control/Servo_Control.o"
-arm-none-eabi-gcc "../Hardware/Rubik_Control/Rubik_Control.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/Rubik_Control/Rubik_Control.d" -MT"Hardware/Rubik_Control/Rubik_Control.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/Rubik_Control/Rubik_Control.o"
-arm-none-eabi-gcc "../Hardware/PCA9685/PCA9685.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/PCA9685/PCA9685.d" -MT"Hardware/PCA9685/PCA9685.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/PCA9685/PCA9685.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.o"
 ../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseCommand':
-../Hardware/UART_Handle/UART_Handle.c:161:17: warning: implicit declaration of function 'sscanf' [-Wimplicit-function-declaration]
-  161 |     int count = sscanf(
-      |                 ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:265:17: warning: implicit declaration of function 'Rubik_CommandHandler' [-Wimplicit-function-declaration]
+  265 |                 Rubik_CommandHandler(argc_parse, argv_parse, command_id);
+      |                 ^~~~~~~~~~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_Reply':
+../Hardware/UART_Handle/UART_Handle.c:343:18: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  343 |     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+      |                  ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:4:1: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+    3 | #include <string.h>
+  +++ |+#include <stdio.h>
+    4 | 
+../Hardware/UART_Handle/UART_Handle.c:343:18: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  343 |     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+      |                  ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:343:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ReplyValue':
+../Hardware/UART_Handle/UART_Handle.c:351:5: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  351 |     snprintf(number, sizeof(number), "%lu", (unsigned long)value);
+      |     ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:351:5: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseCommand':
+../Hardware/UART_Handle/UART_Handle.c:254:9: warning: 'command_id' may be used uninitialized [-Wmaybe-uninitialized]
+  254 |         UART_Reply(command_id, "BAD ARGC", NULL);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:246:18: note: 'command_id' was declared here
+  246 |     unsigned int command_id;
+      |                  ^~~~~~~~~~
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
+ 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
+   text	   data	    bss	    dec	    hex	filename
+  29808	    444	   2244	  32496	   7ef0	rubik_stm32_ver1.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32_ver1.list
+ 
+11:55:31 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
+make -j12 all 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+   text	   data	    bss	    dec	    hex	filename
+  29808	    444	   2244	  32496	   7ef0	rubik_stm32_ver1.elf
+Finished building: default.size.stdout
+ 
+11:55:37 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
+make -j12 all 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+   text	   data	    bss	    dec	    hex	filename
+  29808	    444	   2244	  32496	   7ef0	rubik_stm32_ver1.elf
+Finished building: default.size.stdout
+ 
+12:06:45 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseId':
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: implicit declaration of function 'sscanf' [-Wimplicit-function-declaration]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
 ../Hardware/UART_Handle/UART_Handle.c:4:1: note: include '<stdio.h>' or provide a declaration of 'sscanf'
     3 | #include <string.h>
   +++ |+#include <stdio.h>
     4 | 
-../Hardware/UART_Handle/UART_Handle.c:161:17: warning: incompatible implicit declaration of built-in function 'sscanf' [-Wbuiltin-declaration-mismatch]
-  161 |     int count = sscanf(
-      |                 ^~~~~~
-../Hardware/UART_Handle/UART_Handle.c:161:17: note: include '<stdio.h>' or provide a declaration of 'sscanf'
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.o"
-arm-none-eabi-gcc "../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.d" -MT"Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o"
-arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"Core/Startup/startup_stm32f411ceux.d" -MT"Core/Startup/startup_stm32f411ceux.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Startup/startup_stm32f411ceux.o" "../Core/Startup/startup_stm32f411ceux.s"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc "../Core/Src/stm32f4xx_hal_msp.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stm32f4xx_hal_msp.d" -MT"Core/Src/stm32f4xx_hal_msp.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32f4xx_hal_msp.o"
-arm-none-eabi-gcc "../Core/Src/stm32f4xx_it.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stm32f4xx_it.d" -MT"Core/Src/stm32f4xx_it.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stm32f4xx_it.o"
-arm-none-eabi-gcc "../Core/Src/syscalls.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/syscalls.d" -MT"Core/Src/syscalls.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/syscalls.o"
-arm-none-eabi-gcc "../Core/Src/sysmem.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/sysmem.d" -MT"Core/Src/sysmem.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/sysmem.o"
-arm-none-eabi-gcc "../Core/Src/system_stm32f4xx.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/system_stm32f4xx.d" -MT"Core/Src/system_stm32f4xx.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/system_stm32f4xx.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  31088	    444	   2196	  33728	   83c0	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-22:02:01 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: incompatible implicit declaration of built-in function 'sscanf' [-Wbuiltin-declaration-mismatch]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:208:9: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseCommand':
+../Hardware/UART_Handle/UART_Handle.c:273:39: error: 'id' undeclared (first use in this function); did you mean 'void'?
+  273 |     if (!UART_ParseId(argv_parse[0], &id)) return;
+      |                                       ^~
+      |                                       void
+../Hardware/UART_Handle/UART_Handle.c:273:39: note: each undeclared identifier is reported only once for each function it appears in
+../Hardware/UART_Handle/UART_Handle.c:289:17: warning: implicit declaration of function 'Rubik_CommandHandler' [-Wimplicit-function-declaration]
+  289 |                 Rubik_CommandHandler(argc_parse, argv_parse, command_id);
+      |                 ^~~~~~~~~~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_Reply':
+../Hardware/UART_Handle/UART_Handle.c:367:18: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  367 |     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+      |                  ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:367:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c:367:18: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+../Hardware/UART_Handle/UART_Handle.c:367:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ReplyValue':
+../Hardware/UART_Handle/UART_Handle.c:375:5: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  375 |     snprintf(number, sizeof(number), "%lu", (unsigned long)value);
+      |     ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:375:5: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+make: *** [Hardware/UART_Handle/subdir.mk:22: Hardware/UART_Handle/UART_Handle.o] Error 1
+make: *** Waiting for unfinished jobs....
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+12:07:11 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/Calibration_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Calibration_Command.d" -MT"Hardware/UART_Handle/Calibration_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Calibration_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/Config_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Config_Command.d" -MT"Hardware/UART_Handle/Config_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Config_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/Control_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Control_Command.d" -MT"Hardware/UART_Handle/Control_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Control_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/System_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/System_Command.d" -MT"Hardware/UART_Handle/System_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/System_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Command.d" -MT"Hardware/UART_Handle/UART_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Command.o"
 arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  35792	    452	   2340	  38584	   96b8	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-22:21:14 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseId':
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: implicit declaration of function 'sscanf' [-Wimplicit-function-declaration]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:4:1: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+    3 | #include <string.h>
+  +++ |+#include <stdio.h>
+    4 | 
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: incompatible implicit declaration of built-in function 'sscanf' [-Wbuiltin-declaration-mismatch]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:208:9: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseCommand':
+../Hardware/UART_Handle/UART_Handle.c:273:39: error: 'commmand_id' undeclared (first use in this function); did you mean 'command_id'?
+  273 |     if (!UART_ParseId(argv_parse[0], &commmand_id)) return;
+      |                                       ^~~~~~~~~~~
+      |                                       command_id
+../Hardware/UART_Handle/UART_Handle.c:273:39: note: each undeclared identifier is reported only once for each function it appears in
+../Hardware/UART_Handle/UART_Handle.c:289:17: warning: implicit declaration of function 'Rubik_CommandHandler' [-Wimplicit-function-declaration]
+  289 |                 Rubik_CommandHandler(argc_parse, argv_parse, command_id);
+      |                 ^~~~~~~~~~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_Reply':
+../Hardware/UART_Handle/UART_Handle.c:367:18: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  367 |     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+      |                  ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:367:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c:367:18: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+../Hardware/UART_Handle/UART_Handle.c:367:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ReplyValue':
+../Hardware/UART_Handle/UART_Handle.c:375:5: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  375 |     snprintf(number, sizeof(number), "%lu", (unsigned long)value);
+      |     ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:375:5: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+make: *** [Hardware/UART_Handle/subdir.mk:22: Hardware/UART_Handle/UART_Handle.o] Error 1
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+12:07:24 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
+arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseId':
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: implicit declaration of function 'sscanf' [-Wimplicit-function-declaration]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:4:1: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+    3 | #include <string.h>
+  +++ |+#include <stdio.h>
+    4 | 
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: incompatible implicit declaration of built-in function 'sscanf' [-Wbuiltin-declaration-mismatch]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:208:9: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseCommand':
+../Hardware/UART_Handle/UART_Handle.c:273:38: warning: passing argument 2 of 'UART_ParseId' from incompatible pointer type [-Wincompatible-pointer-types]
+  273 |     if (!UART_ParseId(argv_parse[0], &command_id)) return;
+      |                                      ^~~~~~~~~~~
+      |                                      |
+      |                                      unsigned int *
+../Hardware/UART_Handle/UART_Handle.c:194:54: note: expected 'uint16_t *' {aka 'short unsigned int *'} but argument is of type 'unsigned int *'
+  194 | static bool UART_ParseId(const char *text, uint16_t *id)
+      |                                            ~~~~~~~~~~^~
+../Hardware/UART_Handle/UART_Handle.c:289:17: warning: implicit declaration of function 'Rubik_CommandHandler' [-Wimplicit-function-declaration]
+  289 |                 Rubik_CommandHandler(argc_parse, argv_parse, command_id);
+      |                 ^~~~~~~~~~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_Reply':
+../Hardware/UART_Handle/UART_Handle.c:367:18: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  367 |     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+      |                  ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:367:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c:367:18: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+../Hardware/UART_Handle/UART_Handle.c:367:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ReplyValue':
+../Hardware/UART_Handle/UART_Handle.c:375:5: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  375 |     snprintf(number, sizeof(number), "%lu", (unsigned long)value);
+      |     ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:375:5: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
  
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
    text	   data	    bss	    dec	    hex	filename
-  35824	    452	   2340	  38616	   96d8	rubik_stm32.elf
+  32692	    444	   2244	  35380	   8a34	rubik_stm32_ver1.elf
 Finished building: default.size.stdout
  
-Finished building: rubik_stm32.list
+Finished building: rubik_stm32_ver1.list
  
-22:25:24 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+12:11:15 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
-arm-none-eabi-size  rubik_stm32.elf 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
+ 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
    text	   data	    bss	    dec	    hex	filename
-  35824	    452	   2340	  38616	   96d8	rubik_stm32.elf
+  32692	    444	   2244	  35380	   8a34	rubik_stm32_ver1.elf
 Finished building: default.size.stdout
  
-22:30:45 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+Finished building: rubik_stm32_ver1.list
+ 
+12:12:48 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
 arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
 ../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
-../Hardware/UART_Handle/Rubik_Command.c:54:23: warning: implicit declaration of function 'HAL_UART_Transmit' [-Wimplicit-function-declaration]
-   54 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
-      |                       ^~~~~~~~~~~~~~~~~
-../Hardware/UART_Handle/Rubik_Command.c:54:42: error: 'huart1' undeclared (first use in this function)
-   54 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
-      |                                          ^~~~~~
-../Hardware/UART_Handle/Rubik_Command.c:54:42: note: each undeclared identifier is reported only once for each function it appears in
-../Hardware/UART_Handle/Rubik_Command.c:54:50: error: 'uart_alive' undeclared (first use in this function)
-   54 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
-      |                                                  ^~~~~~~~~~
-make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
+../Hardware/UART_Handle/Rubik_Command.c:56:22: error: exponent has no digits
+   56 |          if (argc != 2eU) { UART_Error(command_id, "BAD_ARG"); return; }
+      |                      ^~~
+make: *** [Hardware/UART_Handle/subdir.mk:22: Hardware/UART_Handle/Rubik_Command.o] Error 1
 "make -j12 all" terminated with exit code 2. Build might be incomplete.
-22:31:16 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+12:13:07 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
+ 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
+   text	   data	    bss	    dec	    hex	filename
+  32692	    444	   2244	  35380	   8a34	rubik_stm32_ver1.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32_ver1.list
+ 
+12:13:34 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
+ 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
+   text	   data	    bss	    dec	    hex	filename
+  32692	    444	   2244	  35380	   8a34	rubik_stm32_ver1.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32_ver1.list
+ 
+12:26:13 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
+make -j12 all 
+arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
+arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
+../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
+../Hardware/UART_Handle/Rubik_Command.c:41:31: warning: initialization of 'char' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+   41 |                   char move = argv[3];
+      |                               ^~~~
+../Hardware/UART_Handle/Rubik_Command.c:44:26: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   44 |               if (strcmp(move, "L") == 0)
+      |                          ^~~~
+      |                          |
+      |                          char
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseId':
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: implicit declaration of function 'sscanf' [-Wimplicit-function-declaration]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:4:1: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+    3 | #include <string.h>
+  +++ |+#include <stdio.h>
+    4 | 
+In file included from ../Hardware/UART_Handle/Rubik_Command.c:11:
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:208:9: warning: incompatible implicit declaration of built-in function 'sscanf' [-Wbuiltin-declaration-mismatch]
+  208 |     if (sscanf(text, "%u", &value) != 1 || value > UINT16_MAX)
+      |         ^~~~~~
+../Hardware/UART_Handle/UART_Handle.c:208:9: note: include '<stdio.h>' or provide a declaration of 'sscanf'
+../Hardware/UART_Handle/Rubik_Command.c:50:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   50 |               else if (strcmp(move, "R") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ParseCommand':
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:240:38: warning: passing argument 2 of 'UART_ParseId' from incompatible pointer type [-Wincompatible-pointer-types]
+  240 |     if (!UART_ParseId(argv_parse[0], &command_id)) return;
+      |                                      ^~~~~~~~~~~
+      |                                      |
+      |                                      unsigned int *
+../Hardware/UART_Handle/Rubik_Command.c:57:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   57 |               else if (strcmp(move, "U") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:194:54: note: expected 'uint16_t *' {aka 'short unsigned int *'} but argument is of type 'unsigned int *'
+  194 | static bool UART_ParseId(const char *text, uint16_t *id)
+      |                                            ~~~~~~~~~~^~
+../Hardware/UART_Handle/Rubik_Command.c:64:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   64 |               else if (strcmp(move, "D") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:71:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   71 |               else if (strcmp(move, "F") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:78:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   78 |               else if (strcmp(move, "B") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:85:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   85 |               else if (strcmp(move, "L_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:92:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   92 |               else if (strcmp(move, "R_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:99:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   99 |               else if (strcmp(move, "U_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:106:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+  106 |               else if (strcmp(move, "D_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:113:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+  113 |               else if (strcmp(move, "F_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+../Hardware/UART_Handle/UART_Handle.c:256:17: warning: implicit declaration of function 'Rubik_CommandHandler' [-Wimplicit-function-declaration]
+  256 |                 Rubik_CommandHandler(argc_parse, argv_parse, command_id);
+      |                 ^~~~~~~~~~~~~~~~~~~~
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:120:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+  120 |               else if (strcmp(move, "B_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_Reply':
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:334:18: warning: implicit declaration of function 'snprintf' [-Wimplicit-function-declaration]
+  334 |     int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+      |                  ^~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:133:6: error: case label not within a switch statement
+  133 |      case RUBIK_PING:
+      |      ^~~~
+../Hardware/UART_Handle/UART_Handle.c:334:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/UART_Handle.c:334:18: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+../Hardware/UART_Handle/UART_Handle.c:334:18: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/Rubik_Command.c:137:10: error: break statement not within loop or switch
+  137 |          break;
+      |          ^~~~~
+../Hardware/UART_Handle/UART_Handle.c: In function 'UART_ReplyValue':
+../Hardware/UART_Handle/Rubik_Command.c:138:6: error: case label not within a switch statement
+  138 |      case RUBIK_RESET:
+      |      ^~~~
+../Hardware/UART_Handle/UART_Handle.c:342:5: warning: incompatible implicit declaration of built-in function 'snprintf' [-Wbuiltin-declaration-mismatch]
+  342 |     snprintf(number, sizeof(number), "%lu", (unsigned long)value);
+      |     ^~~~~~~~
+../Hardware/UART_Handle/UART_Handle.c:342:5: note: include '<stdio.h>' or provide a declaration of 'snprintf'
+../Hardware/UART_Handle/Rubik_Command.c:143:10: error: break statement not within loop or switch
+  143 |          break;
+      |          ^~~~~
+../Hardware/UART_Handle/Rubik_Command.c:144:6: error: case label not within a switch statement
+  144 |      case RUBIK_STOP:
+      |      ^~~~
+../Hardware/UART_Handle/Rubik_Command.c:147:10: error: break statement not within loop or switch
+  147 |          break;
+      |          ^~~~~
+../Hardware/UART_Handle/Rubik_Command.c:148:6: error: 'default' label not within a switch statement
+  148 |      default:
+      |      ^~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:150:10: error: break statement not within loop or switch
+  150 |          break;
+      |          ^~~~~
+../Hardware/UART_Handle/Rubik_Command.c: At top level:
+../Hardware/UART_Handle/Rubik_Command.c:152:1: error: expected identifier or '(' before '}' token
+  152 | }
+      | ^
+make: *** [Hardware/UART_Handle/subdir.mk:22: Hardware/UART_Handle/Rubik_Command.o] Error 1
+make: *** Waiting for unfinished jobs....
+"make -j12 all" terminated with exit code 2. Build might be incomplete.
+12:26:59 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
 arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
 ../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
-../Hardware/UART_Handle/Rubik_Command.c:55:42: error: 'huart1' undeclared (first use in this function)
-   55 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
-      |                                          ^~~~~~
-../Hardware/UART_Handle/Rubik_Command.c:55:42: note: each undeclared identifier is reported only once for each function it appears in
-../Hardware/UART_Handle/Rubik_Command.c:55:50: error: 'uart_alive' undeclared (first use in this function)
-   55 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
-      |                                                  ^~~~~~~~~~
-make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
-"make -j12 all" terminated with exit code 2. Build might be incomplete.
-22:32:27 **** Incremental Build of configuration Debug for project rubik_stm32 ****
+../Hardware/UART_Handle/Rubik_Command.c:41:31: warning: initialization of 'char' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+   41 |                   char move = argv[3];
+      |                               ^~~~
+../Hardware/UART_Handle/Rubik_Command.c:44:26: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   44 |               if (strcmp(move, "L") == 0)
+      |                          ^~~~
+      |                          |
+      |                          char
+In file included from ../Hardware/UART_Handle/Rubik_Command.c:11:
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:50:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   50 |               else if (strcmp(move, "R") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:57:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   57 |               else if (strcmp(move, "U") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:64:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   64 |               else if (strcmp(move, "D") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:71:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   71 |               else if (strcmp(move, "F") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:78:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   78 |               else if (strcmp(move, "B") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:85:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   85 |               else if (strcmp(move, "L_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:92:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   92 |               else if (strcmp(move, "R_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:99:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+   99 |               else if (strcmp(move, "U_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:106:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+  106 |               else if (strcmp(move, "D_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:113:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+  113 |               else if (strcmp(move, "F_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+../Hardware/UART_Handle/Rubik_Command.c:120:31: warning: passing argument 1 of 'strcmp' makes pointer from integer without a cast [-Wint-conversion]
+  120 |               else if (strcmp(move, "B_") == 0)
+      |                               ^~~~
+      |                               |
+      |                               char
+C:\ST\STM32CubeIDE_1.18.1\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.13.3.rel1.win32_1.0.0.202411081344\tools\bin/../lib/gcc/arm-none-eabi/13.3.1/../../../../arm-none-eabi/include/string.h:36:18: note: expected 'const char *' but argument is of type 'char'
+   36 | int      strcmp (const char *, const char *);
+      |                  ^~~~~~~~~~~~
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
+ 
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
+   text	   data	    bss	    dec	    hex	filename
+  34544	    444	   2244	  37232	   9170	rubik_stm32_ver1.elf
+Finished building: default.size.stdout
+ 
+Finished building: rubik_stm32_ver1.list
+ 
+12:31:18 **** Incremental Build of configuration Debug for project rubik_stm32_ver1 ****
 make -j12 all 
 arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
-../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
-../Hardware/UART_Handle/Rubik_Command.c:59:42: error: 'huart1' undeclared (first use in this function)
-   59 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_ping) - 1U, 20U);
-      |                                          ^~~~~~
-../Hardware/UART_Handle/Rubik_Command.c:59:42: note: each undeclared identifier is reported only once for each function it appears in
-../Hardware/UART_Handle/Rubik_Command.c:59:50: error: 'uart_alive' undeclared (first use in this function)
-   59 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_ping) - 1U, 20U);
-      |                                                  ^~~~~~~~~~
-make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
-"make -j12 all" terminated with exit code 2. Build might be incomplete.
-22:32:43 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
-../Hardware/UART_Handle/Rubik_Command.c: In function 'Rubik_CommandHandler':
-../Hardware/UART_Handle/Rubik_Command.c:59:42: error: 'huart1' undeclared (first use in this function)
-   59 |     case RUBIK_PING:  HAL_UART_Transmit(&huart1, uart_ping, sizeof(uart_ping) - 1U, 20U);
-      |                                          ^~~~~~
-../Hardware/UART_Handle/Rubik_Command.c:59:42: note: each undeclared identifier is reported only once for each function it appears in
-make: *** [Hardware/UART_Handle/subdir.mk:37: Hardware/UART_Handle/Rubik_Command.o] Error 1
-"make -j12 all" terminated with exit code 2. Build might be incomplete.
-22:35:37 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
+arm-none-eabi-gcc -o "rubik_stm32_ver1.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\uart\rubik_stm32_ver1\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32_ver1.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: rubik_stm32_ver1.elf
  
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
+arm-none-eabi-size  rubik_stm32_ver1.elf 
+arm-none-eabi-objdump -h -S rubik_stm32_ver1.elf  > "rubik_stm32_ver1.list"
    text	   data	    bss	    dec	    hex	filename
-  35824	    452	   2340	  38616	   96d8	rubik_stm32.elf
+  34516	    444	   2244	  37204	   9154	rubik_stm32_ver1.elf
 Finished building: default.size.stdout
  
-Finished building: rubik_stm32.list
- 
-22:38:27 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  35832	    452	   2340	  38624	   96e0	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:03:27 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Command.d" -MT"Hardware/UART_Handle/UART_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Command.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  38880	    464	   2344	  41688	   a2d8	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:03:57 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  38896	    464	   2344	  41704	   a2e8	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:11:12 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:121:6: warning: implicit declaration of function 'UART_Accept' [-Wimplicit-function-declaration]
-  121 |      UART_Accept(1);
-      |      ^~~~~~~~~~~
-../Core/Src/main.c:122:6: warning: implicit declaration of function 'UART_Done' [-Wimplicit-function-declaration]
-  122 |      UART_Done(1);
-      |      ^~~~~~~~~
-../Core/Src/main.c:123:6: warning: implicit declaration of function 'UART_Error' [-Wimplicit-function-declaration]
-  123 |      UART_Error(1, "Test error");
-      |      ^~~~~~~~~~
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  29692	    452	   2212	  32356	   7e64	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:14:03 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  29668	    452	   2212	  32332	   7e4c	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:20:46 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-../Core/Src/main.c: In function 'main':
-../Core/Src/main.c:121:6: warning: implicit declaration of function 'UART_Accept' [-Wimplicit-function-declaration]
-  121 |      UART_Accept(1);
-      |      ^~~~~~~~~~~
-../Core/Src/main.c:122:6: warning: implicit declaration of function 'UART_Done' [-Wimplicit-function-declaration]
-  122 |      UART_Done(1);
-      |      ^~~~~~~~~
-../Core/Src/main.c:123:6: warning: implicit declaration of function 'UART_Error' [-Wimplicit-function-declaration]
-  123 |      UART_Error(1, "Test error");
-      |      ^~~~~~~~~~
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  29668	    452	   2212	  32332	   7e4c	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:21:34 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  38924	    464	   2344	  41732	   a304	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:21:58 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-size  rubik_stm32.elf 
-   text	   data	    bss	    dec	    hex	filename
-  38924	    464	   2344	  41732	   a304	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-23:28:33 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  39276	    464	   2352	  42092	   a46c	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
- 
-23:39:11 **** Incremental Build of configuration Debug for project rubik_stm32 ****
-make -j12 all 
-arm-none-eabi-gcc "../Hardware/UART_Handle/Calibration_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Calibration_Command.d" -MT"Hardware/UART_Handle/Calibration_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Calibration_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/Config_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Config_Command.d" -MT"Hardware/UART_Handle/Config_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Config_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/Control_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Control_Command.d" -MT"Hardware/UART_Handle/Control_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Control_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/Rubik_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/Rubik_Command.d" -MT"Hardware/UART_Handle/Rubik_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/Rubik_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/System_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/System_Command.d" -MT"Hardware/UART_Handle/System_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/System_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Command.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Command.d" -MT"Hardware/UART_Handle/UART_Command.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Command.o"
-arm-none-eabi-gcc "../Hardware/UART_Handle/UART_Handle.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F411xE -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Hardware/UART_Handle/UART_Handle.d" -MT"Hardware/UART_Handle/UART_Handle.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Hardware/UART_Handle/UART_Handle.o"
-arm-none-eabi-gcc -o "rubik_stm32.elf" @"objects.list"   -mcpu=cortex-m4 -T"E:\Rubik_Machine\rubik-rpi-stm32-solver\firmware\rubik_stm32\STM32F411CEUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rubik_stm32.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: rubik_stm32.elf
- 
-arm-none-eabi-size  rubik_stm32.elf 
-arm-none-eabi-objdump -h -S rubik_stm32.elf  > "rubik_stm32.list"
-   text	   data	    bss	    dec	    hex	filename
-  39524	    464	   2352	  42340	   a564	rubik_stm32.elf
-Finished building: default.size.stdout
- 
-Finished building: rubik_stm32.list
+Finished building: rubik_stm32_ver1.list
  

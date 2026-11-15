@@ -1,0 +1,41 @@
+#ifndef UART_HANDLE_UART_HANDLE_H_
+#define UART_HANDLE_UART_HANDLE_H_
+
+#include "stm32f4xx_hal.h"
+#include "main.h"
+
+#define UART_BUFFER_SIZE 64
+
+void UART_Command_Init(UART_HandleTypeDef *huart);
+void UART_Command_RxCallback(UART_HandleTypeDef *huart);
+void UART_Command_Process(void);
+
+typedef enum
+{
+    CMD_UNKNOWN = 0,
+
+    CMD_RUBIK,
+    CMD_CONTROL,
+    CMD_CALIB,
+	CMD_CONFIG,
+	CMD_SYSTEM,
+
+} UART_Command_t;
+
+
+void UART_Command_Init(UART_HandleTypeDef *huart);
+void UART_Command_RxCallback(UART_HandleTypeDef *huart);
+void UART_Command_ErrorCallback(UART_HandleTypeDef *huart);
+
+void UART_Command_Process(void);
+void UART_Handle_Process(void);
+
+
+void UART_Reply(uint16_t id, const char *status, const char *value);
+void UART_ReplyValue(uint16_t id, uint32_t value);
+void UART_Accept(uint16_t id);
+void UART_Done(uint16_t id);
+void UART_Error(uint16_t id, const char *error);
+void UART_Command_Stop(uint16_t id);
+
+#endif

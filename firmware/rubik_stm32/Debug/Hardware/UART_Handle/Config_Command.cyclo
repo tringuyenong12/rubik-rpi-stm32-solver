@@ -1,3 +1,0 @@
-../Hardware/UART_Handle/Config_Command.c:5:6:Config_CommandInit	1
-../Hardware/UART_Handle/Config_Command.c:6:10:Config_UartTimeoutMs	1
-../Hardware/UART_Handle/Config_Command.c:8:6:Config_CommandHandler	12
