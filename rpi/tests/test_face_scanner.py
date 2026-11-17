@@ -133,6 +133,26 @@ class TestFaceScanner(unittest.TestCase):
 
 
 class TestCameraPreview(unittest.TestCase):
+    def test_startup_frames_are_previewed_without_classifying_or_saving_colors(self):
+        frame, expected = self.synthetic_face(40, 0)
+        camera = Mock()
+        camera.isOpened.return_value = True
+        camera.read.side_effect = [(True, frame.copy()) for _ in range(5)]
+        session = FaceScanner(stable_seconds=0, min_samples=2)
+        with patch.object(vision2, 'scanner', session), \
+                patch.object(vision2.camera_roi, 'load'), \
+                patch.object(vision2, 'monotonic', side_effect=[0, .1, .2, 2.1, 2.2, 2.3]), \
+                patch.object(vision2, 'detect_face', wraps=vision2.detect_face) as detect, \
+                patch.object(cv2, 'VideoCapture', return_value=camera), \
+                patch.object(cv2, 'imshow'), patch.object(cv2, 'destroyAllWindows'), \
+                patch.object(cv2, 'moveWindow'), patch.object(cv2, 'setMouseCallback'), \
+                patch.object(cv2, 'getWindowProperty', return_value=1), \
+                patch.object(cv2, 'waitKey', side_effect=[-1, -1, -1, -1, ord('x')]):
+            vision2.grab_colors(1, cv2.CAP_DSHOW, show_masks=False)
+        self.assertEqual(detect.call_count, 3)
+        self.assertEqual(session.snapshot()['faces']['white'], tuple(color for row in expected for color in row))
+        camera.release.assert_called_once()
+
     def synthetic_face(self, size, angle):
         """Input: sticker size/rotation. Output: a mixed-color camera frame and expected grid."""
         frame = np.full((480, 640, 3), 20, dtype=np.uint8)
@@ -200,12 +220,13 @@ class TestCameraPreview(unittest.TestCase):
         camera.read.side_effect = [(True, frame.copy()) for _ in range(3)] + [(False, None)]
         session = FaceScanner(stable_seconds=0, min_samples=2)
         with patch.object(vision2, 'scanner', session), \
+                patch.object(vision2.camera_roi, 'load'), \
                 patch.object(cv2, 'VideoCapture', return_value=camera) as capture, \
                 patch.object(cv2, 'imshow') as show, patch.object(cv2, 'destroyAllWindows'), \
-                patch.object(cv2, 'moveWindow'), \
+                patch.object(cv2, 'moveWindow'), patch.object(cv2, 'setMouseCallback'), \
                 patch.object(cv2, 'waitKey', side_effect=[-1, -1, ord('x')]), \
                 patch.object(cv2, 'getWindowProperty', return_value=1):
-            vision2.grab_colors(1, cv2.CAP_DSHOW, show_masks=False)
+            vision2.grab_colors(1, cv2.CAP_DSHOW, show_masks=False, warmup_seconds=0)
         capture.assert_called_once_with(1, cv2.CAP_DSHOW)
         camera.release.assert_called_once()
         self.assertTrue(all(call.args[0] != 'Cube Faces' for call in show.call_args_list))

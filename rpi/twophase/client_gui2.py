@@ -17,7 +17,9 @@ import twophase.cubie as cubie
 import twophase.vision_params as vision_params
 from twophase import vision2
 from rubik_robot.vision.face_scanner import COLORS, scanner
-from rubik_robot.vision.solve_guide import cube_faces, guide, prepare_cube, request_solution
+from rubik_robot.vision.solve_guide import cube_faces, guide, prepare_cube, request_solution, verify_scan_colors
+from rubik_robot.vision.scan_audit import write_audit
+from rubik_robot.solution_panel import SolutionPanel
 
 
 # ################################## some global variables and constants ###############################################
@@ -29,6 +31,7 @@ colorpick_id = [0 for i in range(6)]
 curcol = None
 t = ("U", "R", "F", "D", "L", "B")
 cols = ("yellow", "green", "red", "white", "blue", "orange")
+color_names = dict(zip(cols, ('vàng', 'xanh lá', 'đỏ', 'trắng', 'xanh dương', 'cam')))
 ########################################################################################################################
 
 # ################################################ Diverse functions ###################################################
@@ -97,17 +100,31 @@ def cancel_guidance():
     solving = False
     last_auto_revision = scanner.snapshot()['revision']
     guide.reset()
+    solution_panel.clear()
 
 
 def solve_in_background(generation, revision, faces, samples, host, port):
     """Input: captured snapshot/endpoint. Output: a result queued for the Tk thread."""
+    audit = {'generation': generation, 'revision': revision, 'captured_faces': faces,
+             'captured_hsv': samples, 'status': 'checking'}
     try:
-        cube, _, centers, note = prepare_cube(faces, samples)
+        cube, _, centers, note = prepare_cube(faces, samples, allow_color_correction=False)
+        verify_scan_colors(faces, cube)
+        audit.update(status='validated', solver_cube=cube, solver_faces=cube_faces(cube), note=note)
+        try:
+            write_audit('last_solver_input', audit)
+        except OSError as failure:
+            print(f'Could not write scan audit: {failure}', flush=True)
         solution = request_solution(host, port, cube)
         result = (cube, centers, note, solution)
         solve_results.put((generation, revision, result, None))
     except Exception as error:
-        solve_results.put((generation, revision, None, str(error)))
+        audit.update(status='rejected', error=str(error))
+        try:
+            write_audit('last_solver_input', audit)
+        except OSError:
+            pass
+        solve_results.put((generation, revision, None, error))
 
 
 def solve():
@@ -130,7 +147,7 @@ def solve():
     solving = True
     last_auto_revision = state['revision']
     display.delete(1.0, END)
-    show_text('Checking 54 colors and face directions, then requesting the TCP solver...\n')
+    show_text('Checking 54 colors and face directions, then finding a solution...\n')
     Thread(target=solve_in_background,
            args=(solve_generation, state['revision'], faces, samples, host, port), daemon=True).start()
 
@@ -148,11 +165,16 @@ def receive_solution():
         solving = False
         if error:
             guide.fail(error)
-            show_text(f'Check scan: {error}\nUse Rescan shown face or correct the editor, then Solve.\n')
+            if isinstance(error, OSError):
+                show_text(f'Solver connection failed: {error}\n'
+                          'Your scan is kept. Check the server address/port, then press Solve again.\n')
+            else:
+                show_text(f'Check scan: {error}\nUse Rescan shown face or correct the editor, then Solve.\n')
             continue
         cube, centers, note, solution = result
         try:
-            guide.begin(cube, solution, centers)
+            guide.reset()
+            solution_panel.show(cube, solution)
             show_text(f'{note}\n{cube}\nSolution: {solution or "<already solved>"}\n')
         except ValueError as failure:
             guide.fail(failure)
@@ -182,7 +204,7 @@ def empty():
     global last_saved
     cancel_guidance()
     display.delete(1.0, END)
-    orientation_status.set('Reference: yellow U, red F, green R. Rotate the whole cube while scanning.')
+    orientation_status.set('Khi quét: chỉ xoay cả khối, giữ nguyên các tầng. U vàng, F đỏ, R xanh lá.')
     scanner.reset()
     last_saved = {}
     auto_scan.set(True)
@@ -229,7 +251,7 @@ def click(_event):
                 canvas.itemconfig(colorpick_id[i], width=1)
             canvas.itemconfig("current", width=5)
         else:
-            if solving or guide.snapshot()['phase'] not in ('idle', 'solved'):
+            if solving or guide.snapshot()['phase'] not in ('idle', 'solved', 'error'):
                 return
             for face_index in range(6):
                 for sticker in range(9):
@@ -286,7 +308,8 @@ def set_delta_C(val):
 def transfer():
     """Transfer the facelet colors detected by the opencv vision to the GUI editor."""
     cancel_guidance()
-    scanner.save_current()
+    if not scanner.save_current():
+        show_text('Màu chưa ổn định hoặc chưa khớp ảnh camera. Giữ yên rồi chụp lại.\n')
     refresh_scan()
 
 
@@ -329,6 +352,12 @@ def refresh_scan():
     global last_saved
     state = scanner.snapshot()
     guidance = guide.snapshot()
+    if state['faces'] != last_saved:
+        try:
+            write_audit('last_camera_scan', {'revision': state['revision'], 'faces': state['faces'],
+                                            'hsv_faces': state['hsv_faces']})
+        except OSError as failure:
+            print(f'Could not write camera scan audit: {failure}', flush=True)
     faces = cube_faces(guidance['cube']) if guidance['cube'] else state['faces']
     if guidance['phase'] == 'solved' and state['faces'] != faces:
         scanner.set_verified_faces(faces)
@@ -354,9 +383,11 @@ def refresh_scan():
                               outline='darkorange' if conflict else 'black', width=3 if conflict else 1)
     text = vision2.camera_error or f"{len(state['faces'])}/6 - {state['message']}"
     if solving:
-        text = 'Checking scan and waiting for the TCP solver...'
+        text = 'Checking scan and finding a solution...'
     elif guidance['phase'] != 'idle':
         text = guidance['message']
+    elif solution_panel.model.cube:
+        text = f'Công thức đã sẵn sàng: {len(solution_panel.model.moves)} nước. Xem cửa sổ hướng dẫn.'
     if vision2.camera_error:
         text = vision2.camera_error
     scan_status.set(text)
@@ -366,11 +397,14 @@ def refresh_scan():
         button.config(state=DISABLED if solving or active else NORMAL)
     if active:
         orientation_status.set('One arrow: turn one layer 90 degrees. Three arrows: rotate the whole cube.')
+    elif solution_panel.model.cube:
+        orientation_status.set('Giữ F đỏ hướng về bạn, U vàng ở trên, R xanh lá bên phải khi làm theo công thức.')
     elif state['current']:
         center = state['current'][4]
         top = {'yellow': 'orange', 'white': 'red', 'red': 'yellow',
                'green': 'yellow', 'blue': 'yellow', 'orange': 'yellow'}[center]
-        orientation_status.set(f"Showing {center}: the adjacent {top} face must be at the top edge.")
+        orientation_status.set(f'Mặt tâm {color_names[center]}: cạnh trên giáp mặt tâm {color_names[top]}. '
+                               'Khi quét chỉ xoay cả khối, không xoay riêng từng tầng.')
 
 
 def poll_scan():
@@ -390,6 +424,21 @@ def close_client():
     vision2.camera_stop.set()
     root.destroy()
 
+
+def restore_solution(cube, solution):
+    """Restore a previously scanned formula without requiring another camera scan."""
+    global last_auto_revision
+    solution_panel.show(cube, solution)  # Validate before replacing the scan.
+    guide.reset()
+    scanner.reset()
+    pause_scan()
+    for values in cube_faces(cube).values():
+        scanner.update([values[:3], values[3:6], values[6:]])
+        scanner.save_current()
+    last_auto_revision = scanner.snapshot()['revision']
+    refresh_scan()
+    show_text(f'Restored saved scan\n{cube}\nSolution: {solution or "<already solved>"}\n')
+
 # ######################################################################################################################
 
 #  ###################################### Generate and display the TK_widgets ##########################################
@@ -397,6 +446,7 @@ def close_client():
 
 root = Tk()
 root.wm_title("Solver Client")
+solution_panel = SolutionPanel(root)
 canvas = Canvas(root, width=12 * width + 20, height=9 * width + 20)
 canvas.pack()
 bsolve = Button(text="Solve", height=2, width=10, relief=RAISED, command=solve)
@@ -485,10 +535,11 @@ rotate_button = Button(scan_controls, text="Rotate saved face 90", command=rotat
 rotate_button.pack(side=LEFT, padx=4)
 Button(scan_controls, text="New scan", command=empty).pack(side=LEFT, padx=4)
 auto_guide = BooleanVar(value=True)
-Checkbutton(scan_controls, text="Auto guide after 6 faces", variable=auto_guide).pack(side=LEFT, padx=4)
+Checkbutton(scan_controls, text="Auto solve after 6 faces", variable=auto_guide).pack(side=LEFT, padx=4)
+Button(root, text='Xem công thức và hình hướng dẫn', command=solution_panel.reopen).pack(pady=3)
 scan_status = StringVar(value="Show a face and hold still")
 Label(root, textvariable=scan_status, wraplength=720).pack(padx=10, pady=3)
-orientation_status = StringVar(value="Reference: yellow U, red F, green R. Rotate the whole cube while scanning.")
+orientation_status = StringVar(value='Khi quét: chỉ xoay cả khối, giữ nguyên các tầng. U vàng, F đỏ, R xanh lá.')
 Label(root, textvariable=orientation_status, wraplength=720).pack(padx=10, pady=(0, 8))
 root.protocol("WM_DELETE_WINDOW", close_client)
 root.after(100, poll_scan)
@@ -498,6 +549,10 @@ scramble_workspace = ScrambleWorkspace(root, sys.modules[__name__])
 
 from rubik_robot.auto_solve_panel import AutoSolveWorkspace
 auto_solve_workspace = AutoSolveWorkspace(root, sys.modules[__name__], scramble_workspace)
+
+if vision_params.initial_solution:
+    restore_solution(vision_params.initial_solution['cube'], vision_params.initial_solution['solution'])
+    vision_params.initial_solution = None
 
 root.mainloop()
 ########################################################################################################################

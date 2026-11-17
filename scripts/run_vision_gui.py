@@ -1,5 +1,6 @@
-"""Launch the camera scanner and arrow-guided Two-Phase desktop client."""
+"""Launch camera scanning with formula output and separate illustrated move cards."""
 import argparse
+import json
 import sys
 from pathlib import Path
 from threading import Thread
@@ -18,7 +19,28 @@ def main() -> None:
     parser.add_argument("--camera", type=int, default=1 if sys.platform == 'win32' else 0)
     parser.add_argument("--backend", choices=("auto", "dshow", "msmf"), default="auto")
     parser.add_argument("--show-masks", action="store_true", help="Show HSV tuning masks")
+    parser.add_argument('--diagnostics', type=Path, help='Record up to 480 raw frames and detection results')
+    parser.add_argument('--restore-solution', type=Path, help='Reopen a saved cube/solution JSON without rescanning')
+    parser.add_argument('--performance', type=Path, help='Save timing and recognition metrics when the camera closes')
     args = parser.parse_args()
+    if args.performance:
+        from rubik_robot.vision.performance import CameraPerformance
+        vision2.performance_recorder = CameraPerformance(args.performance)
+    if args.restore_solution:
+        from rubik_robot.vision.move_instructions import SolutionWalkthrough
+        from twophase import vision_params
+        try:
+            saved = json.loads(args.restore_solution.read_text(encoding='utf-8'))
+            checked = SolutionWalkthrough()
+            checked.load(saved['cube'], saved['solution'])
+            vision_params.initial_solution = {'cube': checked.cube, 'solution': checked.solution}
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            parser.error(f'Cannot restore solution: {error}')
+    from rubik_robot.vision.camera_settings import load_vision_profile
+    load_vision_profile(args.camera)
+    if args.diagnostics:
+        from rubik_robot.vision.diagnostics import FrameRecorder
+        vision2.diagnostic_recorder = FrameRecorder(args.diagnostics)
     backends = {"auto": None, "dshow": cv2.CAP_DSHOW, "msmf": cv2.CAP_MSMF}
     backend = backends[args.backend]
     if args.backend == "auto" and sys.platform == "win32":
@@ -30,12 +52,13 @@ def main() -> None:
     vision2.camera_thread = thr
     thr.start()
 
-    print("Server address: localhost:8080. Guidance starts automatically after 6 validated faces.")
+    print("Solver: localhost:8080 with local fallback. After 6 faces, open the formula and illustrated move cards.")
     try:
         import twophase.client_gui2
     finally:
         vision2.camera_stop.set()
-        vision2.camera_thread.join(timeout=2)
+        # Performance snapshots are written only after preview stops.
+        vision2.camera_thread.join(timeout=10 if vision2.performance_recorder is not None else 2)
 
 
 if __name__ == "__main__":

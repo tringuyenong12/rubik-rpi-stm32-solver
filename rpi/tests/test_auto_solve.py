@@ -161,7 +161,7 @@ class TestAutoFlow(unittest.TestCase):
             if index is not None:
                 values[index] = 'red'
                 break
-        cube, recovered, note = prepare_machine_cube(damaged, samples, FACE_COLORS)
+        cube, recovered, note = prepare_machine_cube(damaged, samples, FACE_COLORS, allow_color_correction=True)
         self.assertEqual(cube, SCRAMBLED)
         self.assertEqual(recovered, self.faces)
         self.assertIn('corrected 1 stickers', note)
@@ -298,7 +298,9 @@ class TestAutoCamera(unittest.TestCase):
         device.isOpened.return_value = True
         pngs = []
         owner = getattr(vision2, 'camera_thread', None)
-        with patch.object(vision2, 'camera_thread', None, create=True), patch('rubik_robot.auto_solve.cv2.VideoCapture', return_value=device):
+        with patch.object(vision2, 'camera_thread', None, create=True), \
+                patch.object(vision2.camera_roi, 'load'), \
+                patch('rubik_robot.auto_solve.cv2.VideoCapture', return_value=device):
             with AutoCamera((1, None, False), Event(), pngs.append) as camera:
                 camera.latest = (0, time.monotonic()-1, np.zeros_like(frame))
                 colors, samples = camera.capture(SCAN_ROUTE[0], timeout_s=2, settle_s=.05)

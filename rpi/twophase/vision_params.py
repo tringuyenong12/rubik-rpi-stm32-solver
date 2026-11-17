@@ -29,6 +29,7 @@ blue_H = 160  # highest allowed hue for color blue
 # The colors of a cube face are stored here by the function vision2.grabcolors
 face_col = []  # the colors (as text) of a cube face
 face_hsv = []  # the colors (as hsv-values) of a cube face
+initial_solution = None  # Optional explicitly restored, validated cube/solution.
 
 # These dictionaries define the colors of all 6 faces and are filled by the client_gui2.transfer routine
 cube_col = {}  # the colors (as text) of the 6 faces

@@ -12,7 +12,7 @@ from rubik_robot.cube.state import SOLVED_CUBE
 from rubik_robot.motion.planner import MotionPlanner
 from rubik_robot.protocol import Command
 from rubik_robot.transport.serial_link import SerialLink
-from rubik_robot.vision.face_scanner import COLORS, FaceScanner
+from rubik_robot.vision.face_scanner import COLORS, new_camera_scanner
 from rubik_robot.vision.solve_guide import (
     apply_move, color_cost, face_definition, hsv_to_lab, minimum_assignment,
     request_solution, valid_cube,
@@ -71,7 +71,7 @@ def machine_faces(cube, position_colors):
             for index, face in enumerate('URFDLB')}
 
 
-def prepare_machine_cube(faces, samples, position_colors):
+def prepare_machine_cube(faces, samples, position_colors, allow_color_correction=False):
     """Input: real-color captures/poses. Output: validated state in the machine's coordinates."""
     virtual_colors = {actual: FACE_COLORS[face] for face, actual in position_colors.items()}
     virtual_faces = {virtual_colors[center]: tuple(virtual_colors[color] for color in values)
@@ -80,7 +80,7 @@ def prepare_machine_cube(faces, samples, position_colors):
     cube = face_definition(virtual_faces)
     if valid_cube(cube):
         return cube, machine_faces(cube, position_colors), 'Machine-relative scan validated'
-    if set(virtual_samples) != set(COLORS):
+    if not allow_color_correction or set(virtual_samples) != set(COLORS):
         raise ValueError('Colors or machine face directions are inconsistent. Rescan the cube.')
     numeric = hsv_to_lab([sample for center in COLORS for sample in virtual_samples[center]])
     if numeric.shape != (54, 3):
@@ -195,10 +195,15 @@ class AutoCamera:
                 raise RuntimeError('Previous camera is still closing. Wait and press Start again.')
         check_cancel(self.cancel)
         camera_id, backend, _ = self.options
+        vision2.camera_roi.load(camera_id)
         self.cap = cv2.VideoCapture(camera_id) if backend is None else cv2.VideoCapture(camera_id, backend)
         if not self.cap.isOpened():
             self.cap.release()
             raise RuntimeError(f'Cannot open camera {camera_id}')
+        from rubik_robot.vision.camera_settings import apply_camera_profile, configure_camera_runtime, CAMERA_WARMUP_SECONDS
+        configure_camera_runtime()
+        apply_camera_profile(self.cap, camera_id)
+        self.warmup_until = monotonic() + CAMERA_WARMUP_SECONDS
         self.thread = Thread(target=self._read, daemon=True)
         vision2.camera_thread = self.thread
         self.thread.start()
@@ -232,9 +237,11 @@ class AutoCamera:
     def capture(self, pose, seen_centers=(), timeout_s=12, settle_s=.4):
         """Input: completed robot pose/deadline. Output: voted nine colors and HSV samples."""
         from twophase import vision2
+        from rubik_robot.vision.scan_preview import StableScanPreview
 
-        scanner = FaceScanner(stable_seconds=.25, min_samples=5)
-        ready = monotonic() + settle_s
+        scanner = new_camera_scanner()
+        preview = StableScanPreview()
+        ready = max(monotonic() + settle_s, self.warmup_until)
         deadline, sequence, shown = ready + timeout_s, self.sequence, 0.
         diagnostic = 'Looking for all 9 stickers'
         while monotonic() < deadline:
@@ -249,17 +256,20 @@ class AutoCamera:
             sequence, timestamp, frame = latest
             if timestamp < ready:
                 continue
-            hsv, colors = vision2.detect_face(frame)
+            roi = vision2.camera_roi.selection(frame.shape)
+            hsv, colors = vision2.detect_face(frame, roi, include_masks=False)
+            preview_colors, preview_boxes = preview.update(frame, colors, vision2.face_boxes, roi, now=timestamp)
             if len(colors) == 3 and all(len(row) == 3 for row in colors) and colors[1][1] in seen_centers:
                 diagnostic = f'{colors[1][1]} already captured. Waiting for a new face at position {pose.face}'
-                scanner = FaceScanner(stable_seconds=.25, min_samples=5)
+                scanner = new_camera_scanner()
                 scanner.message = diagnostic
             else:
-                scanner.update(colors, hsv_grid=hsv)
+                scanner.update(colors, hsv_grid=hsv, displayed_grid=preview_colors)
                 diagnostic = scanner.snapshot()['message']
             state = scanner.snapshot()
             if timestamp - shown >= .1:
-                overlay = vision2.draw_scan_overlay(frame.copy(), colors, state)
+                overlay = vision2.draw_scan_overlay(vision2.camera_roi.draw(frame.copy()), preview_colors, state,
+                                                    boxes_override=preview_boxes)
                 # Existing overlay draws in place and may return None.
                 image = overlay if overlay is not None else frame.copy()
                 image = cv2.resize(image, (480, 360))

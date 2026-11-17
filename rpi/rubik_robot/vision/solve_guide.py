@@ -1,4 +1,4 @@
-"""Validate camera scans and guide verified quarter turns using the TCP solver."""
+"""Validate camera scans and guide quarter turns with TCP or the local solver."""
 
 from collections import deque
 from itertools import product
@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 
 from rubik_robot.cube.state import FACE_ORDER, SOLVED_CUBE, validate_cube_string
-from rubik_robot.solver.kociemba_solver import normalize_twophase_solution
+from rubik_robot.solver.kociemba_solver import normalize_twophase_solution, solve_cube
 from rubik_robot.vision.face_scanner import COLORS
 from twophase.cubie import basicMoveCube
 from twophase.face import FaceCube
@@ -135,7 +135,15 @@ def orient_faces(faces):
     return found
 
 
-def prepare_cube(faces, hsv_faces=None):
+def verify_scan_colors(faces, definition):
+    """A solver may reorient faces, but cannot replace any captured colors."""
+    prepared = cube_faces(definition)
+    for center in COLORS:
+        if center not in faces or tuple(prepared[center]) not in [rotate_grid(faces[center], turn) for turn in range(4)]:
+            raise ValueError('Prepared cube changes captured sticker colors. Rescan the affected face.')
+
+
+def prepare_cube(faces, hsv_faces=None, allow_color_correction=False):
     """Input: captured grids/samples. Output: valid cube, canonical faces, centers and note."""
     if set(faces) != set(COLORS):
         raise ValueError('Capture all six center colors first')
@@ -154,7 +162,7 @@ def prepare_cube(faces, hsv_faces=None):
         definition = orient_faces(faces)
         note = 'Scan validated'
     except ValueError as original_error:
-        if samples is None:
+        if samples is None or not allow_color_correction:
             raise original_error
         free = np.asarray([index for index in range(54) if index % 9 != 4])
         slots = np.repeat(np.arange(6), 8)
@@ -171,11 +179,20 @@ def prepare_cube(faces, hsv_faces=None):
 
 
 def request_solution(host, port, cube):
-    """Input: TCP endpoint/cube. Output: normalized solution verified against the cube."""
-    with socket.create_connection((host, port), timeout=30) as connection:
-        connection.sendall((cube + '\n').encode('ascii'))
-        with connection.makefile('r', encoding='utf-8') as response:
-            reply = response.readline(4096).strip()
+    """Request TCP solving, or solve locally if the loopback server is absent."""
+    try:
+        with socket.create_connection((host, port), timeout=30) as connection:
+            connection.sendall((cube + '\n').encode('ascii'))
+            with connection.makefile('r', encoding='utf-8') as response:
+                reply = response.readline(4096).strip()
+    except ConnectionRefusedError:
+        if host.strip().lower() not in ('localhost', '127.0.0.1', '::1'):
+            raise
+        print(f'Local TCP solver unavailable at {host}:{port}; solving on this computer.', flush=True)
+        reply = solve_cube(cube, max_length=20, timeout=3)
+        # An empty local result is valid for an already solved cube.
+        if cube == SOLVED_CUBE and not reply:
+            return ''
     if not reply:
         raise ValueError('Server closed the connection without a solution')
     if 'error' in reply.lower() or 'invalid' in reply.lower():
