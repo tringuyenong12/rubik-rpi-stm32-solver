@@ -87,8 +87,12 @@ Với STM32F103, có thể dùng thêm TIM3/TIM4 hoặc driver PWM ngoài như P
 Firmware trong `firmware/stm32cubeide/App` hiện là scaffold an toàn:
 
 - `SERVO` để test từng kênh PWM.
-- `MOVE` để test pipeline UART.
+- `MOVE`, `TURN`, `SCAN_POSE` trả lỗi chưa hỗ trợ cho đến khi có sequence cơ khí.
 - Mapping actuator thật sẽ được điền sau khi chốt motor và cảm biến cho từng cụm.
+
+Phải gọi `ServoController_ConfigProfile()` với số đo thực tế trước `Start()`.
+Không có profile thì PWM không bật. Cấu hình nhiều timer và ba mốc góc theo
+[hướng dẫn thư viện](../firmware/stm32cubeide/App/SERVO_CONTROLLER_GUIDE.md).
 
 ## 5. Thêm Code App
 
@@ -156,7 +160,8 @@ STM32 phải trả:
 OK PONG
 ```
 
-Thử calibration servo:
+Sau khi đã cấu hình profile cho kênh 0, thử pulse nằm trong giới hạn đã đo
+(các số dưới đây chỉ minh họa):
 
 ```text
 SERVO 0 1500 300

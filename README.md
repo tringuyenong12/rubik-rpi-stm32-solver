@@ -48,11 +48,13 @@ Camera
 ```text
 docs/                   Tài liệu plan, kiến trúc, giao tiếp, pipeline CV
 rpi/                    Code chạy trên Raspberry Pi 4
+  rubik_robot/          Package điều khiển robot chính (Vision, State, Motion, Transport)
+  twophase/             Package giải Rubik 2-Phase thuần Python (Herbert Kociemba) tích hợp sẵn
 firmware/stm32cubeide/  Firmware STM32 theo workflow STM32CubeIDE/CubeMX
 mechanical/             Ghi chú cơ khí, calibration và test motion
 technical drawing/      Ảnh bản vẽ/CAD của thiết kế cơ khí hiện tại
 calibration/            Nơi lưu thông số màu/servo theo phần cứng thực
-scripts/                Script tiện ích cho demo/test
+scripts/                Script tiện ích cho demo/test (demo_pipeline.py, run_vision_gui.py)
 ```
 
 ## Quick Start Cho Raspberry Pi
@@ -63,7 +65,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python -m rubik_robot.main --mode demo
-pytest
+python -m unittest discover tests
 ```
 
 Trên Windows PowerShell:
@@ -74,7 +76,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 python -m rubik_robot.main --mode demo
-pytest
+python -m unittest discover tests
 ```
 
 Theo mapping cơ khí mới, CLI mặc định xuất lệnh xoay mặt bằng `TURN`. Nếu muốn test firmware cũ với lệnh `MOVE`:
@@ -124,3 +126,89 @@ Thiết kế cơ khí theo bản vẽ CAD được tổng hợp trong [docs/MECH
 ## Trạng Thái Hiện Tại
 
 Repo này là bộ khung ban đầu cho đồ án. Code Python có demo solver/motion/protocol, firmware STM32 có parser lệnh cơ bản. Các thông số camera, màu, servo và cơ khí cần được calibration theo phần cứng thực tế.
+
+## Quét Camera Và Hướng Dẫn Trên Client–Server
+
+Chạy các lệnh dưới đây từ thư mục gốc project, với môi trường Python ở `.venv`.
+
+Terminal thứ nhất chạy server Two-Phase.
+
+```powershell
+.\.venv\Scripts\python.exe -B rpi\twophase\start_server.py 8080 20 3
+```
+
+Terminal thứ hai mở Solver Client và Logitech ID 1.
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts\run_vision_gui.py --camera 1 --backend dshow
+```
+
+- Bật `Auto scan` và `Auto guide after 6 faces`. Giữ mỗi mặt ngay ngắn để tự lưu, có thể quét khác thứ tự.
+- Quy ước tâm là U vàng, R xanh lá, F đỏ, D trắng, L xanh biển, B cam. Khi quét U, cạnh trên giáp cam. Khi quét D, cạnh trên giáp đỏ. Bốn mặt bên có cạnh trên giáp vàng.
+- Đủ sáu mặt, client kiểm tra màu theo mẫu tâm, tìm hướng mặt hợp lệ và gọi server. Màu hoặc hướng còn mâu thuẫn được báo để sửa trên sơ đồ hoặc dùng `Rescan shown face`, rồi `Solve`.
+- Một mũi tên chỉ thao tác xoay một tầng 90°. Ba mũi tên song song chỉ xoay cả khối để đổi mặt quan sát. Nước 180° được chia thành hai lần 90°.
+- Giữ mặt theo thông báo để camera xác nhận từng bước. Sơ đồ Solver Client cập nhật theo trạng thái đã xác nhận, hoàn tất hiện `CUBE SOLVED!`.
+- `New scan` hủy hướng dẫn và bắt đầu quét lại. `--show-masks` mở thêm bộ lọc để hiệu chỉnh màu.
+
+Chạy bộ kiểm thử Python từ thư mục gốc.
+
+```powershell
+Push-Location rpi
+..\.venv\Scripts\python.exe -B -m unittest discover -s tests -v
+Pop-Location
+```
+
+## Trộn Bộ Đề Từ Rubik Đã Giải
+
+Trong Solver Client, chọn tab `Scramble` ở thanh lựa chọn phía trên để mở chức năng trộn.
+
+| Mức độ | Số nước trộn |
+| --- | --- |
+| Dễ | 5 |
+| Trung bình | 12 |
+| Khó | 22 |
+
+Mức độ được chia theo độ dài chuỗi sinh ra. Mỗi bộ đề được tính từ trạng thái đã giải, tránh hai nước liên tiếp trên cùng trục. Độ dài lời giải tối ưu của bộ đề có thể khác số nước trộn.
+
+1. Đặt Rubik đã giải theo U vàng, F đỏ, R xanh lá.
+2. Chọn `Easy`, `Medium` hoặc `Hard`, rồi bấm `Generate scramble` để xem chuỗi xoay, lệnh UART và sơ đồ sáu mặt của trạng thái đích.
+3. Dùng `Copy UART` hoặc `Save .txt` để xuất đúng các bước trộn.
+4. Chọn cổng COM, baud rate và bấm `Send UART` để gửi trực tiếp.
+5. Mỗi lệnh `TURN` chờ `OK TURN` rồi `DONE TURN`. Lỗi hoặc timeout sẽ dừng chuỗi và báo số bước đã xác nhận. Nút dừng chờ bước đang chạy hoàn tất rồi ngừng gửi các bước tiếp theo.
+
+Trước mỗi lần gửi lại hoặc tạo bộ đề mới để thực hiện trên robot, đưa Rubik về trạng thái đã giải. Chuyển về `Solve Guide` sẽ mở một lượt quét mới. Khi firmware báo `ERR UNSUPPORTED`, cần triển khai sequence xoay tương ứng để thực thi lệnh đã xuất. Giao thức chi tiết nằm trong [UART_PROTOCOL.md](docs/UART_PROTOCOL.md).
+
+Tạo và xuất bộ đề bằng terminal từ thư mục gốc project.
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level easy
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level medium
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level hard --output scramble_hard.txt
+```
+
+Gửi trực tiếp qua cổng COM đã chọn.
+
+```powershell
+.\.venv\Scripts\python.exe -B scripts\run_scramble.py --level easy --port COM5 --baudrate 115200
+```
+
+`--seed 7` tái tạo cùng bộ đề để kiểm thử. `--duration-ms` và `--face-turn-command` điều chỉnh thời gian hoặc chọn `MOVE` cho firmware tương ứng.
+
+## Tự Động Quét Và Giải Qua UART
+
+Chọn tab thứ ba `Auto Solve` trong cùng Solver Client. Đặt Rubik xáo trộn vào
+máy với hướng màu bất kỳ, chọn cổng UART và bấm `Start`. Camera nhận diện mặt
+đầu tiên tại chỗ và cập nhật theo màu tâm trước khi kết nối UART.
+
+Chương trình gửi bảy tư thế `SCAN_POSE` cố định sau lần chụp đầu, chờ `DONE` rồi
+tự chụp các phía còn lại. U/F/D/B/R/L biểu thị vị trí của khối trong máy lúc Start.
+Các mặt xuất hiện dần theo màu tâm, có kiểm tra trùng. Đủ sáu mặt sẽ thông báo,
+đưa khối về tư thế ban đầu, kiểm tra trạng thái, gọi server Two-Phase và xuất/gửi
+từng lệnh giải `TURN` theo hệ tọa độ máy qua UART. Nút dừng ngừng các bước tiếp
+theo sau thao tác hiện tại.
+
+Lệnh mở server và client vẫn giống phần hướng dẫn giải phía trên. Firmware cần
+thực hiện đúng hợp đồng tư thế toàn khối và trả `DONE`; firmware hiện có thể trả
+`ERR UNSUPPORTED` khi sequence cơ khí chưa được triển khai. Phần mới chỉ xử lý
+camera, solver và UART ở PC. Hướng đặt camera, bảng tư thế, phản hồi và lệnh kiểm
+thử đầy đủ nằm trong [AUTO_SOLVE.md](docs/AUTO_SOLVE.md).

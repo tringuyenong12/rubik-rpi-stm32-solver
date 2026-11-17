@@ -1,0 +1,150 @@
+/*
+ * Rubik_Command.c
+ *
+ *  Created on: Nov 15, 2026
+ *      Author: Dell
+ */
+
+
+#include "Rubik_Command.h"
+#include "../Rubik_Control/Rubik_Control.h"
+#include <string.h>
+
+
+//#<ID> RUBIK PING
+//#<ID> RUBIK RESET
+//#<ID> RUBIK MOVE <face> <duration_ms>
+//#<ID> RUBIK STOP
+
+enum { RUBIK_UNKNOWN, RUBIK_PING, RUBIK_RESET, RUBIK_MOVE, RUBIK_STOP };
+
+
+void Rubik_CommandHandler(uint8_t argc, char *argv[], uint16_t command_id)
+{
+
+    if (!argc)
+    {
+         UART_Error(command_id, "BAD_ARG");
+         return;
+     }
+    const char *action = argv[2];
+    int code = RUBIK_UNKNOWN;
+    if (strcmp(action, "PING") == 0) code = RUBIK_PING;
+    else if (strcmp(action, "RESET") == 0) code = RUBIK_RESET;
+    else if (strcmp(action, "MOVE") == 0) code = RUBIK_MOVE;
+    else if (strcmp(action, "STOP") == 0) code = RUBIK_STOP;
+
+     switch (code)
+     {
+     case RUBIK_MOVE:
+     {
+    	 	  char move = argv[3];
+
+
+    	      if (strcmp(move, "L") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Left();
+    	          UART_Done(command_id);
+    	      }
+    	      else if (strcmp(move, "R") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Right();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "U") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_UpToFront();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "D") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_DownToFront();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "F") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Front();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "B") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Back();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "L_") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Left_();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "R_") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Right_();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "U_") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Up_ToFront();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "D_") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Down_ToFront();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "F_") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Front_();
+    	          UART_Done(command_id);
+
+    	      }
+    	      else if (strcmp(move, "B_") == 0)
+    	      {
+    	    	  UART_Accept(command_id);
+    	          Rubik_Back_();
+    	          UART_Done(command_id);
+    	      }
+    	      else {
+    	    	  UART_Error(command_id, "BAD_RUBIK_MOVE_ARG");
+    	      }
+    	      break;
+     }
+     case RUBIK_PING:
+         if (argc != 3U) { UART_Error(command_id, "BAD_ARG"); return; }
+         UART_Accept(command_id);
+         UART_Done(command_id);
+         break;
+     case RUBIK_RESET:
+         if (argc != 3U) { UART_Error(command_id, "BAD_ARG"); return; }
+         UART_Accept(command_id);
+         Rubik_Hold_Start_Position();
+         UART_Done(command_id);
+         break;
+     case RUBIK_STOP:
+         if (argc != 3U) { UART_Error(command_id, "BAD_ARG"); return; }
+         UART_Command_Stop(command_id);
+         break;
+     default:
+         UART_Error(command_id, "UNKNOWN_CMD");
+         break;
+     }
+}

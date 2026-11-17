@@ -1,6 +1,7 @@
 opencv-python>=4.8
 numpy>=1.24
 pyserial>=3.5
-kociemba>=1.2
+# Built-in pure-Python solver in rpi/twophase is included; optional fallback:
+# kociemba>=1.2
 pytest>=7.0
 

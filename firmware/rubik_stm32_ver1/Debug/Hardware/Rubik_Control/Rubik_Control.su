@@ -1,0 +1,15 @@
+../Hardware/Rubik_Control/Rubik_Control.c:20:6:Rubik_Hold_Start_Position	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:39:7:Rubik_Left	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:55:6:Rubik_Left_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:71:7:Rubik_Right	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:87:7:Rubik_Right_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:104:7:Rubik_Front	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:120:7:Rubik_Front_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:136:7:Rubik_Back	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:152:7:Rubik_Back_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:168:7:Rubik_UpToFront	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:245:7:Rubik_Up_ToFront	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:315:7:Rubik_DownToFront	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:385:7:Rubik_Down_ToFront	4	static
+../Hardware/Rubik_Control/Rubik_Control.c:391:7:Rubik_Front_Back_Move_Full_Release	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:399:8:Rubik_Left_Right_Move_Full_Release	8	static
