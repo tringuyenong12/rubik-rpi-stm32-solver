@@ -4,6 +4,7 @@
 # pip install opencv_python-3.2.0-cp36-cp36m-win_amd64.whl
 
 import cv2
+import sys
 import numpy as np
 from threading import Event
 from time import monotonic, perf_counter
@@ -20,6 +21,7 @@ performance_recorder = None
 
 camera_stop = Event()
 camera_error = ""
+face_rejection = ""
 face_centers = []
 face_boxes = []
 sticker_boxes = []
@@ -143,11 +145,11 @@ def display_colorname(bgrcap, p):
         bgrcap, col, tuple(p - (tz[0] // 2, -tz[1] // 2)), font, 0.4, txtcol, 1)
 
 
-def material_color_sample(pixels):
+def material_color_sample(pixels, minimum_fraction=.55):
     """Measure coherent, strongly colored material while excluding white glare."""
     colored = pixels[(pixels[:, 1] >= vision_params.sat_W+20)
-                     & (pixels[:, 2] >= max(50, vision_params.rgb_L))]
-    if len(colored) < len(pixels)*.55:
+                     & (pixels[:, 2] >= max(35, vision_params.rgb_L))]
+    if len(colored) == 0 or len(colored) < len(pixels)*minimum_fraction:
         return None
     selected = colored[colored[:, 1] >= np.percentile(colored[:, 1], 70)]
     angles = selected[:, 0]*np.pi/90
@@ -159,6 +161,51 @@ def material_color_sample(pixels):
     result = np.median(selected, axis=0)
     result[0] = (np.arctan2(sine, cosine) % (2*np.pi))*90/np.pi
     return result
+
+
+def blue_glare_material(p):
+    """Confirm a blue-tinted center using coherent blue material around its rim."""
+    x, y = (int(value) for value in p)
+    inner = hsv[max(0, y-18):min(height, y+18), max(0, x-18):min(width, x+18)]
+    if inner.size == 0:
+        return None
+    floor = max(35, vision_params.rgb_L)
+    tint = ((inner[:, :, 0] >= vision_params.green_H+1.5)
+            & (inner[:, :, 0] < vision_params.blue_H-1.5)
+            & (inner[:, :, 1] >= max(12, vision_params.sat_W*.4))
+            & (inner[:, :, 2] >= floor))
+    if np.mean(tint) < .6:
+        return None
+    x0, x1 = max(0, x-54), min(width, x+54)
+    y0, y1 = max(0, y-54), min(height, y+54)
+    yy, xx = np.ogrid[y0-y:y1-y, x0-x:x1-x]
+    radius_squared = xx*xx+yy*yy
+    ring = (radius_squared >= 40*40) & (radius_squared < 54*54)
+    if not np.any(ring):
+        return None
+    pixels = hsv[y0:y1, x0:x1]
+    blue = ((pixels[:, :, 0] >= vision_params.green_H+1.5)
+            & (pixels[:, :, 0] < vision_params.blue_H-1.5)
+            & (pixels[:, :, 1] >= vision_params.sat_W+20)
+            & (pixels[:, :, 2] >= floor))
+    if np.mean(blue[ring]) < .2:
+        return None
+    covered = 0
+    for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
+        quadrant = ring & (xx*sx >= 0) & (yy*sy >= 0)
+        if np.any(quadrant) and np.mean(blue[quadrant]) >= .15:
+            covered += 1
+    if covered < 2:
+        return None
+    material = material_color_sample(pixels[ring & blue].astype(np.float32, copy=False))
+    if material is None:
+        return None
+    # A weak bluish patch alone remains uncertain. Its central hue must agree
+    # with strong peripheral pixels, rather than a different adjacent color.
+    central_hue = np.median(inner[:, :, 0][tint])
+    if abs((material[0]-central_hue+90) % 180-90) > 15:
+        return None
+    return material
 
 
 def getcolor(p, radius=10, white_value=None):
@@ -181,20 +228,64 @@ def getcolor(p, radius=10, white_value=None):
         extended = hsv[max(0, y-30):min(height, y+30), max(0, x-30):min(width, x+30)]
         evidence = extended.reshape(-1, 3).astype(np.float32, copy=False)
         material = material_color_sample(evidence)
+        if (material is not None and median[1] > vision_params.sat_W
+                and abs((material[0]-median[0]+90) % 180-90) > 15):
+            material = None
+        if material is None:
+            # Stay inside this sticker's cell, but include material around a
+            # large reflection that can fill the original 60-pixel patch.
+            wider = hsv[max(0, y-42):min(height, y+42), max(0, x-42):min(width, x+42)]
+            wider = wider.reshape(-1, 3).astype(np.float32, copy=False)
+            material = material_color_sample(wider)
+            if (material is not None and median[1] > vision_params.sat_W
+                    and abs((material[0]-median[0]+90) % 180-90) > 15):
+                material = None
+            if material is not None:
+                evidence = wider
         if material is not None:
             median = material
+        # Circular centers often reflect across their entire middle. Inspect
+        # the material near the edge, staying inside this 120-pixel cell.
+        x0, x1 = max(0, x-54), min(width, x+54)
+        y0, y1 = max(0, y-54), min(height, y+54)
+        yy, xx = np.ogrid[y0-y:y1-y, x0-x:x1-x]
+        distance_squared = xx*xx + yy*yy
+        ring = hsv[y0:y1, x0:x1][(distance_squared >= 40*40) & (distance_squared < 54*54)]
+        if len(ring):
+            warm_tint = (median[1] > vision_params.sat_W
+                         and (median[0] < vision_params.orange_H or median[0] >= vision_params.blue_H))
+            edge_material = material_color_sample(ring.astype(np.float32, copy=False),
+                                                  minimum_fraction=.25 if warm_tint and median[1] < 80 else .55)
+            if edge_material is not None:
+                hue_distance = abs((edge_material[0]-median[0]+90) % 180-90)
+                # Peripheral fingers or an adjacent sticker must not replace
+                # a blue/green material reading with an unrelated warm hue.
+                central_orange = vision_params.orange_L <= median[0] < vision_params.orange_H
+                edge_orange = vision_params.orange_L <= edge_material[0] < vision_params.orange_H
+                warm_conflict = (warm_tint and material is not None and median[1] >= 80
+                                 and central_orange != edge_orange)
+                if (not warm_conflict and (median[1] <= vision_params.sat_W or hue_distance <= 15)
+                        and (material is None or edge_material[1] >= median[1]+12)):
+                    median = edge_material
+        if (median[1] < vision_params.sat_W+12
+                and vision_params.green_H <= median[0] < vision_params.blue_H):
+            blue_material = blue_glare_material((x, y))
+            if blue_material is not None:
+                median = blue_material
     mh, ms, mv = median
     white_value = vision_params.val_W if white_value is None else white_value
     if ms <= vision_params.sat_W:
         if mv < white_value:
             return median, ''
-        if mv >= 250 and np.mean(pixels[:, 2] >= 250) > .8:
-            # Fully clipped glare contains no dependable color information.
+        clipped = (pixels[:, 2] >= 250) & (pixels[:, 1] <= 5)
+        if mv >= 250 and np.mean(clipped) > .8:
+            # HSV V is the brightest channel. Only near-zero saturation also
+            # indicates that all three channels have lost their color detail.
             return median, ''
         # Specular blue can look almost white. A coherent blue tint or a
         # saturated colored minority makes this patch uncertain, not white.
         chromatic = evidence[(evidence[:, 1] >= vision_params.sat_W + 20)
-                             & (evidence[:, 2] >= max(50, vision_params.rgb_L))]
+                             & (evidence[:, 2] >= max(35, vision_params.rgb_L))]
         mixed = False
         if len(chromatic) >= len(evidence)*.12:
             chromatic_angles = chromatic[:, 0]*np.pi/90
@@ -210,8 +301,12 @@ def getcolor(p, radius=10, white_value=None):
     elif abs((mh-vision_params.orange_L+90) % 180-90) < .4:
         return median, ''
     elif vision_params.orange_L <= mh < vision_params.orange_H:
+        if mv < vision_params.orange_min_V:
+            return median, ''
         return median, 'orange'
     elif vision_params.orange_H <= mh < vision_params.yellow_H:
+        if mv < vision_params.yellow_min_V:
+            return median, ''
         return median, 'yellow'
     elif vision_params.yellow_H <= mh < vision_params.green_H:
         return median, 'green'
@@ -317,10 +412,13 @@ def find_squares(bgrcap, n, white_value=None):
               (vision_params.yellow_H, vision_params.green_H),
               (vision_params.green_H, vision_params.blue_H))
     masks = [white_mask]
-    masks.extend(((hue >= low) & (hue < high) & colored).astype(np.uint8) * 255
+    # HSV hue is integral. Native range/bitwise operations avoid allocating
+    # several full-frame NumPy arrays per color on the Raspberry Pi.
+    masks.extend(cv2.bitwise_and(cv2.inRange(hue, int(np.ceil(low)), int(np.ceil(high))-1), color_mask)
                  for low, high in ranges)
-    red = ((hue < vision_params.orange_L) | (hue >= vision_params.blue_H)) & colored
-    masks.append(red.astype(np.uint8) * 255)
+    red = cv2.bitwise_or(cv2.inRange(hue, 0, int(np.ceil(vision_params.orange_L))-1),
+                        cv2.inRange(hue, int(np.ceil(vision_params.blue_H)), 179))
+    masks.append(cv2.bitwise_and(red, color_mask))
     min_area = max(40, (bgrcap.shape[0] / n) ** 2 * 0.2)
     max_area = bgrcap.shape[0] * bgrcap.shape[1] * 0.16
     candidates = []
@@ -386,10 +484,67 @@ def fit_face_grid(points, boxes):
     return best_indices
 
 
+def locate_calibrated_face(image):
+    """Fit six or more observed stickers spanning all three rows and columns."""
+    find_squares(image, grid_N)
+    points = np.float32(cent)
+    grid = np.float32([[col*120+FACE_MARGIN+60, row*120+FACE_MARGIN+60]
+                       for row in range(3) for col in range(3)])
+    if len(points) < 6:
+        return None
+    sizes = np.asarray([np.sqrt(abs(cv2.contourArea(box))) for box in sticker_boxes])
+    points = points[(sizes > 42) & (sizes < 135)]
+    if len(points) < 6:
+        return None
+    # Translation seeds avoid confusing adjacent rows when the face moves by
+    # more than half a cell. The fit still requires evidence in every row/column.
+    seeds = (points[:, None]-grid[None]).reshape(-1, 2)
+    seeds = seeds[np.linalg.norm(seeds, axis=1) < 100]
+    best, best_rank = None, None
+    for shift in seeds:
+        distances = np.linalg.norm((grid+shift)[:, None]-points[None, :], axis=2)
+        matches = distances.argmin(axis=1)
+        cells = np.where(distances.min(axis=1) < 35)[0]
+        if len(cells) < 6 or len(set(matches[cells])) != len(cells):
+            continue
+        alignment, inliers = cv2.estimateAffine2D(
+            grid[cells], points[matches[cells]], method=cv2.RANSAC, ransacReprojThreshold=8)
+        if alignment is None:
+            continue
+        inliers = inliers.ravel().astype(bool)
+        count = int(sum(inliers))
+        accepted = cells[inliers]
+        if (count < 6 or len(set(accepted//3)) < 3 or len(set(accepted % 3)) < 3):
+            continue
+        horizontal, vertical = alignment[:, :2].T
+        scales = np.linalg.norm([horizontal, vertical], axis=1)
+        if (not np.all((scales > .8) & (scales < 1.2))
+                or abs(np.dot(horizontal, vertical)/np.prod(scales)) > .22
+                or np.linalg.det(alignment[:, :2]) <= 0):
+            continue
+        projected = cv2.transform(grid[None], alignment)[0]
+        displacement = np.max(np.linalg.norm(projected-grid, axis=1))
+        if displacement > 105 or (count < 7 and displacement > 60):
+            # Six patches can fit a partly covered face spuriously. Large
+            # corrections need a seventh independent sticker as evidence.
+            continue
+        error = np.median(np.linalg.norm(projected[accepted]-points[matches[accepted]], axis=1))
+        rank = (count, -error-.005*displacement)
+        if best_rank is None or rank > best_rank:
+            best, best_rank = (alignment, count), rank
+    if best is not None:
+        displacement = np.max(np.linalg.norm(cv2.transform(grid[None], best[0])[0]-grid, axis=1))
+        if displacement < 3:
+            return None  # Do not introduce contour quantization jitter into a calibrated grid.
+    return best
+
+
 def detect_face(frame, roi=None, include_masks=True):
     """Detect only inside optional (x1, y1, x2, y2), returning full-frame geometry."""
     global width, height, hsv, cent, sticker_boxes, face_centers, face_boxes
     global color_mask, white_mask, black_mask
+    global face_rejection
+    face_rejection = ''
     if roi is None:
         return _detect_face(frame)
     if np.asarray(roi).shape == (4, 2):
@@ -402,9 +557,17 @@ def detect_face(frame, roi=None, include_masks=True):
         inverse = np.linalg.inv(transform)
         size = FACE_SIZE + 2 * FACE_MARGIN
         rectified = cv2.warpPerspective(frame, transform, (size, size))
+        placement = locate_calibrated_face(rectified)
+        if placement is not None:
+            alignment, _ = placement
+            correction = np.vstack((cv2.invertAffineTransform(alignment), [0, 0, 1]))
+            transform = correction @ transform
+            inverse = np.linalg.inv(transform)
+            rectified = cv2.warpPerspective(frame, transform, (size, size))
         _prepare_calibrated_grid(rectified, include_masks)
         result = _sample_calibrated_grid(offset=(FACE_MARGIN, FACE_MARGIN))
         if not result[1]:
+            original_rejection = face_rejection
             # Recover a small placement error inside the extra border. Only a
             # complete, uniform nine-patch reading can replace a failed reading.
             for dx, dy in ((-16, 0), (16, 0), (0, -16), (0, 16),
@@ -412,6 +575,8 @@ def detect_face(frame, roi=None, include_masks=True):
                 result = _sample_calibrated_grid(offset=(FACE_MARGIN+dx, FACE_MARGIN+dy))
                 if result[1]:
                     break
+            if not result[1]:
+                face_rejection = original_rejection
         def restore(points):
             return cv2.perspectiveTransform(np.asarray(points, dtype=np.float32).reshape(1, -1, 2), inverse)[0]
         cent = list(restore(cent)) if cent else []
@@ -479,6 +644,8 @@ def _prepare_calibrated_grid(frame, include_masks=True):
 def _sample_calibrated_grid(offset=(0, 0)):
     """Check nine patches without rebuilding full-image HSV or filter masks."""
     global cent, sticker_boxes, face_centers, face_boxes
+    global face_rejection
+    face_rejection = ''
     cent, sticker_boxes, face_centers, face_boxes = [], [], [], []
     samples = []
     for row in range(3):
@@ -486,12 +653,17 @@ def _sample_calibrated_grid(offset=(0, 0)):
             x, y = col*120 + 60 + offset[0], row*120 + 60 + offset[1]
             patch = hsv[y-18:y+18, x-18:x+18]
             sample, color = getcolor((x, y), radius=18)
+            location = f'Cell {row+1},{col+1}'
+            measurement = 'HSV ' + '/'.join(str(round(float(value))) for value in sample)
             if not color:
+                face_rejection = f'{location}: uncertain ({measurement})'
                 return [], []
             if row == 1 and col == 1 and not center_color_confident(sample, color):
+                face_rejection = f'Center {color}: uncertain ({measurement})'
                 return [], []
-            bright = patch[:, :, 2] >= max(50, vision_params.rgb_L)
+            bright = patch[:, :, 2] >= max(35, vision_params.rgb_L)
             if np.mean(bright) < .85:
+                face_rejection = f'{location}: dark patch / check placement'
                 return [], []
             if color == 'white':
                 valid = (patch[:, :, 1] <= vision_params.sat_W) & (patch[:, :, 2] >= white_threshold)
@@ -500,12 +672,15 @@ def _sample_calibrated_grid(offset=(0, 0)):
                 valid = (hue_distance <= 15) & (patch[:, :, 1] > vision_params.sat_W) & bright
             if np.mean(valid) < .65:
                 if color == 'white':
+                    face_rejection = f'{location}: mixed white / glare ({measurement})'
                     return [], []
-                interior = hsv[y-30:y+30, x-30:x+30].astype(np.float32)
+                interior = hsv[max(0, y-42):y+42, max(0, x-42):x+42].astype(np.float32)
                 hue_distance = np.abs((interior[:, :, 0]-sample[0]+90) % 180-90)
                 supported = ((hue_distance <= 15) & (interior[:, :, 1] >= vision_params.sat_W+20)
-                             & (interior[:, :, 2] >= max(50, vision_params.rgb_L)))
-                if np.mean(supported) < .55:
+                             & (interior[:, :, 2] >= max(35, vision_params.rgb_L)))
+                if (np.mean(supported) < .55
+                        and (color != 'blue' or blue_glare_material((x, y)) is None)):
+                    face_rejection = f'{location}: mixed {color} ({measurement})'
                     return [], []
             point = np.float32([x, y])
             box = np.float32([[x-45,y-45], [x+45,y-45], [x+45,y+45], [x-45,y+45]])
@@ -591,6 +766,13 @@ def draw_scan_overlay(frame, colors, state, boxes_override=None):
     cv2.rectangle(frame, (frame.shape[1] // 2 - 26, 6), (frame.shape[1] // 2 + 26, 29), (35, 35, 35), -1)
     cv2.putText(frame, f"{progress}%", (frame.shape[1] // 2 - 21, 23),
                 cv2.FONT_HERSHEY_SIMPLEX, .45, (255, 255, 255), 1, cv2.LINE_AA)
+    if not colors and face_rejection:
+        # Keep the cause readable instead of truncating it after scanner status.
+        scale = min(.43, (frame.shape[1]-16) / max(1, cv2.getTextSize(
+            face_rejection, cv2.FONT_HERSHEY_SIMPLEX, 1, 1)[0][0]))
+        cv2.rectangle(frame, (0, frame.shape[0]-79), (frame.shape[1], frame.shape[0]-59), (25, 25, 25), -1)
+        cv2.putText(frame, face_rejection, (8, frame.shape[0]-64),
+                    cv2.FONT_HERSHEY_SIMPLEX, scale, (0, 230, 255), 1, cv2.LINE_AA)
     detection = ('9/9 grid' if colors else 'Checking colors' if boxes_override is not None
                  else f'{len(sticker_boxes)} candidates')
     text = f"{len(state['faces'])}/6 faces | {detection} | {state['message']}"
@@ -634,6 +816,8 @@ def grab_colors(camera_id=0, backend=None, show_masks=True, warmup_seconds=CAMER
     camera_error = ""
     configure_camera_runtime()
     camera_roi.load(camera_id)
+    if backend is None and sys.platform == 'linux':
+        backend = cv2.CAP_V4L2
     cap = cv2.VideoCapture(camera_id) if backend is None else cv2.VideoCapture(camera_id, backend)
     try:
         if not cap.isOpened():
@@ -673,8 +857,6 @@ def grab_colors(camera_id=0, backend=None, show_masks=True, warmup_seconds=CAMER
                 color_mask = white_mask = black_mask = np.zeros((height, width), dtype=np.uint8)
             else:
                 vision_params.face_hsv, vision_params.face_col = detect_face(frame, roi, include_masks=show_masks)
-            if diagnostic_recorder is not None:
-                diagnostic_recorder.record(frame, vision_params.face_hsv, vision_params.face_col, roi)
             if camera_roi.start is not None or camera_roi.picking is not None:
                 vision_params.face_hsv, vision_params.face_col = [], []
                 scanner.set_enabled(scanner.snapshot()['enabled'])
@@ -685,6 +867,14 @@ def grab_colors(camera_id=0, backend=None, show_masks=True, warmup_seconds=CAMER
             state = scanner.snapshot()
             if remaining > 0:
                 state['message'] = f'Camera settling: {remaining:.1f}s - wait before scanning'
+            elif (not vision_params.face_col and face_rejection
+                  and camera_roi.start is None and camera_roi.picking is None):
+                state['message'] = face_rejection
+            if diagnostic_recorder is not None:
+                diagnostic_recorder.record(frame, vision_params.face_hsv, vision_params.face_col, roi,
+                                           rejection=face_rejection,
+                                           state={'faces': list(state['faces']), 'progress': state['progress'],
+                                                  'message': state['message']}, displayed=preview_colors)
             tick_detected = perf_counter()
             if performance_recorder is not None:
                 performance_recorder.capture(frame, tick_detected)
@@ -719,10 +909,13 @@ def grab_colors(camera_id=0, backend=None, show_masks=True, warmup_seconds=CAMER
         camera_error = str(error)
     finally:
         cap.release()
-        if performance_recorder is not None:
-            performance_recorder.finish()
         camera_stop.set()
         scanner.update([])
         cv2.destroyAllWindows()
+        if performance_recorder is not None:
+            try:
+                performance_recorder.finish()
+            except (OSError, cv2.error) as error:
+                print(f'Could not save camera performance report: {error}')
         if camera_error:
             print(camera_error)

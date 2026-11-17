@@ -24,6 +24,12 @@ class TestScanPreview(unittest.TestCase):
         self.assertEqual(self.show(self.grid, .03)[0], [])
         self.assertEqual(self.show(self.grid, .06)[0], self.grid)
 
+    def test_continuous_valid_frames_at_two_fps_can_acquire_labels(self):
+        self.assertEqual(self.show(self.grid, 0)[0], [])
+        self.assertEqual(self.show(self.grid, .5)[0], [])
+        self.assertEqual(self.show(self.grid, 1)[0], self.grid)
+        self.assertEqual(self.show([], 1.5, boxes=[])[0], [])
+
     def test_one_noisy_center_or_missed_frame_does_not_flash_labels(self):
         self.acquire()
         noise = [['orange']*3 for _ in range(3)]

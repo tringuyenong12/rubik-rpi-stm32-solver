@@ -46,7 +46,9 @@ class StableScanPreview:
                   and np.mean(cv2.absdiff(small, self.previous_image)) > self.motion_threshold)
         self.previous_image = small
         valid = len(colors) == 3 and all(len(row) == 3 for row in colors) and len(boxes) == 9
-        if moving or now-self.last_valid > self.hold_seconds:
+        # Slow Raspberry Pi frames can arrive farther apart than hold_seconds.
+        # Expire missing readings, but let consecutive valid, still frames vote.
+        if moving or (not valid and now-self.last_valid > self.hold_seconds):
             self._clear_labels()
         if not valid:
             return self.colors, self.boxes

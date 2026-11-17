@@ -303,7 +303,9 @@ class TestAutoCamera(unittest.TestCase):
                 patch('rubik_robot.auto_solve.cv2.VideoCapture', return_value=device):
             with AutoCamera((1, None, False), Event(), pngs.append) as camera:
                 camera.latest = (0, time.monotonic()-1, np.zeros_like(frame))
-                colors, samples = camera.capture(SCAN_ROUTE[0], timeout_s=2, settle_s=.05)
+                # The real detector must collect twelve frames and hold for
+                # 1.5 seconds. Allow the normal capture budget on a busy Pi.
+                colors, samples = camera.capture(SCAN_ROUTE[0], settle_s=.05)
                 self.assertEqual(colors, ('red',)*9)
                 self.assertEqual(len(samples), 9)
                 self.assertTrue(pngs[0].startswith(b'\x89PNG'))

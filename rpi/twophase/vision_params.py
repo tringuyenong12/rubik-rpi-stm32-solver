@@ -19,6 +19,8 @@ sigma_C = 5  # a grid square is considered part of a facelet if the standard dev
 delta_C = 5  # pixels within the interval [hue-delta,hue+delta] are considered to belong to the same facelet
 
 # These parameters depend on the actually used cube colors and the lightning conditions
+yellow_min_V = 0  # Optional per-camera floor for shaded warm occlusions.
+orange_min_V = 0  # Optional measured brightness floor for dark warm occlusions.
 orange_L = 6  # lowest allowed hue for color orange
 orange_H = 23  # highest allowed hue for color orange
 yellow_H = 50  # highest allowed hue for color yellow

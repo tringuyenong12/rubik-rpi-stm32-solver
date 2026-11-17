@@ -1,0 +1,57 @@
+# CÀI VÀ CHẠY TRÊN RASPBERRY PI
+# Dành cho Raspberry Pi OS Desktop 64-bit, Python >= 3.10, camera USB.
+# Mở file này và chạy từng nhóm lệnh trong Terminal của Pi.
+# Thư mục dự án dự kiến nằm ở /home/nguy3n/rubik-rpi-stm32-solver.
+
+# 1. Cài thư viện bằng APT của Raspberry Pi OS.
+# python3-opencv: xử lý ảnh và cửa sổ camera (cv2).
+# python3-numpy: xử lý mảng ảnh và tính toán màu (numpy).
+# python3-serial: giao tiếp UART/USB với STM32 (serial).
+# python3-tk: giao diện Tkinter và cửa sổ hình hướng dẫn.
+# python3-venv: tạo môi trường Python riêng cho Pi.
+# python3-pytest: chạy kiểm thử của dự án.
+# v4l-utils: kiểm tra các camera USB trên Linux.
+sudo apt update
+sudo apt install -y python3-venv python3-opencv python3-numpy python3-serial python3-tk python3-pytest v4l-utils
+
+# 2. Tạo môi trường Pi, dùng các thư viện vừa cài bằng APT.
+# .venv-pi được tạo riêng vì .venv chép từ Windows chứa chương trình Windows.
+cd ~/rubik-rpi-stm32-solver
+python3 --version
+python3 -m venv --system-site-packages .venv-pi
+
+# 3. Kiểm tra đã import được toàn bộ thư viện chạy ứng dụng.
+.venv-pi/bin/python -c 'import cv2, numpy, serial, tkinter; print("OpenCV", cv2.__version__); print("NumPy", numpy.__version__); print("pyserial", serial.__version__); print("Tk", tkinter.TkVersion)'
+
+# Bộ giải thuần Python nằm trong rpi/twophase, được các script nạp trực tiếp.
+# kociemba là thư viện dự phòng tùy chọn, chưa cần cài cho luồng chạy này.
+# Các thư viện socket, threading, pathlib, json... thuộc Python tiêu chuẩn.
+# Hướng dẫn này dùng gói APT của hệ điều hành thay cho pip requirements.txt.
+
+# 4. Terminal thứ nhất: chạy server, giữ Terminal này mở.
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -u -B rpi/twophase/start_server.py 8080 20 3
+# 8080 là cổng TCP, 20 là số nước tối đa, 3 là thời gian tìm kiếm yêu cầu (giây).
+# Lần đầu có thể phải tạo bảng tra solver trước khi hiện Server now listening...
+# Đợi thông báo đó rồi chạy client trong Terminal thứ hai.
+
+# 5. Terminal thứ hai trên Desktop Pi hoặc trong phiên VNC: mở camera và GUI.
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -B scripts/run_vision_gui.py --camera 0 --backend auto
+# Nếu chọn sai camera, đóng ứng dụng rồi xem danh sách thiết bị.
+# v4l2-ctl --list-devices
+# Thử lại với --camera 1 nếu camera USB dùng chỉ số 1.
+# GUI cần phiên Desktop có màn hình, SSH thông thường chỉ dùng để chạy server.
+# Trên Pi dùng dấu / trong đường dẫn và backend auto.
+
+# 6. Kiểm thử phần mềm nếu cần (đóng ứng dụng trước khi chạy).
+# cd ~/rubik-rpi-stm32-solver/rpi
+# ../.venv-pi/bin/python -m unittest discover -s tests
+
+# Cấu hình camera và ROI nằm trong calibration/camera_settings.json và camera_roi.json.
+# Cấu hình đang lưu theo camera 1 trên Windows. Nếu Pi dùng camera 0, cần hiệu chỉnh
+# cho camera 0. Exposure/cân bằng trắng phụ thuộc driver Linux và ánh sáng thực tế.
+# Chọn lại ROI bằng phím P trong cửa sổ camera khi thay vị trí lắp.
+
+# Tài liệu APT và môi trường --system-site-packages của Raspberry Pi OS:
+# https://www.raspberrypi.com/documentation/computers/os.html

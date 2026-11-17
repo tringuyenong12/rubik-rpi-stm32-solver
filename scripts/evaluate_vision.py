@@ -12,12 +12,13 @@ import cv2
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'rpi'))
-from rubik_robot.vision.camera_settings import load_vision_profile
+from rubik_robot.vision.camera_settings import load_vision_profile, configure_camera_runtime
 from rubik_robot.vision.roi import CameraROI
 from twophase import vision2
 
 
 def evaluate(manifest, camera_id=1):
+    configure_camera_runtime()
     load_vision_profile(camera_id)
     roi = CameraROI()
     roi.load(camera_id)

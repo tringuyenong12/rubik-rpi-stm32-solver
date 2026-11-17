@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 
 FACE_SIZE = 360
-FACE_MARGIN = 32  # About 9% extra space on each side; keep the calibrated square.
+FACE_MARGIN = 64  # Search 18% beyond each face edge without scaling its grid.
 
 
 def expanded_corners(corners):
@@ -115,8 +115,10 @@ class CameraROI:
                 self.region = (x1 / w, y1 / h, x2 / w, y2 / h)
                 self.corners = None
                 self.save()
-            else:
+            elif max(x2 - x1, y2 - y1) >= 5:
                 self.message = 'ROI too small (minimum 60 x 60)'
+            else:
+                self.message = ''
             self.start = self.end = None
 
     def selection(self, shape):
@@ -139,7 +141,10 @@ class CameraROI:
             polygon = self._shade_polygon
             # Native masked copying avoids slow, allocating NumPy boolean indexing.
             cv2.copyTo(cv2.LUT(frame, self._shade_lut), self._shade_mask, frame)
+            # The yellow outline bounds the search; the thin line is the reference face.
             cv2.polylines(frame, [polygon], True, (0, 230, 255), 2)
+            face = np.rint(self.selection(frame.shape)).astype(np.int32)
+            cv2.polylines(frame, [face], True, (120, 150, 150), 1)
         else:
             frame[:y1] //= 3
             frame[y2:] //= 3
@@ -155,7 +160,7 @@ class CameraROI:
             text = f'Click corner {len(self.picking)+1}/4: TL, TR, BR, BL of face'
         else:
             text = (self.message if self.message and self.message != 'ROI saved'
-                    else 'ROI: drag | P: 4 corners | R: reset')
+                    else 'ROI search: drag | P: face corners | R: reset')
         cv2.putText(frame, text, (8, frame.shape[0] - 33),
                     cv2.FONT_HERSHEY_SIMPLEX, .43, (0, 230, 255), 1, cv2.LINE_AA)
         return frame

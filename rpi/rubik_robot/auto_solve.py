@@ -5,6 +5,8 @@ from contextlib import ExitStack
 from threading import Condition, Event, Thread
 from time import monotonic
 
+import sys
+
 import cv2
 import numpy as np
 
@@ -196,6 +198,8 @@ class AutoCamera:
         check_cancel(self.cancel)
         camera_id, backend, _ = self.options
         vision2.camera_roi.load(camera_id)
+        if backend is None and sys.platform == 'linux':
+            backend = cv2.CAP_V4L2
         self.cap = cv2.VideoCapture(camera_id) if backend is None else cv2.VideoCapture(camera_id, backend)
         if not self.cap.isOpened():
             self.cap.release()

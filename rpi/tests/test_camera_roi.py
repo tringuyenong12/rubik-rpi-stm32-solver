@@ -77,6 +77,25 @@ class TestCameraROI(unittest.TestCase):
         self.assertEqual(vision2.detect_face(frame, corners)[1], [])
         self.assertEqual(vision2.face_centers, [])
 
+    def test_face_search_follows_translation_rotation_and_small_size_changes(self):
+        canonical = np.full((360, 360, 3), 20, dtype=np.uint8)
+        palette = [(0, 0, 220), (0, 170, 0), (220, 70, 0), (0, 140, 255),
+                   (240, 240, 240), (0, 230, 255), (220, 70, 0), (0, 0, 220), (0, 170, 0)]
+        for index, color in enumerate(palette):
+            x, y = index % 3*120, index // 3*120
+            cv2.rectangle(canonical, (x+12, y+12), (x+108, y+108), color, -1)
+        source = np.float32([[0, 0], [359, 0], [359, 359], [0, 359]])
+        corners = np.float32([[310, 45], [500, 240], [295, 430], [110, 225]])
+        frame = cv2.warpPerspective(canonical, cv2.getPerspectiveTransform(source, corners), (640, 480))
+        expected = [['red', 'green', 'blue'], ['orange', 'white', 'yellow'], ['blue', 'red', 'green']]
+        for dx, dy, angle, scale in ((30, 12, 0, 1), (-24, -15, 0, 1),
+                                      (14, 8, 6, .94), (-12, 8, -5, 1.05)):
+            with self.subTest(dx=dx, dy=dy, angle=angle, scale=scale):
+                motion = cv2.getRotationMatrix2D((305, 238), angle, scale)
+                motion[:, 2] += (dx, dy)
+                moved = cv2.warpAffine(frame, motion, (640, 480), borderValue=(20, 20, 20))
+                self.assertEqual(vision2.detect_face(moved, corners, include_masks=False)[1], expected)
+
     def test_red_hue_wrap_does_not_average_to_blue(self):
         hsv = np.full((40, 40, 3), (179, 200, 220), dtype=float)
         hsv[:, :20, 0] = 1

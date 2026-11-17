@@ -1,4 +1,7 @@
 .venv/
+.venv-pi/
+artifacts/
+*.bak
 __pycache__/
 *.pyc
 .pytest_cache/

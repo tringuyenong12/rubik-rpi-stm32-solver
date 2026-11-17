@@ -17,6 +17,18 @@ from twophase import vision2, vision_params
 
 
 class TestScanIntegrity(unittest.TestCase):
+    def test_low_fps_camera_saves_the_same_colors_it_displays(self):
+        scanner, preview = new_camera_scanner(), StableScanPreview()
+        frame = np.full((120, 120, 3), 80, dtype=np.uint8)
+        colors = [['blue']*3 for _ in range(3)]
+        boxes = [np.float32([[x, y], [x+20, y], [x+20, y+20], [x, y+20]])
+                 for y in (10, 45, 80) for x in (10, 45, 80)]
+        for index in range(16):
+            shown, _ = preview.update(frame, colors, boxes, (0, 0, 120, 120), now=index*.5)
+            scanner.update(colors, now=index*.5, displayed_grid=shown)
+        self.assertEqual(scanner.snapshot()['faces']['blue'], ('blue',)*9)
+        self.assertEqual(shown, colors)
+
     def test_preview_and_current_colors_must_agree_before_auto_or_manual_capture(self):
         scanner = FaceScanner(stable_seconds=.1, min_samples=2)
         blue = [['blue']*3 for _ in range(3)]

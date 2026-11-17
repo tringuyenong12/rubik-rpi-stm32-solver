@@ -59,13 +59,58 @@ scripts/                Script tiện ích cho demo/test (demo_pipeline.py, run_
 
 ## Quick Start Cho Raspberry Pi
 
+Hướng dẫn này dùng Raspberry Pi OS Desktop 64-bit, Python từ 3.10 và camera USB.
+Các lệnh cài thư viện, kiểm tra môi trường và chạy ứng dụng được tổng hợp trong
+[INSTALL_PI.txt](INSTALL_PI.txt). Chạy các lệnh dưới đây trên Pi, từ thư mục dự án
+đã chép vào `/home/nguy3n/rubik-rpi-stm32-solver`.
+
+OpenCV (`cv2`), NumPy, pyserial (`serial`) và Tkinter là các thư viện chạy ứng dụng.
+APT cài các bản do Raspberry Pi OS cung cấp cùng phụ thuộc hệ thống. Môi trường
+`.venv-pi` dùng `--system-site-packages` để truy cập các gói này theo hướng dẫn của
+[Raspberry Pi OS](https://www.raspberrypi.com/documentation/computers/os.html).
+Bộ giải Two-Phase đã nằm trong `rpi/twophase`; `kociemba` là dự phòng tùy chọn.
+
 ```bash
-cd rpi
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-python -m rubik_robot.main --mode demo
-python -m unittest discover tests
+sudo apt update
+sudo apt install -y python3-venv python3-opencv python3-numpy python3-serial python3-tk python3-pytest v4l-utils
+cd ~/rubik-rpi-stm32-solver
+python3 -m venv --system-site-packages .venv-pi
+.venv-pi/bin/python -c 'import cv2, numpy, serial, tkinter; print("Thu vien OK")'
+```
+
+Terminal thứ nhất chạy server trên Pi. Giữ terminal mở và đợi thông báo
+`Server now listening...`. Lần đầu có thể mất thời gian tạo bảng tra solver.
+
+```bash
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -u -B rpi/twophase/start_server.py 8080 20 3
+```
+
+Ba tham số lần lượt là cổng TCP `8080`, số nước tối đa `20` và thời gian tìm kiếm
+yêu cầu `3` giây. Terminal thứ hai trên Desktop của Pi hoặc trong phiên VNC chạy
+giao diện quét màu và hướng dẫn giải.
+
+```bash
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -B scripts/run_vision_gui.py --camera 0 --backend auto
+```
+
+Dùng `v4l2-ctl --list-devices` để xem camera USB, thử `--camera 1` nếu cần.
+Đường dẫn `.venv\Scripts\python.exe` và backend `dshow` thuộc Windows.
+Môi trường `.venv-pi` được tạo riêng trên Pi. GUI cần phiên Desktop có màn hình;
+server có thể chạy qua SSH. Camera CSI cắm cáp dẹt cần kiểm tra đường lấy ảnh riêng.
+
+Thông số trong `calibration/camera_settings.json` và `calibration/camera_roi.json`
+lưu theo chỉ số camera. Bản hiệu chỉnh hiện tại dùng camera `1` trên Windows;
+khi Pi dùng camera `0`, cần hiệu chỉnh cho chỉ số `0`. Phơi sáng/cân bằng trắng
+phụ thuộc driver Linux. Chọn lại ROI bằng phím `P` khi đổi vị trí lắp camera.
+
+Để chạy demo hoặc kiểm thử từ thư mục `rpi` trên Pi dùng các lệnh sau.
+
+```bash
+cd ~/rubik-rpi-stm32-solver/rpi
+../.venv-pi/bin/python -m rubik_robot.main --mode demo
+../.venv-pi/bin/python -m unittest discover -s tests
 ```
 
 Trên Windows PowerShell:
