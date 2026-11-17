@@ -1,0 +1,79 @@
+Servo_t servo[SERVO_COUNT ] =
+{
+    [SERVO_ROTATE_FRONT] = {
+        .channel = 0,
+        .state.rotate = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .home_angle = 90.000f, .offset_calib_home_angle = 0.0f,
+            .clockwise_angle = 180.000f, .offset_calib_clockwise_angle = 0.0f,
+            .anticlockwise_angle = 0.000f, .offset_calib_anticlockwise_angle = 0.0f
+        }
+    },
+    [SERVO_ROTATE_RIGHT] = {
+        .channel = 1,
+        .state.rotate = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .home_angle = 95.000f, .offset_calib_home_angle = 0.0f,
+            .clockwise_angle = 178.000f, .offset_calib_clockwise_angle = 0.0f,
+            .anticlockwise_angle = 0.000f, .offset_calib_anticlockwise_angle = 0.0f
+        }
+    },
+    [SERVO_ROTATE_BACK] = {
+        .channel = 2,
+        .state.rotate = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .home_angle = 90.000f, .offset_calib_home_angle = 0.0f,
+            .clockwise_angle = 180.000f, .offset_calib_clockwise_angle = 0.0f,
+            .anticlockwise_angle = 0.000f, .offset_calib_anticlockwise_angle = 0.0f
+        }
+    },
+    [SERVO_ROTATE_LEFT] = {
+        .channel = 3,
+        .state.rotate = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .home_angle = 95.000f, .offset_calib_home_angle = 0.0f,
+            .clockwise_angle = 178.000f, .offset_calib_clockwise_angle = 0.0f,
+            .anticlockwise_angle = 0.000f, .offset_calib_anticlockwise_angle = 0.0f
+        }
+    },
+    [SERVO_MOVE_FRONT] = {
+        .channel = 4,
+        .state.move = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .full_release_angle = 180.000f, .offset_calib_full_release_angle = 0.0f,
+            .half_release_angle = 90.000f, .offset_calib_half_release_angle = 0.0f,
+            .clamp_angle = 15.000f, .offset_calib_clamp_angle = 0.0f,
+            .tight_clamp_angle = 5.000f, .offset_calib_tight_clamp_angle = 0.0f
+        }
+    },
+    [SERVO_MOVE_RIGHT] = {
+        .channel = 5,
+        .state.move = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .full_release_angle = 170.000f, .offset_calib_full_release_angle = 0.0f,
+            .half_release_angle = 90.000f, .offset_calib_half_release_angle = 0.0f,
+            .clamp_angle = 15.000f, .offset_calib_clamp_angle = 0.0f,
+            .tight_clamp_angle = 5.000f, .offset_calib_tight_clamp_angle = 0.0f
+        }
+    },
+    [SERVO_MOVE_BACK] = {
+        .channel = 6,
+        .state.move = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .full_release_angle = 180.000f, .offset_calib_full_release_angle = 0.0f,
+            .half_release_angle = 90.000f, .offset_calib_half_release_angle = 0.0f,
+            .clamp_angle = 15.000f, .offset_calib_clamp_angle = 0.0f,
+            .tight_clamp_angle = 5.000f, .offset_calib_tight_clamp_angle = 0.0f
+        }
+    },
+    [SERVO_MOVE_LEFT] = {
+        .channel = 7,
+        .state.move = {
+            .current_angle = -1.0f, .target_angle = -1.0f,
+            .full_release_angle = 160.000f, .offset_calib_full_release_angle = 0.0f,
+            .half_release_angle = 90.000f, .offset_calib_half_release_angle = 0.0f,
+            .clamp_angle = 15.000f, .offset_calib_clamp_angle = 0.0f,
+            .tight_clamp_angle = 5.000f, .offset_calib_tight_clamp_angle = 0.0f
+        }
+    }
+};
