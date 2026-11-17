@@ -19,6 +19,8 @@ sigma_C = 5  # a grid square is considered part of a facelet if the standard dev
 delta_C = 5  # pixels within the interval [hue-delta,hue+delta] are considered to belong to the same facelet
 
 # These parameters depend on the actually used cube colors and the lightning conditions
+yellow_min_V = 0  # Optional per-camera floor for shaded warm occlusions.
+orange_min_V = 0  # Optional measured brightness floor for dark warm occlusions.
 orange_L = 6  # lowest allowed hue for color orange
 orange_H = 23  # highest allowed hue for color orange
 yellow_H = 50  # highest allowed hue for color yellow
@@ -29,6 +31,7 @@ blue_H = 160  # highest allowed hue for color blue
 # The colors of a cube face are stored here by the function vision2.grabcolors
 face_col = []  # the colors (as text) of a cube face
 face_hsv = []  # the colors (as hsv-values) of a cube face
+initial_solution = None  # Optional explicitly restored, validated cube/solution.
 
 # These dictionaries define the colors of all 6 faces and are filled by the client_gui2.transfer routine
 cube_col = {}  # the colors (as text) of the 6 faces

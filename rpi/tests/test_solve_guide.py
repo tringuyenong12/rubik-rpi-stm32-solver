@@ -26,8 +26,8 @@ PROTOTYPES = ((30, 230, 220), (60, 220, 190), (1, 230, 210),
 
 
 class TestScanRecovery(unittest.TestCase):
-    def test_complete_scan_recovers_misclassified_colors_from_centers(self):
-        """Input: excess red labels and true HSV samples. Output: the original valid cube."""
+    def test_explicit_color_correction_can_recover_misclassified_colors_from_centers(self):
+        """Only an explicit opt-in may recolor a captured state."""
         faces = cube_faces(SCRAMBLED)
         samples = {color: tuple(PROTOTYPES[COLORS.index(value)] for value in faces[color]) for color in COLORS}
         damaged = {color: list(values) for color, values in faces.items()}
@@ -37,7 +37,7 @@ class TestScanRecovery(unittest.TestCase):
                 if index != 4 and value == 'orange':
                     values[index] = 'red'
                     changed += 1
-        cube, recovered, centers, note = prepare_cube(damaged, samples)
+        cube, recovered, centers, note = prepare_cube(damaged, samples, allow_color_correction=True)
         self.assertEqual(cube, SCRAMBLED)
         self.assertEqual(recovered, faces)
         self.assertEqual(centers.shape, (6, 3))
@@ -223,8 +223,8 @@ class TestArrowGeometry(unittest.TestCase):
         self.assertEqual(len(paths), 3)
         self.assertTrue(all(path[1, 0] < path[0, 0] for path in paths))
 
-    def test_camera_loop_confirms_a_real_rendered_turn_and_draws_solved(self):
-        """Input: generated before/after camera frames. Output: camera-driven solved session."""
+    def test_camera_only_scans_without_drawing_or_confirming_solution_steps(self):
+        """Camera observations must not draw arrows or advance manual instructions."""
         from twophase import vision2
         cube = apply_move(SOLVED_CUBE, 'R')
         session = SolveGuide()
@@ -244,14 +244,20 @@ class TestArrowGeometry(unittest.TestCase):
         scanner = FaceScanner()
         scanner.set_enabled(False)
         with patch.object(vision2, 'scanner', scanner), patch.object(vision2, 'guide', session), \
+                patch.object(session, 'observe') as observe, \
+                patch.object(vision2, 'draw_guide_overlay') as draw_guide, \
+                patch.object(vision2.camera_roi, 'load'), \
                 patch.object(cv2, 'VideoCapture', return_value=capture), \
                 patch.object(cv2, 'imshow') as show, patch.object(cv2, 'destroyAllWindows'), \
-                patch.object(cv2, 'moveWindow'), patch.object(cv2, 'getWindowProperty', return_value=1), \
+                patch.object(cv2, 'moveWindow'), patch.object(cv2, 'setMouseCallback'), \
+                patch.object(cv2, 'getWindowProperty', return_value=1), \
                 patch.object(cv2, 'waitKey', side_effect=[-1]*11+[ord('x')]), \
                 patch('rubik_robot.vision.solve_guide.monotonic', side_effect=np.arange(12)*.07):
-            vision2.grab_colors(1, cv2.CAP_DSHOW, show_masks=False)
-        self.assertEqual(session.snapshot()['phase'], 'solved')
-        self.assertEqual(session.snapshot()['cube'], SOLVED_CUBE)
+            vision2.grab_colors(1, cv2.CAP_DSHOW, show_masks=False, warmup_seconds=0)
+        self.assertEqual(session.snapshot()['phase'], 'align')
+        self.assertEqual(session.snapshot()['cube'], cube)
+        observe.assert_not_called()
+        draw_guide.assert_not_called()
         self.assertEqual(len(show.call_args_list), 12)
         self.assertTrue(all(call.args[0] == 'Rubik Cube Detection' for call in show.call_args_list))
 
@@ -280,15 +286,21 @@ class TestDesktopFlow(unittest.TestCase):
 
     def setUp(self):
         """Input: previous editor state. Output: a fresh scan with automatic guidance enabled."""
+        audit_patch = patch.object(self.gui, 'write_audit')
+        audit_patch.start()
+        self.addCleanup(audit_patch.stop)
         self.gui.empty()
         self.gui.auto_guide.set(True)
         self.gui.display.delete('1.0', 'end')
 
     def populate(self, cube):
         """Input: physical cube. Output: stable six-face camera capture in the live scanner."""
+        samples = max(10, self.gui.scanner.min_samples)
+        duration = max(.9, self.gui.scanner.stable_seconds + .1)
         for index, (color, values) in enumerate(cube_faces(cube).items()):
-            for step in range(5):
-                self.gui.scanner.update([values[:3], values[3:6], values[6:]], index + step*.07)
+            for step in range(samples):
+                self.gui.scanner.update([values[:3], values[3:6], values[6:]],
+                                        index*(duration+1) + step*duration/(samples-1))
         self.gui.refresh_scan()
 
     def wait_for(self, condition):
@@ -299,20 +311,21 @@ class TestDesktopFlow(unittest.TestCase):
             time.sleep(.01)
         self.assertTrue(condition())
 
-    def test_six_faces_automatically_request_solution_and_update_editor(self):
-        """Input: sixth captured face. Output: start guidance and render confirmed cube updates."""
+    def test_six_faces_open_manual_formula_without_camera_guidance(self):
+        """A complete scan opens illustrations; browsing does not verify physical turns."""
         cube = apply_move(SOLVED_CUBE, 'R')
         self.populate(cube)
         with patch.object(self.gui, 'request_solution', return_value="R'") as request:
             self.gui.poll_scan()
-            self.wait_for(lambda: self.gui.guide.snapshot()['phase'] == 'align')
+            self.wait_for(lambda: self.gui.solution_panel.model.cube == cube)
             request.assert_called_once_with('localhost', 8080, cube)
         self.assertEqual(self.gui.get_definition_string(), cube)
-        helper = TestSolveGuide()
-        self.assertEqual(helper.finish(self.gui.guide, cube), SOLVED_CUBE)
+        self.assertEqual(self.gui.solution_panel.model.solution, "R'")
+        self.assertEqual(self.gui.guide.snapshot()['phase'], 'idle')
+        self.gui.solution_panel.step(1)
         self.gui.refresh_scan()
-        self.assertEqual(self.gui.get_definition_string(), SOLVED_CUBE)
-        self.assertEqual(self.gui.scan_status.get(), 'CUBE SOLVED!')
+        self.assertEqual(self.gui.get_definition_string(), cube)
+        self.assertIn('Công thức', self.gui.scan_status.get())
 
     def test_server_error_keeps_camera_state_and_rescan_controls_available(self):
         """Input: unavailable server. Output: retain all six faces and permit correction/retry."""
@@ -322,9 +335,53 @@ class TestDesktopFlow(unittest.TestCase):
             self.wait_for(lambda: self.gui.guide.snapshot()['phase'] == 'error')
         self.assertFalse(self.gui.solving)
         self.assertEqual(len(self.gui.scanner.snapshot()['faces']), 6)
+        text = self.gui.display.get('1.0', 'end')
+        self.assertIn('Solver connection failed', text)
+        self.assertIn('Your scan is kept', text)
+        self.assertNotIn('Use Rescan shown face', text)
         self.assertEqual(str(self.gui.rescan_button['state']), 'normal')
         self.gui.rescan_current()
         self.assertEqual(len(self.gui.scanner.snapshot()['faces']), 5)
+
+    def test_saved_formula_restores_six_faces_without_restarting_camera_guidance(self):
+        cube = apply_move(SOLVED_CUBE, 'F')
+        self.gui.restore_solution(cube, "F'")
+        self.assertEqual(self.gui.get_definition_string(), cube)
+        self.assertEqual(len(self.gui.scanner.snapshot()['faces']), 6)
+        self.assertFalse(self.gui.scanner.snapshot()['enabled'])
+        self.assertEqual(self.gui.solution_panel.model.solution, "F'")
+        self.assertEqual(self.gui.guide.snapshot()['phase'], 'idle')
+        self.gui.empty()
+        self.assertEqual(self.gui.solution_panel.model.cube, '')
+
+    def test_blue_changed_to_white_never_produces_a_formula_even_with_repairable_hsv(self):
+        self.populate(SCRAMBLED)
+        faces = cube_faces(SCRAMBLED)
+        with self.gui.scanner.lock:
+            self.gui.scanner.hsv_faces = {
+                center: tuple(PROTOTYPES[COLORS.index(color)] for color in values)
+                for center, values in faces.items()}
+        center, index = next((center, index) for center, values in faces.items()
+                             for index, color in enumerate(values) if index != 4 and color == 'blue')
+        self.gui.scanner.edit(center, index, 'white')
+        self.gui.refresh_scan()
+        with patch.object(self.gui, 'request_solution') as request:
+            self.gui.poll_scan()
+            self.wait_for(lambda: self.gui.guide.snapshot()['phase'] == 'error')
+        request.assert_not_called()
+        self.assertEqual(self.gui.solution_panel.model.cube, '')
+        self.assertEqual(self.gui.scanner.snapshot()['faces'][center][index], 'white')
+
+    def test_prepared_color_layout_cannot_differ_from_the_saved_scan(self):
+        cube = apply_move(SOLVED_CUBE, 'R')
+        self.populate(cube)
+        changed = apply_move(SOLVED_CUBE, 'U')
+        with patch.object(self.gui, 'prepare_cube', return_value=(changed, cube_faces(changed), None, 'changed')), \
+                patch.object(self.gui, 'request_solution') as request:
+            self.gui.solve()
+            self.wait_for(lambda: self.gui.guide.snapshot()['phase'] == 'error')
+        request.assert_not_called()
+        self.assertEqual(self.gui.solution_panel.model.cube, '')
 
     def test_bad_color_counts_show_all_six_faces_and_correction_borders(self):
         """Input: an invalid sixth-face label. Output: retain it, highlight conflicts and permit retry."""
@@ -345,6 +402,12 @@ class TestDesktopFlow(unittest.TestCase):
         """Input: New scan during a pending request. Output: ignore its late solution."""
         self.populate(apply_move(SOLVED_CUBE, 'R'))
         started, release = threading.Event(), threading.Event()
+        delivered = threading.Event()
+        original_put = self.gui.solve_results.put
+
+        def queue_reply(item):
+            original_put(item)
+            delivered.set()
 
         def delayed_reply(*args):
             """Input: solver request. Output: a deliberately delayed valid solution."""
@@ -352,15 +415,17 @@ class TestDesktopFlow(unittest.TestCase):
             release.wait(3)
             return "R'"
 
-        with patch.object(self.gui, 'request_solution', side_effect=delayed_reply):
+        with patch.object(self.gui, 'request_solution', side_effect=delayed_reply), \
+                patch.object(self.gui.solve_results, 'put', side_effect=queue_reply):
             self.gui.solve()
             self.assertTrue(started.wait(2))
             self.gui.empty()
             release.set()
-            self.wait_for(lambda: not self.gui.solve_results.empty())
+            self.wait_for(delivered.is_set)
             self.gui.receive_solution()
         self.assertEqual(self.gui.guide.snapshot()['phase'], 'idle')
         self.assertEqual(self.gui.scanner.snapshot()['faces'], {})
+        self.assertEqual(self.gui.solution_panel.model.moves, [])
         self.assertFalse(self.gui.solving)
 
 

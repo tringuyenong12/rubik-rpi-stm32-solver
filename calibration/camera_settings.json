@@ -1,0 +1,47 @@
+{
+  "1": {
+    "capture": {
+      "AUTO_EXPOSURE": 0.25,
+      "EXPOSURE": -7,
+      "GAIN": 0,
+      "AUTO_WB": 0,
+      "WB_TEMPERATURE": 3500
+    },
+    "vision": {
+      "sat_W": 35,
+      "yellow_H": 44,
+      "val_W": 100
+    },
+    "note": "Measured on six real faces: exposure -7, gain 0, manual WB 3500 K; sat_W 35; yellow/green hue split 44."
+  },
+  "0": {
+    "vision": {
+      "sat_W": 35,
+      "yellow_H": 44,
+      "val_W": 100,
+      "rgb_L": 35,
+      "orange_min_V": 110,
+      "yellow_min_V": 110
+    },
+    "capture_by_platform": {
+      "linux": {
+        "AUTO_EXPOSURE": 1,
+        "EXPOSURE": 60,
+        "GAIN": 0,
+        "AUTO_WB": 0,
+        "WB_TEMPERATURE": 3500
+      }
+    },
+    "v4l2_controls": {
+      "auto_exposure": 1,
+      "white_balance_automatic": 0,
+      "exposure_time_absolute": 60,
+      "white_balance_temperature": 3500,
+      "backlight_compensation": 0,
+      "power_line_frequency": 1,
+      "exposure_dynamic_framerate": 0,
+      "gain": 0
+    },
+    "note": "C270 Linux measured live: manual exposure 60 (6 ms), gain 0, WB 3500 K, 50 Hz. ROI measured from pi_colors_03."
+  }
+}

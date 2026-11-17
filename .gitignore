@@ -1,8 +1,13 @@
 .venv/
+.venv-pi/
+artifacts/
+*.bak
 __pycache__/
 *.pyc
 .pytest_cache/
 logs/
+artifacts/camera_tuning/
+artifacts/solution_guides/
 calibration/*.json
 .pio/
 .vscode/
