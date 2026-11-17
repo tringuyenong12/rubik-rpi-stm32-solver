@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rubik-robot"
+version = "0.1.0"
+description = "Raspberry Pi software for a Rubik 3x3x3 solving robot"
+requires-python = ">=3.10"
+dependencies = [
+    "opencv-python>=4.8",
+    "numpy>=1.24",
+    "pyserial>=3.5",
+    "kociemba>=1.2",
+]
+
+[project.scripts]
+rubik-robot = "rubik_robot.main:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
