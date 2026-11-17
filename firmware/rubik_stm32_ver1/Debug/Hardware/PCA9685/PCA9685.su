@@ -1,0 +1,6 @@
+../Hardware/PCA9685/PCA9685.c:10:6:PCA9685_SetBit	40	static
+../Hardware/PCA9685/PCA9685.c:21:6:PCA9685_SetPWMFrequency	40	static
+../Hardware/PCA9685/PCA9685.c:35:6:PCA9685_Init	16	static
+../Hardware/PCA9685/PCA9685.c:42:6:PCA9685_SetPWM	40	static
+../Hardware/PCA9685/PCA9685.c:55:6:PCA9685_SetServoAngle	24	static
+../Hardware/PCA9685/PCA9685.c:70:6:PCA9685_SetServoAngleBonus	40	static
