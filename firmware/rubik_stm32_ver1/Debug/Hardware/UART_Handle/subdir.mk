@@ -5,15 +5,27 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Hardware/UART_Handle/Calibration_Command.c \
+../Hardware/UART_Handle/Config_Command.c \
+../Hardware/UART_Handle/Control_Command.c \
 ../Hardware/UART_Handle/Rubik_Command.c \
+../Hardware/UART_Handle/System_Command.c \
 ../Hardware/UART_Handle/UART_Handle.c 
 
 OBJS += \
+./Hardware/UART_Handle/Calibration_Command.o \
+./Hardware/UART_Handle/Config_Command.o \
+./Hardware/UART_Handle/Control_Command.o \
 ./Hardware/UART_Handle/Rubik_Command.o \
+./Hardware/UART_Handle/System_Command.o \
 ./Hardware/UART_Handle/UART_Handle.o 
 
 C_DEPS += \
+./Hardware/UART_Handle/Calibration_Command.d \
+./Hardware/UART_Handle/Config_Command.d \
+./Hardware/UART_Handle/Control_Command.d \
 ./Hardware/UART_Handle/Rubik_Command.d \
+./Hardware/UART_Handle/System_Command.d \
 ./Hardware/UART_Handle/UART_Handle.d 
 
 
@@ -24,7 +36,7 @@ Hardware/UART_Handle/%.o Hardware/UART_Handle/%.su Hardware/UART_Handle/%.cyclo:
 clean: clean-Hardware-2f-UART_Handle
 
 clean-Hardware-2f-UART_Handle:
-	-$(RM) ./Hardware/UART_Handle/Rubik_Command.cyclo ./Hardware/UART_Handle/Rubik_Command.d ./Hardware/UART_Handle/Rubik_Command.o ./Hardware/UART_Handle/Rubik_Command.su ./Hardware/UART_Handle/UART_Handle.cyclo ./Hardware/UART_Handle/UART_Handle.d ./Hardware/UART_Handle/UART_Handle.o ./Hardware/UART_Handle/UART_Handle.su
+	-$(RM) ./Hardware/UART_Handle/Calibration_Command.cyclo ./Hardware/UART_Handle/Calibration_Command.d ./Hardware/UART_Handle/Calibration_Command.o ./Hardware/UART_Handle/Calibration_Command.su ./Hardware/UART_Handle/Config_Command.cyclo ./Hardware/UART_Handle/Config_Command.d ./Hardware/UART_Handle/Config_Command.o ./Hardware/UART_Handle/Config_Command.su ./Hardware/UART_Handle/Control_Command.cyclo ./Hardware/UART_Handle/Control_Command.d ./Hardware/UART_Handle/Control_Command.o ./Hardware/UART_Handle/Control_Command.su ./Hardware/UART_Handle/Rubik_Command.cyclo ./Hardware/UART_Handle/Rubik_Command.d ./Hardware/UART_Handle/Rubik_Command.o ./Hardware/UART_Handle/Rubik_Command.su ./Hardware/UART_Handle/System_Command.cyclo ./Hardware/UART_Handle/System_Command.d ./Hardware/UART_Handle/System_Command.o ./Hardware/UART_Handle/System_Command.su ./Hardware/UART_Handle/UART_Handle.cyclo ./Hardware/UART_Handle/UART_Handle.d ./Hardware/UART_Handle/UART_Handle.o ./Hardware/UART_Handle/UART_Handle.su
 
 .PHONY: clean-Hardware-2f-UART_Handle
 

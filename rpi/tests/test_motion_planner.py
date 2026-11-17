@@ -9,9 +9,9 @@ class TestMotionPlanner(unittest.TestCase):
         self.assertEqual(
             [action.to_wire() for action in actions],
             [
-                "MOVE R 1 100",
-                "MOVE U -1 100",
-                "MOVE F 2 200",
+                "RUBIK MOVE R",
+                "RUBIK MOVE U_",
+                "RUBIK MOVE F\nRUBIK MOVE F",
             ],
         )
 
@@ -20,20 +20,20 @@ class TestMotionPlanner(unittest.TestCase):
         self.assertEqual(
             [action.to_wire() for action in actions],
             [
-                "TURN R 1 100",
-                "TURN U -1 100",
-                "TURN F 2 200",
+                "RUBIK MOVE R",
+                "RUBIK MOVE U_",
+                "RUBIK MOVE F\nRUBIK MOVE F",
             ],
         )
 
-    def test_plan_can_emit_turn_commands_for_mechanical_protocol(self):
+    def test_legacy_turn_option_emits_new_protocol(self):
         actions = MotionPlanner(default_duration_ms=100, face_turn_command="TURN").plan("R U' F2")
         self.assertEqual(
             [action.to_wire() for action in actions],
             [
-                "TURN R 1 100",
-                "TURN U -1 100",
-                "TURN F 2 200",
+                "RUBIK MOVE R",
+                "RUBIK MOVE U_",
+                "RUBIK MOVE F\nRUBIK MOVE F",
             ],
         )
 

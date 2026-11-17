@@ -4,9 +4,8 @@ import argparse
 from pathlib import Path
 
 from rubik_robot.cube.state import SOLVED_CUBE, validate_cube_string
-from rubik_robot.motion.planner import MotionPlanner
 from rubik_robot.protocol import Command
-from rubik_robot.solver.kociemba_solver import solve_cube
+from rubik_robot.solver.execution import solution_plan
 from rubik_robot.transport.serial_link import SerialLink
 
 
@@ -19,14 +18,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="demo: print pipeline, solve: solve cube string, send: send commands over UART",
     )
     parser.add_argument("--cube", default=SOLVED_CUBE, help="54-character cube string in URFDLB order")
-    parser.add_argument("--port", default="/dev/ttyAMA0", help="UART serial port")
+    parser.add_argument("--port", default="/dev/serial0", help="UART serial port")
     parser.add_argument("--baudrate", type=int, default=115200)
     parser.add_argument("--duration-ms", type=int, default=450)
     parser.add_argument(
         "--face-turn-command",
         choices=["MOVE", "TURN"],
-        default="TURN",
-        help="TURN matches the mechanical actuator protocol; MOVE is kept for legacy debug",
+        default="MOVE",
+        help="Deprecated compatibility option; always sends RUBIK MOVE",
     )
     parser.add_argument("--log-dir", type=Path, default=Path("logs"))
     return parser
@@ -34,9 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def run_demo(cube: str, duration_ms: int, face_turn_command: str) -> None:
     validate_cube_string(cube)
-    solution = solve_cube(cube)
-    planner = MotionPlanner(default_duration_ms=duration_ms, face_turn_command=face_turn_command)
-    actions = planner.plan(solution)
+    solution, actions = solution_plan(cube, duration_ms=duration_ms)
 
     print("Cube:", cube)
     print("Solution:", solution or "<already solved>")
@@ -47,13 +44,15 @@ def run_demo(cube: str, duration_ms: int, face_turn_command: str) -> None:
 
 def run_send(cube: str, port: str, baudrate: int, duration_ms: int, face_turn_command: str) -> None:
     validate_cube_string(cube)
-    solution = solve_cube(cube)
-    planner = MotionPlanner(default_duration_ms=duration_ms, face_turn_command=face_turn_command)
-    actions = planner.plan(solution)
+    solution, actions = solution_plan(cube, duration_ms=duration_ms)
 
-    with SerialLink(port=port, baudrate=baudrate, timeout_s=2.0) as link:
+    if not actions:
+        print('Cube is already solved; no UART commands needed.')
+        return
+
+    with SerialLink(port=port, baudrate=baudrate, timeout_s=30.0) as link:
         print(link.request(Command("PING")))
-        print(link.request(Command("HOME")))
+        print(link.request(Command("RESET")))
         for action in actions:
             print("->", action.to_wire())
             print("<-", link.request(action.command))

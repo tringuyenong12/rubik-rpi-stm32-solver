@@ -3,5 +3,6 @@
 ../Core/Src/main.c:172:13:MX_I2C1_Init	2
 ../Core/Src/main.c:206:13:MX_USART1_UART_Init	2
 ../Core/Src/main.c:239:13:MX_GPIO_Init	1
-../Core/Src/main.c:255:6:HAL_UART_RxCpltCallback	1
-../Core/Src/main.c:266:6:Error_Handler	1
+../Core/Src/main.c:279:6:HAL_UART_RxCpltCallback	1
+../Core/Src/main.c:286:6:HAL_GPIO_EXTI_Callback	1
+../Core/Src/main.c:308:6:Error_Handler	1

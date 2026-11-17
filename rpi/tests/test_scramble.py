@@ -34,18 +34,23 @@ class FakeSerial:
     def write(self, frame):
         """Input: UART bytes. Output: queue protocol responses and record the frame."""
         self.writes.append(frame)
-        if frame == b'PING\n':
-            self.lines.append(b'OK PONG\n')
+        command_id, body = frame.decode().strip().split(' ', 1)
+        prefix = '>' + command_id
+        if body == 'RUBIK PING':
+            self.lines.extend(((prefix + ' OK\n').encode(), (prefix + ' DONE\n').encode()))
         else:
             self.turns += 1
             if self.turns == self.fail_at:
-                self.lines.append(b'ERR UNSUPPORTED move_sequence\n')
+                self.lines.append((prefix + ' ERR BAD_RUBIK_MOVE_ARG\n').encode())
             elif self.ack_only:
-                self.lines.append(b'OK TURN\n')
-            elif self.partial:
-                self.lines.extend((b'OK TU', b'RN\r\nDO', b'NE TURN\r\n'))
+                self.lines.append((prefix + ' OK\n').encode())
             else:
-                self.lines.extend((b'OK TURN\n', b'DONE TURN\n'))
+                reply = (prefix + ' OK\r\n' + prefix + ' DONE\r\n').encode()
+                if self.partial:
+                    self.lines.extend((reply[:5], reply[5:12], reply[12:]))
+                else:
+                    self.lines.append(reply)
+        return len(frame)
 
     def flush(self):
         """Input: none. Output: writes are already available to the fake device."""
@@ -75,7 +80,7 @@ class TestScramblePlan(unittest.TestCase):
                     self.assertTrue(valid_cube(plan.cube))
                     self.assertNotEqual(plan.cube, SOLVED_CUBE)
                     self.assertTrue(all(AXES[a[0]] != AXES[b[0]] for a, b in zip(plan.moves, plan.moves[1:])))
-                    self.assertEqual(plan.uart_text().count('\n'), length)
+                    self.assertEqual(plan.uart_text().count('\n'), sum(2 if m.endswith('2') else 1 for m in plan.moves))
 
     def test_repeated_seed_and_duration_export(self):
         """Input: fixed seed/command timing. Output: reproducible moves and correct 180-degree timing."""
@@ -99,20 +104,20 @@ class TestScrambleUART(unittest.TestCase):
         plan = create_scramble('easy', 7)
         serial = FakeSerial(partial=True)
         progress = []
-        with patch('serial.Serial', return_value=serial), patch('rubik_robot.transport.serial_link.time.sleep'):
+        with patch('serial.Serial', return_value=serial):
             result = send_scramble(plan, 'COM_TEST', progress=lambda count, reply: progress.append(count))
         self.assertEqual(result, SendResult(5, False))
-        self.assertEqual(serial.writes, [b'PING\n'] + [line.encode() + b'\n' for line in plan.uart_text().splitlines()])
+        self.assertEqual(serial.writes, [f'#{i} {line}\n'.encode() for i, line in enumerate(['RUBIK PING'] + plan.uart_text().splitlines(), 1)])
         self.assertEqual(progress, [1, 2, 3, 4, 5])
         self.assertTrue(serial.closed)
 
     def test_error_stops_without_retrying_a_turn(self):
-        """Input: firmware error on third move. Output: two completed moves and no automatic retry."""
+        """Input: firmware error after two quarters of R2. Output: one completed move and no automatic retry."""
         serial = FakeSerial(fail_at=3)
-        with patch('serial.Serial', return_value=serial), patch('rubik_robot.transport.serial_link.time.sleep'):
+        with patch('serial.Serial', return_value=serial):
             with self.assertRaises(ScrambleSendError) as caught:
                 send_scramble(create_scramble('easy', 1), 'COM_TEST')
-        self.assertEqual(caught.exception.completed, 2)
+        self.assertEqual(caught.exception.completed, 1)
         self.assertTrue(caught.exception.uncertain_move)
         self.assertEqual(serial.turns, 3)
         self.assertTrue(serial.closed)
@@ -120,7 +125,7 @@ class TestScrambleUART(unittest.TestCase):
     def test_ack_without_done_is_not_counted_as_completed(self):
         """Input: ACK without completion. Output: timeout before another move is sent."""
         serial = FakeSerial(ack_only=True)
-        with patch('serial.Serial', return_value=serial), patch('rubik_robot.transport.serial_link.time.sleep'):
+        with patch('serial.Serial', return_value=serial):
             with self.assertRaises(ScrambleSendError) as caught:
                 send_scramble(create_scramble('easy', 1), 'COM_TEST', timeout_s=.01)
         self.assertEqual(caught.exception.completed, 0)
@@ -136,10 +141,10 @@ class TestScrambleUART(unittest.TestCase):
             if count == 2:
                 cancel.set()
 
-        with patch('serial.Serial', return_value=serial), patch('rubik_robot.transport.serial_link.time.sleep'):
+        with patch('serial.Serial', return_value=serial):
             result = send_scramble(create_scramble('easy', 1), 'COM_TEST', cancel=cancel, progress=progress)
         self.assertEqual(result, SendResult(2, True))
-        self.assertEqual(serial.turns, 2)
+        self.assertEqual(serial.turns, 3)  # R2 is two physical commands, then U_.
 
     def test_pre_cancelled_send_does_not_open_a_port(self):
         """Input: cancelled job. Output: zero serial traffic."""
@@ -151,12 +156,14 @@ class TestScrambleUART(unittest.TestCase):
 
     def test_stale_done_before_ack_is_ignored(self):
         """Input: old DONE followed only by new ACK. Output: wait for the new completion."""
-        link = SerialLink('COM_TEST', timeout_s=.01)
         serial = FakeSerial(ack_only=True)
-        link._serial = serial
-        with self.assertRaises(TimeoutError):
-            link.request_completed(Command('TURN', ('R', 1, 450)))
-        self.assertEqual(serial.timeout, 10)
+        serial.lines.append(b'>#1 DONE\n')
+        from rubik_robot.protocol import MoveCommand
+        from rubik_robot.transport.serial_link import MoveExecutionError
+        with patch('serial.Serial', return_value=serial), SerialLink('COM_TEST', timeout_s=.01) as link:
+            with self.assertRaises(MoveExecutionError):
+                link.request_completed(MoveCommand('R', 1))
+
 
 
 class TestScrambleWorkspace(unittest.TestCase):

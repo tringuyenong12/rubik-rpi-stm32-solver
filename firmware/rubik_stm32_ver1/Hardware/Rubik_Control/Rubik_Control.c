@@ -36,6 +36,31 @@ void Rubik_Hold_Start_Position(void){
 }
 
 
+void Rubik_Release(void){
+    // Rut arm trai va phai ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Rut arm truoc va sau ra
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Dua tat ca cac arm ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    HAL_Delay(5000);
+
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+}
+
+
  void Rubik_Left(){
     // Xoay mat ben trai cua Rubik theo chieu kim dong ho
     Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_CLOCKWISE);
@@ -243,7 +268,7 @@ void Rubik_Left_(){
 
 
  void Rubik_Up_ToFront(){
-       // Kep chat hai mat trai va phai cua Rubik
+    // Kep chat hai mat trai va phai cua Rubik
     Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_TIGHT_CLAMP);
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_TIGHT_CLAMP);
     // Rut arm FRONT va BACK ra, de chuan bi xoay Rubik tu Up xuong Front
@@ -261,6 +286,7 @@ void Rubik_Left_(){
     waitUntilServosDone();
 
     // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
     Rubik_Left_Right_Move_Full_Release();
     waitUntilServosDone();
 
@@ -274,7 +300,7 @@ void Rubik_Left_(){
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
     waitUntilServosDone();
 
-    // Xoay mat Front nguoc chieu kim dong ho cho U'
+    // Xoay mat Front
     Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_ANTICLOCKWISE);
     waitUntilServosDone();
 
@@ -283,7 +309,7 @@ void Rubik_Left_(){
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_TIGHT_CLAMP);
 
     // Rut arm Front va Back ra
-      Rubik_Front_Back_Move_Full_Release();
+    Rubik_Front_Back_Move_Full_Release();
     waitUntilServosDone();
 
 
@@ -296,8 +322,12 @@ void Rubik_Left_(){
     Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
     waitUntilServosDone();
 
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+
         // Rut arm trai va phai ra
-      Rubik_Left_Right_Move_Full_Release();
+    Rubik_Left_Right_Move_Full_Release();
     waitUntilServosDone();
 
         // Xoay arm trai va phai ve trang thai ban dau
@@ -308,21 +338,22 @@ void Rubik_Left_(){
     // Kep chat hai mat trai va phai cua Rubik
     Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+
     waitUntilServosDone();
  }
 
 
  void Rubik_DownToFront(){
-       // Kep chat hai mat trai va phai cua Rubik
+    // Kep chat hai mat trai va phai cua Rubik
     Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_TIGHT_CLAMP);
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_TIGHT_CLAMP);
-    // Rut arm FRONT va BACK ra, de chuan bi xoay Rubik tu Up xuong Front
+    // Rut arm FRONT va BACK ra, de chuan bi xoay Rubik tu Down lên Front
     Rubik_Front_Back_Move_Full_Release();
     waitUntilServosDone();
 
-    // Xoay mat ben tren cua Rubik xuong mat ben truoc theo nguoc chieu kim dong ho
-    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_CLOCKWISE);
-    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_ANTICLOCKWISE);
+    // Xoay mat ben duoi cua Rubik len mat ben truoc theo nguoc chieu kim dong ho
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_ANTICLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_CLOCKWISE);
     waitUntilServosDone();
 
     // Co dinh arm FRONT va BACK
@@ -331,6 +362,7 @@ void Rubik_Left_(){
     waitUntilServosDone();
 
     // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
     Rubik_Left_Right_Move_Full_Release();
     waitUntilServosDone();
 
@@ -344,8 +376,8 @@ void Rubik_Left_(){
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
     waitUntilServosDone();
 
-    // Xoay mat Front nguoc chieu kim dong ho cho U'
-    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_ANTICLOCKWISE);
+    // Xoay mat Front
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_CLOCKWISE);
     waitUntilServosDone();
 
     // Kep chat hai mat trai va phai cua Rubik
@@ -353,21 +385,25 @@ void Rubik_Left_(){
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_TIGHT_CLAMP);
 
     // Rut arm Front va Back ra
-   Rubik_Front_Back_Move_Full_Release();
+    Rubik_Front_Back_Move_Full_Release();
     waitUntilServosDone();
 
 
-    // Xoay rubik tu mat FRONT len mat UP
-    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_ANTICLOCKWISE);
-    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_CLOCKWISE);
+    // Xoay rubik tu mat FRONT xuong mat DOwn
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_CLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_ANTICLOCKWISE);
 
         // Xoay arm FRONT va BACK ve goc xoay ban dau
     Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
     Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
     waitUntilServosDone();
 
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+
         // Rut arm trai va phai ra
-      Rubik_Left_Right_Move_Full_Release();
+    Rubik_Left_Right_Move_Full_Release();
     waitUntilServosDone();
 
         // Xoay arm trai va phai ve trang thai ban dau
@@ -378,12 +414,84 @@ void Rubik_Left_(){
     // Kep chat hai mat trai va phai cua Rubik
     Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
     Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+
     waitUntilServosDone();
  }
 
 
  void Rubik_Down_ToFront(){
+    // Kep chat hai mat trai va phai cua Rubik
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_TIGHT_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_TIGHT_CLAMP);
+    // Rut arm FRONT va BACK ra, de chuan bi xoay Rubik tu Down lên Front
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
 
+    // Xoay mat ben duoi cua Rubik len mat ben truoc theo nguoc chieu kim dong ho
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_ANTICLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_CLOCKWISE);
+    waitUntilServosDone();
+
+    // Co dinh arm FRONT va BACK
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+
+    // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm trai va phai ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    // Kep chat hai mat trai va phai cua Rubik
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+
+    // Xoay mat Front
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_ANTICLOCKWISE);
+    waitUntilServosDone();
+
+    // Kep chat hai mat trai va phai cua Rubik
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_TIGHT_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_TIGHT_CLAMP);
+
+    // Rut arm Front va Back ra
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
+
+
+    // Xoay rubik tu mat FRONT xuong mat DOwn
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_CLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_ANTICLOCKWISE);
+
+        // Xoay arm FRONT va BACK ve goc xoay ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+
+        // Rut arm trai va phai ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+        // Xoay arm trai va phai ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    // Kep chat hai mat trai va phai cua Rubik
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+
+    waitUntilServosDone();
  }
 
 

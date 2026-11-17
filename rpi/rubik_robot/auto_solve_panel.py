@@ -274,7 +274,7 @@ class AutoSolveWorkspace:
         self.root.clipboard_append(scan_commands())
 
     def copy_solution(self):
-        """Input: verified solver plan. Output: exact TURN frames on the clipboard."""
+        """Input: verified solver plan. Output: RUBIK MOVE command bodies on the clipboard."""
         if self.solution_frames:
             self.root.clipboard_clear()
             self.root.clipboard_append(self.solution_frames)

@@ -1,15 +1,15 @@
 """Send Rubik face moves through the existing UART_Command layer.
 
-Import with ``from Rubik_Cube.Rubik_Move import move_Front, U, R_``
+Import with ``from Rubik_Cube.motion.motion import move_Front, U, R_``
 when running from rpi/. Importing this module does not open the UART port.
 Each call blocks until UART_Command returns and propagates its bool result.
 The suffix ``_`` denotes the inverse move, e.g. F_ corresponds to F'.
 """
 
-from .UART_Command import UART_Command
+from ..UART_Command import UART_Command
 
 
-def move(face: str) -> bool:
+def move(face: str, *, session=None) -> bool:
     """Send one of F/R/B/L/U/D, optionally followed by _ or apostrophe.
 
     Invalid moves raise ValueError before sending anything. UART_Command
@@ -23,99 +23,99 @@ def move(face: str) -> bool:
     if token not in {"F", "R", "B", "L", "U", "D",
                      "F_", "R_", "B_", "L_", "U_", "D_"}:
         raise ValueError(f"Unsupported Rubik move: {face!r}")
-    return UART_Command.Send_Command_to_STM32(f"RUBIK MOVE {token}")
+    return UART_Command.Send_Command_to_STM32(f"RUBIK MOVE {token}", session=session)
 
 
-def move_Front() -> bool:
+def move_Front(*, session=None) -> bool:
     """Send RUBIK MOVE F."""
-    return move("F")
+    return move("F", session=session)
 
 
-def move_Front_() -> bool:
+def move_Front_(*, session=None) -> bool:
     """Send RUBIK MOVE F_ (inverse Front)."""
-    return move("F_")
+    return move("F_", session=session)
 
 
-def move_Right() -> bool:
+def move_Right(*, session=None) -> bool:
     """Send RUBIK MOVE R."""
-    return move("R")
+    return move("R", session=session)
 
 
-def move_Right_() -> bool:
+def move_Right_(*, session=None) -> bool:
     """Send RUBIK MOVE R_ (inverse Right)."""
-    return move("R_")
+    return move("R_", session=session)
 
 
-def move_Back() -> bool:
+def move_Back(*, session=None) -> bool:
     """Send RUBIK MOVE B."""
-    return move("B")
+    return move("B", session=session)
 
 
-def move_Back_() -> bool:
+def move_Back_(*, session=None) -> bool:
     """Send RUBIK MOVE B_ (inverse Back)."""
-    return move("B_")
+    return move("B_", session=session)
 
 
-def move_Left() -> bool:
+def move_Left(*, session=None) -> bool:
     """Send RUBIK MOVE L."""
-    return move("L")
+    return move("L", session=session)
 
 
-def move_Left_() -> bool:
+def move_Left_(*, session=None) -> bool:
     """Send RUBIK MOVE L_ (inverse Left)."""
-    return move("L_")
+    return move("L_", session=session)
 
 
-def move_Up() -> bool:
+def move_Up(*, session=None) -> bool:
     """Send RUBIK MOVE U."""
-    return move("U")
+    return move("U", session=session)
 
 
-def move_Up_() -> bool:
+def move_Up_(*, session=None) -> bool:
     """Send RUBIK MOVE U_ (inverse Up)."""
-    return move("U_")
+    return move("U_", session=session)
 
 
-def move_Down() -> bool:
+def move_Down(*, session=None) -> bool:
     """Send RUBIK MOVE D."""
-    return move("D")
+    return move("D", session=session)
 
 
-def move_Down_() -> bool:
+def move_Down_(*, session=None) -> bool:
     """Send RUBIK MOVE D_ (inverse Down)."""
-    return move("D_")
+    return move("D_", session=session)
 
-def move_LR() -> bool:
+def move_LR(*, session=None) -> bool:
     """Send RUBIK MOVE LR (Left and Right together)."""
-    return move("LR")
+    return move("LR", session=session)
 
-def move_LR_() -> bool:
+def move_LR_(*, session=None) -> bool:
     """Send RUBIK MOVE LR_ (inverse Left and Right together)."""
-    return move("LR_")
+    return move("LR_", session=session)
 
-def move_L_R() -> bool:
+def move_L_R(*, session=None) -> bool:
     """Send RUBIK MOVE L'R' (inverse Left and Right together)."""
-    return move("L_R")
+    return move("L_R", session=session)
 
-def move_L_R_() -> bool:
+def move_L_R_(*, session=None) -> bool:
     """Send RUBIK MOVE L'R'_ (inverse Left and Right together)."""
-    return move("L_R_")
+    return move("L_R_", session=session)
 
-def move_UD() -> bool:
+def move_UD(*, session=None) -> bool:
     """Send RUBIK MOVE UD (Up and Down together)."""
-    return move("UD")
+    return move("UD", session=session)
 
-def move_UD_() -> bool:
+def move_UD_(*, session=None) -> bool:
     """Send RUBIK MOVE UD_ (inverse Up and Down together)."""
-    return move("UD_")
+    return move("UD_", session=session)
 
-def move_U_D() -> bool:
+def move_U_D(*, session=None) -> bool:
     """Send RUBIK MOVE U'D' (inverse Up and Down together)."""
-    return move("U_D")
+    return move("U_D", session=session)
 
-def move_U_D_() -> bool:
+def move_U_D_(*, session=None) -> bool:
     """Send RUBIK MOVE U'D'_ (inverse Up and Down together)."""
-    return move("U_D_")
+    return move("U_D_", session=session)
 
 
 

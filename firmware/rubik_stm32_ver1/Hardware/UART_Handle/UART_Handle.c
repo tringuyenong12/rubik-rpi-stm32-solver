@@ -254,38 +254,38 @@ static void UART_ParseCommand(const char *command)
          case CMD_RUBIK:
          {
          	Rubik_CommandHandler(argc_parse, argv_parse, command_id);
-            UART_Reply(command_id, "RUBIK_CMD", NULL);
+            //UART_Reply(command_id, "RUBIK_CMD", NULL);
          	break;
          }
 
          case CMD_CONTROL:
          {
-          	//Control_CommandHandler(argc, argv, command_id);
-            UART_Reply(command_id, "CONTROL_CMD", NULL);
+          	Control_CommandHandler(argc_parse, argv_parse, command_id);
+            //UART_Reply(command_id, "CONTROL_CMD", NULL);
              // Xử lý điều khiển từng servo
              break;
          }
 
          case CMD_CALIB:
          {
-          	//Calibration_CommandHandler(argc, argv, command_id);
-            UART_Reply(command_id, "CALIB_CMD", NULL);
+          	Calibration_CommandHandler(argc_parse, argv_parse, command_id);
+            //UART_Reply(command_id, "CALIB_CMD", NULL);
              // Xử lý điều khiển từng servo
              break;
          }
 
          case CMD_CONFIG:
          {
-          	//Config_CommandHandler(argc, argv, command_id);
-            UART_Reply(command_id, "CONFIG_CMD", NULL);
+          	//Config_CommandHandler(argc_parse, argv_parse, command_id);
+            //UART_Reply(command_id, "CONFIG_CMD", NULL);
              // Xử lý điều khiển từng servo
              break;
          }
 
          case CMD_SYSTEM:
          {
-          	//System_CommandHandler(argc, argv, command_id);
-            UART_Reply(command_id, "SYSTEM_CMD", NULL);
+          	//System_CommandHandler(argc_parse, argv_parse, command_id);
+            //UART_Reply(command_id, "SYSTEM_CMD", NULL);
              // Xử lý điều khiển từng servo
              break;
          }
@@ -331,7 +331,7 @@ void UART_Command_Process(void)
 void UART_Reply(uint16_t id, const char *status, const char *value)
 {
     char reply[96];
-    int length = snprintf(reply, sizeof(reply), "#%u %s%s%s\r\n", (unsigned)id,
+    int length = snprintf(reply, sizeof(reply), ">#%u %s%s%s\r\n", (unsigned)id,
                           status, value ? " " : "", value ? value : "");
     HAL_UART_Transmit(uart_cmd, (uint8_t *)reply, (uint16_t)length, 20U);
 }

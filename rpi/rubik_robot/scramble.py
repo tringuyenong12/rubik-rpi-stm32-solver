@@ -27,7 +27,7 @@ class ScramblePlan:
 
 
 def create_scramble(level: str, seed: int | None = None, duration_ms: int = 450,
-                    command_name: str = 'TURN') -> ScramblePlan:
+                    command_name: str = 'MOVE') -> ScramblePlan:
     """Input: level, optional seed and UART settings. Output: a plan starting from solved."""
     if level not in LEVELS:
         raise ValueError('Choose easy, medium or hard')

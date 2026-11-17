@@ -3,7 +3,7 @@
 ../Hardware/UART_Handle/UART_Handle.c:158:16:UART_Split_Command	8
 ../Hardware/UART_Handle/UART_Handle.c:194:13:UART_ParseId	8
 ../Hardware/UART_Handle/UART_Handle.c:217:16:UART_Get_Command	7
-../Hardware/UART_Handle/UART_Handle.c:233:13:UART_ParseCommand	8
+../Hardware/UART_Handle/UART_Handle.c:233:13:UART_ParseCommand	7
 ../Hardware/UART_Handle/UART_Handle.c:318:6:UART_Command_Process	2
 ../Hardware/UART_Handle/UART_Handle.c:331:6:UART_Reply	3
 ../Hardware/UART_Handle/UART_Handle.c:339:6:UART_ReplyValue	1

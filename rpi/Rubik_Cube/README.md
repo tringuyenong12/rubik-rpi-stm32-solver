@@ -1,11 +1,11 @@
 # Các hàm xoay Rubik qua UART
 
-Module `Rubik_Move.py` sử dụng
+Module `motion/motion.py` sử dụng
 `UART_Command/UART_Command.py::Send_Command_to_STM32()` để gửi lệnh.
 Chạy Python từ thư mục `rpi/` (cần cài `pyserial`).
 
 ```python
-from Rubik_Cube.Rubik_Move import move_Front, move_Front_, U, R_, move
+from Rubik_Cube.motion.motion import move_Front, move_Front_, U, R_, move
 from Rubik_Cube.UART_Command.UART_Command import UART_Close
 
 try:
@@ -41,11 +41,7 @@ Kết quả `True`/`False` được trả nguyên từ tầng UART_Command. Tầ
 cổng `/dev/serial0`, dùng baudrate 115200, thêm `#ID` và ký tự xuống dòng,
 chờ OK/DONE và xử lý ERR. Import module không mở cổng hay gửi lệnh.
 
-## Tình trạng tích hợp firmware
+## Solver / UART
 
-README trong `firmware/rubik_stm32_ver1/Hardware/UART_Handle/` mô tả phiên bản
-cũ. Mã `UART_Handle.c` hiện trả `#ID ...`, trong khi `UART_Command.py` đang
-chờ `>#ID ...`; cần thống nhất định dạng phản hồi để Python nhận kết quả.
-Handler hiện tại ở `Hardware/UART_Handle/Rubik_Command.c` đã nhận đủ 12
-token trong bảng và trả OK/DONE/ERR. Module này chỉ chuyển lệnh qua tầng
-UART hiện có, chưa xác nhận chuyển động trên robot.
+See [solver UART guide](../../docs/solver_uart.md) for the current protocol,
+command mapping, execution scripts, timeouts and firmware limitations.

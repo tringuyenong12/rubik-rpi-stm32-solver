@@ -29,8 +29,8 @@ Servo_t servo[SERVO_COUNT ] =
 		.channel = 1,
 		.state.rotate = {
 			.current_angle = -1.0f, .target_angle = -1.0f,
-			.home_angle = 90.0f, .offset_calib_home_angle = 0.0f,
-			.clockwise_angle = 180.0f, .offset_calib_clockwise_angle = 0.0f,
+			.home_angle = 95.0f, .offset_calib_home_angle = 0.0f,
+			.clockwise_angle = 178.0f, .offset_calib_clockwise_angle = 0.0f,
 			.anticlockwise_angle = 0.0f, .offset_calib_anticlockwise_angle = 0.0f
 		}
 	},
@@ -47,8 +47,8 @@ Servo_t servo[SERVO_COUNT ] =
 		.channel = 3,
 		.state.rotate = {
 			.current_angle = -1.0f, .target_angle = -1.0f,
-			.home_angle = 90.0f, .offset_calib_home_angle = 0.0f,
-			.clockwise_angle = 180.0f, .offset_calib_clockwise_angle = 0.0f,
+			.home_angle = 95.0f, .offset_calib_home_angle = 0.0f,
+			.clockwise_angle = 178.0f, .offset_calib_clockwise_angle = 0.0f,
 			.anticlockwise_angle = 0.0f, .offset_calib_anticlockwise_angle = 0.0f
 		}
 	},
@@ -58,8 +58,8 @@ Servo_t servo[SERVO_COUNT ] =
 			.current_angle = -1.0f, .target_angle = -1.0f,
 			.full_release_angle = 180.0f, .offset_calib_full_release_angle = 0.0f,
 			.half_release_angle = 90.0f, .offset_calib_half_release_angle = 0.0f,
-			.clamp_angle = 10.0f, .offset_calib_clamp_angle = 0.0f,
-			.tight_clamp_angle = 0.0f, .offset_calib_tight_clamp_angle = 0.0f
+			.clamp_angle = 15.0f, .offset_calib_clamp_angle = 0.0f,
+			.tight_clamp_angle = 5.0f, .offset_calib_tight_clamp_angle = 0.0f
 		}
 	},
 	[SERVO_MOVE_RIGHT] = {
@@ -68,8 +68,8 @@ Servo_t servo[SERVO_COUNT ] =
 			.current_angle = -1.0f, .target_angle = -1.0f,
 			.full_release_angle = 180.0f, .offset_calib_full_release_angle = 0.0f,
 			.half_release_angle = 90.0f, .offset_calib_half_release_angle = 0.0f,
-			.clamp_angle = 10.0f, .offset_calib_clamp_angle = 0.0f,
-			.tight_clamp_angle = 0.0f, .offset_calib_tight_clamp_angle = 0.0f
+			.clamp_angle = 15.0f, .offset_calib_clamp_angle = 0.0f,
+			.tight_clamp_angle = 5.0f, .offset_calib_tight_clamp_angle = 0.0f
 		}
 	},
 	[SERVO_MOVE_BACK] = {
@@ -78,8 +78,8 @@ Servo_t servo[SERVO_COUNT ] =
 			.current_angle = -1.0f, .target_angle = -1.0f,
 			.full_release_angle = 180.0f, .offset_calib_full_release_angle = 0.0f,
 			.half_release_angle = 90.0f, .offset_calib_half_release_angle = 0.0f,
-			.clamp_angle = 10.0f, .offset_calib_clamp_angle = 0.0f,
-			.tight_clamp_angle = 0.0f, .offset_calib_tight_clamp_angle = 0.0f
+			.clamp_angle = 15.0f, .offset_calib_clamp_angle = 0.0f,
+			.tight_clamp_angle = 5.0f, .offset_calib_tight_clamp_angle = 0.0f
 		}
 	},
 	[SERVO_MOVE_LEFT] = {
@@ -88,8 +88,8 @@ Servo_t servo[SERVO_COUNT ] =
 			.current_angle = -1.0f, .target_angle = -1.0f,
 			.full_release_angle = 180.0f, .offset_calib_full_release_angle = 0.0f,
 			.half_release_angle = 90.0f, .offset_calib_half_release_angle = 0.0f,
-			.clamp_angle = 10.0f, .offset_calib_clamp_angle = 0.0f,
-			.tight_clamp_angle = 0.0f, .offset_calib_tight_clamp_angle = 0.0f
+			.clamp_angle = 15.0f, .offset_calib_clamp_angle = 0.0f,
+			.tight_clamp_angle = 5.0f, .offset_calib_tight_clamp_angle = 0.0f
 		}
 	}
 };
@@ -102,10 +102,12 @@ void Servo_Init(){
 
 void Servo_Start_Position(){
 	
-	for (int i = 4; i < 8; i++)
+	for (int i = 4; i < 7; i++)
 	{
-		Servo_Move((Servo_ID_t)i, SERVO_MOVE_FULL_RELEASE);
+		Servo_Move((Servo_ID_t)i, SERVO_MOVE_CLAMP);
 	}
+	Servo_Move((Servo_ID_t)7, SERVO_MOVE_FULL_RELEASE);
+
 
 	for (int i = 0; i < 4; i++)
 	{

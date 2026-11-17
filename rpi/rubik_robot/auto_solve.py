@@ -107,6 +107,8 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
     Capture(pose, seen_centers=...) returns colors/HSV. Optional connect opens UART
     after the first face is saved. No command is retried.
     """
+    link.require_scan_support()
+
     def send(command):
         """Input: one command. Output: await its completion before continuing."""
         check_cancel(cancel)
@@ -156,7 +158,7 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
         predicted = apply_move(predicted, token)
     if predicted != SOLVED_CUBE:
         raise ValueError('Server solution does not solve the scanned cube')
-    actions = MotionPlanner(face_turn_command='TURN').plan(solution)
+    actions = MotionPlanner().plan(solution)
     frames = ''.join(action.to_wire() + '\n' for action in actions)
     result = {'cube': cube, 'solution': solution, 'uart': frames, 'position_colors': dict(position_colors)}
     emit('solution', result)
@@ -289,6 +291,7 @@ class AutoCamera:
 
 def run_auto_solve(settings, cancel, emit, preview):
     """Input: frozen UI settings and callbacks. Output: close camera/UART after the entire flow."""
+    SerialLink.require_scan_support()
     with AutoCamera(settings['camera'], cancel, preview) as camera, ExitStack() as resources:
         link = SerialLink(settings['port'], settings['baud'], timeout_s=15)
 

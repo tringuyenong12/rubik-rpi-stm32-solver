@@ -75,16 +75,16 @@ class TestAutoFlow(unittest.TestCase):
                 if face != 'U':
                     self.assertEqual(self.trace[index-2], ('done', f'SCAN_POSE {face}'))
         initial = next(i for i, item in enumerate(self.trace) if item == ('capture', 'U'))
-        ping = next(i for i, item in enumerate(self.trace) if item == ('command', 'PING'))
+        ping = next(i for i, item in enumerate(self.trace) if item == ('command', 'RUBIK PING'))
         self.assertLess(initial, ping)
         solved_at = next(i for i, item in enumerate(self.trace) if item[0] == 'solve')
         previous_commands = [v for k, v in self.trace[:solved_at] if k == 'done']
         self.assertEqual(previous_commands[-1], 'SCAN_POSE U')
         self.assertTrue(any(k == 'scan_complete' for k, _ in self.trace[:solved_at]))
         exported = next(i for i, item in enumerate(self.trace) if item[0] == 'solution')
-        first_turn = next(i for i, item in enumerate(self.trace) if item[0] == 'command' and item[1].startswith('TURN'))
+        first_turn = next(i for i, item in enumerate(self.trace) if item[0] == 'command' and item[1].startswith('RUBIK MOVE'))
         self.assertLess(exported, first_turn)
-        self.assertEqual(len(result['uart'].splitlines()), len(SOLUTION.split()))
+        self.assertEqual(len(result['uart'].splitlines()), sum(2 if token.endswith('2') else 1 for token in SOLUTION.split()))
         self.assertEqual([v for k, v in self.trace if k == 'move'][-1][2], cube_faces(SOLVED_CUBE))
 
     def test_fixed_route_geometry_and_restore(self):
@@ -118,7 +118,7 @@ class TestAutoFlow(unittest.TestCase):
         """Input: unchanged face after a pose command. Output: retain first face and stop safely."""
         with self.assertRaisesRegex(ValueError, 'already captured'):
             self.run_flow(capture=lambda pose, **kw: (('red',)*9, None))
-        self.assertEqual([v for k, v in self.trace if k == 'done'], ['PING', 'SCAN_POSE F'])
+        self.assertEqual([v for k, v in self.trace if k == 'done'], ['RUBIK PING', 'SCAN_POSE F'])
         saved = [v for k, v in self.trace if k == 'face']
         self.assertEqual(len(saved), 1)
         self.assertEqual(set(saved[0]), {'red'})
@@ -144,13 +144,13 @@ class TestAutoFlow(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             self.run_flow(capture=bad_capture)
-        self.assertFalse(any(k == 'solve' or (k == 'command' and v.startswith('TURN')) for k, v in self.trace))
+        self.assertFalse(any(k == 'solve' or (k == 'command' and v.startswith('RUBIK MOVE')) for k, v in self.trace))
 
     def test_wrong_solver_result_is_rejected(self):
         """Input: incorrect solving plan. Output: no TURN reaches UART."""
         with self.assertRaisesRegex(ValueError, 'does not solve'):
             self.run_flow(solver=lambda *args: 'U')
-        self.assertFalse(any(k == 'command' and v.startswith('TURN') for k, v in self.trace))
+        self.assertFalse(any(k == 'command' and v.startswith('RUBIK MOVE') for k, v in self.trace))
 
     def test_center_calibration_preserves_measured_machine_directions(self):
         """Input: wrong sticker label with accurate HSV. Output: exact original machine state."""
@@ -206,24 +206,14 @@ class TestAutoFlow(unittest.TestCase):
             self.run_flow()
         self.assertEqual(self.link.request_completed.call_count, 2)
 
-    def test_ack_only_pose_is_not_completion(self):
-        """Input: real UART helper receiving ACK without DONE. Output: timeout without capture."""
-        responses = deque()
-        serial = Mock(timeout=1)
-
-        def write(frame):
-            """Input: frame. Output: simulate PING or ACK-only pose response."""
-            responses.append(b'OK PONG\n' if frame == b'PING\n' else b'OK SCAN_POSE\n')
-
-        serial.write.side_effect = write
-        serial.readline.side_effect = lambda: responses.popleft() if responses else b''
-        real = SerialLink('FAKE')
-        real._serial = serial
-        link = Mock()
-        link.request_completed.side_effect = lambda command, **kw: real.request_completed(command, .01)
-        with self.assertRaises(TimeoutError):
-            self.run_flow(link=link)
-        self.assertEqual([v for k, v in self.trace if k == 'capture'], ['U'])
+    def test_unsupported_scan_stops_before_camera_or_uart(self):
+        link = SerialLink('COM_TEST')
+        capture = Mock()
+        with patch('serial.Serial') as serial:
+            with self.assertRaisesRegex(NotImplementedError, 'SCAN_POSE'):
+                self.run_flow(link=link, capture=capture)
+            capture.assert_not_called()
+            serial.assert_not_called()
 
     def test_all_24_placements_produce_matching_machine_turns(self):
         """Input: 24 spatial rotations of a real scramble. Output: complete scan and correct physical turns."""
@@ -274,7 +264,7 @@ class TestAutoFlow(unittest.TestCase):
                 final_faces = [v for k, v in trace if k == 'move'][-1][2]
                 self.assertTrue(all(values == (color,)*9 for color, values in final_faces.items()))
                 turns = [call.args[0].face for call in link.request_completed.call_args_list
-                         if call.args[0].name == 'TURN']
+                         if call.args[0].name == 'MOVE']
                 self.assertEqual(turns, [token[0] for token in expected_solution.split()])
 
 

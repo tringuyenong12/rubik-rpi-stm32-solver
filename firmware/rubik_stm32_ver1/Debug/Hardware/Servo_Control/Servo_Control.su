@@ -1,6 +1,6 @@
 ../Hardware/Servo_Control/Servo_Control.c:97:6:Servo_Init	4	static
 ../Hardware/Servo_Control/Servo_Control.c:103:6:Servo_Start_Position	16	static
-../Hardware/Servo_Control/Servo_Control.c:120:13:Servo_WriteAngle	24	static
-../Hardware/Servo_Control/Servo_Control.c:143:6:Servo_Move	24	static
-../Hardware/Servo_Control/Servo_Control.c:177:6:Servo_Rotate	24	static
-../Hardware/Servo_Control/Servo_Control.c:207:6:waitUntilServosDone	8	static
+../Hardware/Servo_Control/Servo_Control.c:122:13:Servo_WriteAngle	24	static
+../Hardware/Servo_Control/Servo_Control.c:145:6:Servo_Move	24	static
+../Hardware/Servo_Control/Servo_Control.c:179:6:Servo_Rotate	24	static
+../Hardware/Servo_Control/Servo_Control.c:209:6:waitUntilServosDone	8	static
