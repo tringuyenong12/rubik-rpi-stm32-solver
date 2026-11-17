@@ -352,6 +352,67 @@ Sau khi chuẩn bị `solution.json` cho cube thật:
 
 ## 9. Chạy camera và chuyển kết quả sang solver UART
 
+### Chạy nhanh giao diện chung trên Raspberry Pi
+
+Mở **Terminal trong Desktop hoặc VNC của Raspberry Pi**, rồi chạy:
+
+```bash
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -B scripts/run_vision_gui.py --camera 0 --backend v4l2
+```
+
+Thay đường dẫn nếu dự án được lưu ở vị trí khác. Một lệnh này mở giao diện có các chế độ:
+
+| Chế độ trên GUI | Cách dùng |
+|---|---|
+| **Solve Guide** | Quét sáu mặt bằng camera, tìm công thức và xem hình hướng dẫn từng bước |
+| **Scramble** | Tạo đề theo độ khó, xem công thức và gửi lệnh trộn đến STM32 |
+| **Auto Solve** | Hiện báo chưa hỗ trợ `SCAN_POSE`; chưa thực hiện robot tự quét và giải |
+
+**Tạo đề và chạy trộn trên GUI:**
+
+1. Chọn **Scramble**.
+2. Chọn độ khó Easy / Medium / Hard, rồi bấm **Generate scramble**.
+3. Xem công thức và trạng thái đích được tạo.
+4. Đặt cube thật ở trạng thái đã giải và chuẩn bị cơ cấu sẵn sàng.
+5. Chọn cổng `/dev/serial0`, baudrate `115200`, rồi bấm nút gửi lệnh trong giao diện.
+6. Theo dõi tiến độ các nước đã nhận DONE. Nút Stop hủy các nước tiếp theo sau nước đang thực hiện.
+
+Nếu dùng USB-UART, chọn cổng thực tế của adapter thay cho `/dev/serial0`. Đóng terminal test UART trước khi gửi từ GUI để tránh dùng chung cổng.
+
+**Quét và xem hướng dẫn giải trên GUI:**
+
+1. Chọn **Solve Guide**.
+2. Đưa từng mặt vào camera và giữ yên cho chương trình lưu; tự đổi mặt bằng tay.
+3. Khi đủ sáu mặt, dùng Solve hoặc tùy chọn tự tìm lời giải sau sáu mặt.
+4. Xem công thức và hình hướng dẫn, dùng nút Bước trước / Bước tiếp để chuyển bước.
+
+Solve Guide chỉ hiển thị hướng dẫn. Để máy thực thi lời giải đã quét, dùng luồng `run_solver.py` ở mục 8 và cách lấy dữ liệu ở mục 9.1.
+
+**Kiểm tra camera nếu giao diện không mở được ảnh:**
+
+```bash
+v4l2-ctl --list-devices
+```
+
+Nếu camera nằm ở chỉ số 1, đóng chương trình đang chạy rồi mở lại:
+
+```bash
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -B scripts/run_vision_gui.py --camera 1 --backend v4l2
+```
+
+**Chạy server solver ở terminal riêng nếu muốn:**
+
+```bash
+cd ~/rubik-rpi-stm32-solver
+.venv-pi/bin/python -u -B rpi/twophase/start_server.py 8080 20 3
+```
+
+Giữ terminal server mở, đợi server sẵn sàng rồi chạy lệnh GUI trong terminal thứ hai. Server là tùy chọn khi GUI dùng localhost và có thể chuyển sang solver tại chỗ; chi tiết tại mục 9.2.
+
+### Luồng camera và dữ liệu đầu ra
+
 GUI cần phiên Desktop trên Pi hoặc phiên VNC có màn hình. Các lệnh solver/serial không dùng GUI có thể chạy qua SSH.
 
 ```bash
@@ -554,3 +615,10 @@ Bỏ `-k "not Workspace"` khi muốn chạy cả kiểm thử giao diện và m�
 7. Nếu có lỗi, kiểm tra trạng thái thật trước lần gửi kế tiếp.
 
 Tài liệu liên quan: [ghi chú UART solver](docs/solver_uart.md), [module Rubik_Cube](rpi/Rubik_Cube/README.md), [handler STM32](firmware/rubik_stm32_ver1/Hardware/UART_Handle/Rubik_Command.c), [session UART Python](rpi/Rubik_Cube/UART_Command/session.py).
+
+Trước khi chạy cấp quyền cho màn hình DISPLAY:
+
+Nếu hiện danh sách quyền truy cập mà không có lỗi, tức là user pc đã kết nối được X11.
+
+Tiếp tục cấp quyền cho phaplun o user PC
+xhost +SI:localuser:phaplun
