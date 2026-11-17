@@ -10,7 +10,7 @@ from ..UART_Command import UART_Command
 
 
 def move(face: str, *, session=None) -> bool:
-    """Send one of F/R/B/L/U/D, optionally followed by _ or apostrophe.
+    """Send a face or firmware LR/FB pair, with independent inverse suffixes.
 
     Invalid moves raise ValueError before sending anything. UART_Command
     supplies the command ID and newline; do not add them here.
@@ -18,10 +18,11 @@ def move(face: str, *, session=None) -> bool:
     if not isinstance(face, str):
         raise ValueError("Move must be a string such as F, U_ or R'")
     token = face.strip().upper()
-    if token.endswith("'"):
-        token = token[:-1] + "_"
+    token = token.replace("'", "_")
     if token not in {"F", "R", "B", "L", "U", "D",
-                     "F_", "R_", "B_", "L_", "U_", "D_"}:
+                     "F_", "R_", "B_", "L_", "U_", "D_",
+                     "LR", "LR_", "L_R", "L_R_",
+                     "FB", "FB_", "F_B", "F_B_"}:
         raise ValueError(f"Unsupported Rubik move: {face!r}")
     return UART_Command.Send_Command_to_STM32(f"RUBIK MOVE {token}", session=session)
 
@@ -90,32 +91,32 @@ def move_LR(*, session=None) -> bool:
     return move("LR", session=session)
 
 def move_LR_(*, session=None) -> bool:
-    """Send RUBIK MOVE LR_ (inverse Left and Right together)."""
+    """Send RUBIK MOVE LR_ (Left and inverse Right together)."""
     return move("LR_", session=session)
 
 def move_L_R(*, session=None) -> bool:
-    """Send RUBIK MOVE L'R' (inverse Left and Right together)."""
+    """Send RUBIK MOVE L_R (inverse Left and Right together)."""
     return move("L_R", session=session)
 
 def move_L_R_(*, session=None) -> bool:
-    """Send RUBIK MOVE L'R'_ (inverse Left and Right together)."""
+    """Send RUBIK MOVE L_R_ (both faces inverse)."""
     return move("L_R_", session=session)
 
-def move_UD(*, session=None) -> bool:
-    """Send RUBIK MOVE UD (Up and Down together)."""
-    return move("UD", session=session)
+def move_FB(*, session=None) -> bool:
+    """Send RUBIK MOVE FB (Front and Back together)."""
+    return move("FB", session=session)
 
-def move_UD_(*, session=None) -> bool:
-    """Send RUBIK MOVE UD_ (inverse Up and Down together)."""
-    return move("UD_", session=session)
+def move_FB_(*, session=None) -> bool:
+    """Send RUBIK MOVE FB_ (inverse Front and Back together)."""
+    return move("FB_", session=session)
 
-def move_U_D(*, session=None) -> bool:
-    """Send RUBIK MOVE U'D' (inverse Up and Down together)."""
-    return move("U_D", session=session)
+def move_F_B(*, session=None) -> bool:
+    """Send RUBIK MOVE F_B (inverse Front and Back together)."""
+    return move("F_B", session=session)
 
-def move_U_D_(*, session=None) -> bool:
-    """Send RUBIK MOVE U'D'_ (inverse Up and Down together)."""
-    return move("U_D_", session=session)
+def move_F_B_(*, session=None) -> bool:
+    """Send RUBIK MOVE F_B_ (inverse Front and Back together)."""
+    return move("F_B_", session=session)
 
 
 

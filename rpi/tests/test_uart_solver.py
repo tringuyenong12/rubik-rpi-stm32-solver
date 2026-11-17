@@ -49,6 +49,41 @@ class Device:
 
 
 class TestUARTSolver(unittest.TestCase):
+    def test_combined_solution_is_validated_and_sent_as_paired_uart_commands(self):
+        cube = SOLVED_CUBE
+        from rubik_robot.vision.solve_guide import apply_move
+        for token in ('F', "B'", 'L2', "R'"):
+            cube = apply_move(cube, token)
+        device = Device()
+        with patch('serial.Serial', return_value=device):
+            result = send_solution(cube, 'COM_TEST', solution="R L2 B F'")
+        self.assertEqual(result.completed, 2)
+        self.assertEqual(device.writes, [b'#1 RUBIK PING\n', b'#2 RUBIK MOVE LR\n',
+                                       b'#3 RUBIK MOVE L\n', b'#4 RUBIK MOVE F_B\n'])
+
+    def test_paired_half_turn_failure_counts_both_completed_faces(self):
+        device = Device(fail_at=3)
+        with patch('serial.Serial', return_value=device):
+            with self.assertRaises(ScrambleSendError) as caught:
+                send_actions(MotionPlanner().plan('L2 R2 F'), 'COM_TEST')
+        self.assertEqual(caught.exception.completed, 0)
+        self.assertEqual(caught.exception.completed_quarter_turns, 2)
+        self.assertEqual(len(device.writes), 3)
+
+    def test_move_accepts_pair_tokens_and_rejects_invalid_input_before_uart(self):
+        from unittest.mock import Mock
+        session = Mock()
+        for token in ('LR', 'LR_', 'L_R', 'L_R_', 'FB', 'FB_', 'F_B', 'F_B_'):
+            self.assertTrue(motion.move(token, session=session))
+            session.request.assert_called_with('RUBIK MOVE ' + token)
+        self.assertTrue(motion.move("l'r'", session=session))
+        session.request.assert_called_with('RUBIK MOVE L_R_')
+        session.reset_mock()
+        for token in ('UD', 'RL', 'LF', 'L2R', 'L R', 'LR\nF', None):
+            with self.assertRaises(ValueError):
+                motion.move(token, session=session)
+        session.request.assert_not_called()
+
     def test_sessions_cannot_open_the_same_port_concurrently(self):
         device = Device()
         with patch('serial.Serial', return_value=device), SerialLink('COM_TEST') as first:

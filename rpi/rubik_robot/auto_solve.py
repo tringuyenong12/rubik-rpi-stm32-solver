@@ -162,10 +162,14 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
     frames = ''.join(action.to_wire() + '\n' for action in actions)
     result = {'cube': cube, 'solution': solution, 'uart': frames, 'position_colors': dict(position_colors)}
     emit('solution', result)
-    for index, (token, action) in enumerate(zip(solution.split(), actions), 1):
+    for index, action in enumerate(actions, 1):
+        tokens = [face + {1: '', -1: "'", 2: '2'}[turns]
+                  for face, turns in action.command.moves]
+        token = ' '.join(tokens)
         emit('status', f'Sending solution {index}/{len(actions)}: {token}')
         send(action.command)
-        cube = apply_move(cube, token)
+        for move in tokens:
+            cube = apply_move(cube, move)
         emit('move', (index, len(actions), machine_faces(cube, position_colors)))
     emit('status', 'AUTO SOLVE COMPLETE — all solution commands confirmed by DONE.')
     return result

@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-//#<ID> CONTROL SERVO <servo_id> <position>
+//#<ID> CONTROL SERVO <servo_id> <position> [second_position]
 
 enum { CONTROL_UNKNOWN, CONTROL_SERVO };
 
@@ -31,9 +31,19 @@ void Control_CommandHandler(uint8_t argc, char *argv[], uint16_t command_id)
     {
     case CONTROL_SERVO:
     {
-        if (argc != 5U) { UART_Error(command_id, "BAD_ARG"); return; }
+        if (argc != 5U && argc != 6U) { UART_Error(command_id, "BAD_ARG"); return; }
 
         const char *id_text = argv[3];
+        Servo_ID_t ids[2];
+        unsigned int id_count = 1U;
+        /* Nhan dung token cap truoc khi chuyen so: 02 khong phai ID 2. */
+        if (strcmp(id_text, "02") == 0 || strcmp(id_text, "13") == 0 ||
+            strcmp(id_text, "46") == 0 || strcmp(id_text, "57") == 0)
+        {
+            ids[0] = (Servo_ID_t)(id_text[0] - '0');
+            ids[1] = (Servo_ID_t)(id_text[1] - '0');
+            id_count = 2U;
+        }
         if (*id_text == '\0') { UART_Error(command_id, "BAD_ARG"); return; }
         for (const char *p = id_text; *p != '\0'; p++)
         {
@@ -44,37 +54,50 @@ void Control_CommandHandler(uint8_t argc, char *argv[], uint16_t command_id)
         char *end;
         errno = 0;
         unsigned long id = strtoul(id_text, &end, 10);
-        if (errno == ERANGE || *end != '\0' || id >= SERVO_COUNT)
+        if (errno == ERANGE || *end != '\0' ||
+            (id_count == 1U && id >= SERVO_COUNT))
         { UART_Error(command_id, "INVALID_POSITION"); return; }
+        if (id_count == 1U) ids[0] = (Servo_ID_t)id;
+        if (id_count == 1U && argc != 5U)
+        { UART_Error(command_id, "BAD_ARG"); return; }
 
-        const char *position_text = argv[4];
-        int position = -1;
-        bool result;
-
-        if (id <= SERVO_ROTATE_LEFT)
+        int positions[2];
+        /* Kiem tra tat ca vi tri truoc khi gui bat ky lenh servo nao. */
+        for (unsigned int i = 0U; i < id_count; ++i)
         {
-            if (strcmp(position_text, "HOME") == 0) position = SERVO_ROTATE_HOME;
-            else if (strcmp(position_text, "CLOCK") == 0) position = SERVO_ROTATE_CLOCKWISE;
-            else if (strcmp(position_text, "ANTI") == 0) position = SERVO_ROTATE_ANTICLOCKWISE;
-
+            const char *position_text = argv[(argc == 6U) ? 4U + i : 4U];
+            int position = -1;
+            if (ids[i] <= SERVO_ROTATE_LEFT)
+            {
+                if (strcmp(position_text, "HOME") == 0) position = SERVO_ROTATE_HOME;
+                else if (strcmp(position_text, "CLOCK") == 0) position = SERVO_ROTATE_CLOCKWISE;
+                else if (strcmp(position_text, "ANTI") == 0) position = SERVO_ROTATE_ANTICLOCKWISE;
+            }
+            else
+            {
+                if (strcmp(position_text, "FULL_RELEASE") == 0) position = SERVO_MOVE_FULL_RELEASE;
+                else if (strcmp(position_text, "HALF_RELEASE") == 0) position = SERVO_MOVE_HALF_RELEASE;
+                else if (strcmp(position_text, "CLAMP") == 0) position = SERVO_MOVE_CLAMP;
+                else if (strcmp(position_text, "TIGHT_CLAMP") == 0) position = SERVO_MOVE_TIGHT_CLAMP;
+            }
             if (position < 0) { UART_Error(command_id, "INVALID_POSITION"); return; }
-            UART_Accept(command_id);
-            result = Servo_Rotate((Servo_ID_t)id, (Servo_Rotate_Position_t)position);
+            positions[i] = position;
         }
-        else
-        {
-            if (strcmp(position_text, "FULL_RELEASE") == 0) position = SERVO_MOVE_FULL_RELEASE;
-            else if (strcmp(position_text, "HALF_RELEASE") == 0) position = SERVO_MOVE_HALF_RELEASE;
-            else if (strcmp(position_text, "CLAMP") == 0) position = SERVO_MOVE_CLAMP;
-            else if (strcmp(position_text, "TIGHT_CLAMP") == 0) position = SERVO_MOVE_TIGHT_CLAMP;
 
-            if (position < 0) { UART_Error(command_id, "INVALID_POSITION"); return; }
-            UART_Accept(command_id);
-            result = Servo_Move((Servo_ID_t)id, (Servo_Move_Position_t)position);
+        UART_Accept(command_id);
+        bool result = true;
+        for (unsigned int i = 0U; i < id_count; ++i)
+        {
+            bool ok;
+            if (ids[i] <= SERVO_ROTATE_LEFT)
+                ok = Servo_Rotate(ids[i], (Servo_Rotate_Position_t)positions[i]);
+            else
+                ok = Servo_Move(ids[i], (Servo_Move_Position_t)positions[i]);
+            result = ok && result;
         }
 
         if (!result) { UART_Error(command_id, "EXEC_FAILED"); return; }
-        waitUntilServosDone();
+        if (!waitUntilServosDone()) { UART_Error(command_id, "EXEC_FAILED"); return; }
         UART_Done(command_id);
         break;
     }

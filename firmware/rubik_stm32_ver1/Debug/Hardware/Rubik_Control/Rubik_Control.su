@@ -14,3 +14,14 @@
 ../Hardware/Rubik_Control/Rubik_Control.c:422:7:Rubik_Down_ToFront	8	static
 ../Hardware/Rubik_Control/Rubik_Control.c:499:7:Rubik_Front_Back_Move_Full_Release	8	static
 ../Hardware/Rubik_Control/Rubik_Control.c:507:8:Rubik_Left_Right_Move_Full_Release	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:514:6:Rubik_LR	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:536:6:Rubik_LR_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:554:6:Rubik_L_R	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:571:6:Rubik_L_R_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:588:6:Rubik_FB	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:603:6:Rubik_FB_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:620:6:Rubik_F_B	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:636:6:Rubik_F_B_	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:653:6:Rubik_Reset	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:671:6:Rubik_Prepare	8	static
+../Hardware/Rubik_Control/Rubik_Control.c:687:6:Rubik_Put	8	static

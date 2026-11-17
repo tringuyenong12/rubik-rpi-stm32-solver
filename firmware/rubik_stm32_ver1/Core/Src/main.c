@@ -102,7 +102,7 @@ int main(void)
   HAL_UART_Transmit(&huart1, uart_alive, sizeof(uart_alive) - 1U, 20U);
   PCA9685_Init(50); // 50Hz for servo
   Servo_Init();
-  Servo_Start_Position();
+  Rubik_Put();
   //Rubik_Hold_Start_Position();
   // UART_Command_Init(&huart1);
   /* USER CODE END 2 */

@@ -511,8 +511,202 @@ void Rubik_Left_(){
       return;
  }
 
+void Rubik_LR(){
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_CLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_CLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm trai va phai ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+        // Kep chat hai mat trai va phai cua Rubik
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+
+    return;
+}
+
+void Rubik_LR_(){
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_CLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_ANTICLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm trai va phai ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
 
 
+    return;
+}
+
+void Rubik_L_R(){
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_ANTICLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_CLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm trai va phai ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    return;
+}
+
+void Rubik_L_R_(){
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_ANTICLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_ANTICLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm trai va phai ra
+    // Rut arm LEFT va RIGHT ra
+    Rubik_Left_Right_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm trai va phai ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    return;
+}
+
+void Rubik_FB(){
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_CLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_CLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm truoc va sau ra
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm truoc va sau ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+    return;
+}
+
+void Rubik_FB_(){
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_CLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_ANTICLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm truoc va sau ra
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm truoc va sau ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    return;
+}
+
+
+void Rubik_F_B(){
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_ANTICLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_CLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm truoc va sau ra
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm truoc va sau ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+    return;
+}
+
+
+void Rubik_F_B_(){
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_ANTICLOCKWISE);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_ANTICLOCKWISE);
+    waitUntilServosDone();
+
+    // Rut arm truoc va sau ra
+    Rubik_Front_Back_Move_Full_Release();
+    waitUntilServosDone();
+
+    // Xoay arm truoc va sau ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+    return;
+}
+
+
+
+void Rubik_Reset(void){
+    // Dua tat ca cac arm ve trang thai ban dau
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_FULL_RELEASE);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_FULL_RELEASE);
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_FULL_RELEASE);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_FULL_RELEASE);
+
+    waitUntilServosDone();
+
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+
+
+    waitUntilServosDone();
+}
+
+void Rubik_Prepare(void){   // Đưa Rubik về trạng thái chuẩn bị để thực hiện các lệnh xoay Rubik
+    // Dua tat ca cac arm ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+    waitUntilServosDone();
+
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+    waitUntilServosDone();
+}
+
+
+void Rubik_Put(void){ // Đưa các cánh tay về trạng thái đặt Rubik để người đưa hoặc lấy Rubik ra khỏi máy
+    // Dua tat ca cac arm ve trang thai ban dau
+    Servo_Rotate(SERVO_ROTATE_FRONT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_RIGHT, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_BACK, SERVO_ROTATE_HOME);
+    Servo_Rotate(SERVO_ROTATE_LEFT, SERVO_ROTATE_HOME);
+
+    waitUntilServosDone();
+    Servo_Move(SERVO_MOVE_FRONT, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_BACK, SERVO_MOVE_CLAMP);
+    Servo_Move(SERVO_MOVE_RIGHT, SERVO_MOVE_CLAMP);
+        Servo_Move(SERVO_MOVE_LEFT, SERVO_MOVE_FULL_RELEASE);
+
+    waitUntilServosDone();
+}
 
 
 

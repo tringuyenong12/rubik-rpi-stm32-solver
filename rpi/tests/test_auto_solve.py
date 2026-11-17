@@ -1,6 +1,6 @@
 """Check pose geometry, six-face transactions, cancellation and independent navigation."""
 
-from collections import deque
+from collections import Counter, deque
 from itertools import permutations, product
 from threading import Event
 from types import SimpleNamespace
@@ -84,7 +84,9 @@ class TestAutoFlow(unittest.TestCase):
         exported = next(i for i, item in enumerate(self.trace) if item[0] == 'solution')
         first_turn = next(i for i, item in enumerate(self.trace) if item[0] == 'command' and item[1].startswith('RUBIK MOVE'))
         self.assertLess(exported, first_turn)
-        self.assertEqual(len(result['uart'].splitlines()), sum(2 if token.endswith('2') else 1 for token in SOLUTION.split()))
+        self.assertEqual(len(result['uart'].splitlines()),
+                         sum(2 if token.endswith('2') else 1 for token in SOLUTION.split()) - 1)
+        self.assertIn('RUBIK MOVE FB', result['uart'].splitlines())
         self.assertEqual([v for k, v in self.trace if k == 'move'][-1][2], cube_faces(SOLVED_CUBE))
 
     def test_fixed_route_geometry_and_restore(self):
@@ -263,9 +265,11 @@ class TestAutoFlow(unittest.TestCase):
                 self.assertEqual(len([v for k, v in trace if k == 'face'][5]), 6)
                 final_faces = [v for k, v in trace if k == 'move'][-1][2]
                 self.assertTrue(all(values == (color,)*9 for color, values in final_faces.items()))
-                turns = [call.args[0].face for call in link.request_completed.call_args_list
-                         if call.args[0].name == 'MOVE']
-                self.assertEqual(turns, [token[0] for token in expected_solution.split()])
+                turns = [face + {1: '', -1: "'", 2: '2'}[count]
+                         for call in link.request_completed.call_args_list
+                         if call.args[0].name == 'MOVE'
+                         for face, count in call.args[0].moves]
+                self.assertEqual(Counter(turns), Counter(expected_solution.split()))
 
 
 class TestAutoCamera(unittest.TestCase):

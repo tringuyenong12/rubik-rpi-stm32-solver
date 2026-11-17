@@ -19,8 +19,9 @@ def solution_plan(cube, solution=None, duration_ms=450):
     actions = MotionPlanner(default_duration_ms=duration_ms).plan(solution)
     for action in actions:
         move = action.command
-        for _ in range(move.turns % 4):
-            cubie.multiply(basicMoveCube['URFDLB'.index(move.face)])
+        for face, turns in move.moves:
+            for _ in range(turns % 4):
+                cubie.multiply(basicMoveCube['URFDLB'.index(face)])
     if cubie.to_facelet_cube().to_string() != SOLVED_CUBE:
         raise ValueError('Solution does not solve the supplied cube; no UART commands sent')
     return solution, actions

@@ -66,7 +66,7 @@ class SerialLink:
                     if not getattr(motion, 'move_' + token)(session=self.session):
                         error = self.session.last_error or RuntimeError('Move failed')
                         raise MoveExecutionError(str(error), completed) from error
-                    completed += 1
+                    completed += sum(face in token for face in 'URFDLB')
                 return f'>#{self.session.command_id} DONE'
             finally:
                 self.session.done_timeout = old_timeout

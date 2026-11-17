@@ -20,10 +20,23 @@ class MotionPlanner:
         self.face_turn_command = face_turn_command
 
     def plan(self, solution: str) -> list[PlannedAction]:
+        """Merge adjacent LR/FB turns in either order using firmware pair moves."""
         actions: list[PlannedAction] = []
-        for token in solution.split():
-            face, turns = self._parse_move(token)
+        moves = [self._parse_move(token) for token in solution.split()]
+        index = 0
+        while index < len(moves):
+            face, turns = moves[index]
+            index += 1
+            second_face = second_turns = None
+            if index < len(moves) and {face, moves[index][0]} in ({"L", "R"}, {"F", "B"}):
+                second_face, second_turns = moves[index]
+                index += 1
+                if face in {"R", "B"}:
+                    face, second_face = second_face, face
+                    turns, second_turns = second_turns, turns
             duration = self.default_duration_ms * (2 if turns == 2 else 1)
+            if second_turns == 2:
+                duration = self.default_duration_ms * 2
             actions.append(
                 PlannedAction(
                     command=MoveCommand(
@@ -31,6 +44,8 @@ class MotionPlanner:
                         turns=turns,
                         duration_ms=duration,
                         command_name=self.face_turn_command,
+                        second_face=second_face,
+                        second_turns=second_turns,
                     ),
                     cost_ms=duration,
                 )
