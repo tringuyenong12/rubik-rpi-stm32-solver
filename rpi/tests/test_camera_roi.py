@@ -13,6 +13,30 @@ from twophase import vision2
 
 
 class TestCameraROI(unittest.TestCase):
+    def test_reverse_corner_clicks_do_not_mirror_the_face(self):
+        with TemporaryDirectory() as directory:
+            roi = CameraROI(Path(directory) / 'roi.json')
+            roi.load(0)
+            roi.bounds((480, 640, 3))
+            roi.picking = []
+            # Left, bottom, right, top used to reflect the grid.
+            for x, y in ((100, 240), (300, 440), (500, 240), (300, 40)):
+                roi.mouse(cv2.EVENT_LBUTTONDOWN, x, y, 0, None)
+            expected = ((100, 240), (300, 40), (500, 240), (300, 440))
+            np.testing.assert_allclose(roi.selection((480, 640, 3)), expected, atol=.001)
+            roi.load(0)
+            np.testing.assert_allclose(roi.selection((480, 640, 3)), expected, atol=.001)
+
+    def test_legacy_reversed_settings_are_loaded_without_reflection(self):
+        import json
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / 'roi.json'
+            path.write_text(json.dumps({'0': {'corners': [[.2, .5], [.5, .9], [.8, .5], [.5, .1]]}}))
+            roi = CameraROI(path)
+            roi.load(0)
+            self.assertGreater(cv2.contourArea(np.float32(roi.corners), oriented=True), 0)
+            np.testing.assert_allclose(roi.corners[0], (.2, .5))
+
     def test_cached_polygon_shading_preserves_stickers_and_updates_after_roi_changes(self):
         roi = CameraROI()
         roi.corners = ((.4, .3), (.6, .3), (.6, .7), (.4, .7))

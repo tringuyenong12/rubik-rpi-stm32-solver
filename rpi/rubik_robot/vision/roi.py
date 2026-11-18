@@ -10,6 +10,14 @@ FACE_SIZE = 360
 FACE_MARGIN = 64  # Search 18% beyond each face edge without scaling its grid.
 
 
+def ordered_corners(corners):
+    """Keep the chosen first corner while preventing a mirrored sticker grid."""
+    points = np.asarray(corners, dtype=np.float32)
+    if cv2.contourArea(points, oriented=True) < 0:
+        points = points[[0, 3, 2, 1]]
+    return tuple(tuple(float(v) for v in point) for point in points)
+
+
 def expanded_corners(corners):
     """Project a small border around the face without moving its calibrated grid."""
     edge = FACE_SIZE - 1
@@ -51,7 +59,7 @@ class CameraROI:
                 if (corners.shape == (4, 2) and np.all(np.isfinite(corners))
                         and np.all((corners >= 0) & (corners <= 1))
                         and cv2.isContourConvex(corners) and cv2.contourArea(corners) > .001):
-                    self.corners = tuple(tuple(float(v) for v in point) for point in corners)
+                    self.corners = ordered_corners(corners)
                 values = values.get('rectangle')
             if (isinstance(values, list) and len(values) == 4
                     and all(isinstance(v, (int, float)) and 0 <= v <= 1 for v in values)
@@ -98,7 +106,7 @@ class CameraROI:
                 if len(self.picking) == 4:
                     corners = np.asarray(self.picking, dtype=np.float32)
                     if cv2.isContourConvex(corners) and cv2.contourArea(corners) > .01:
-                        self.corners = tuple(self.picking)
+                        self.corners = ordered_corners(corners)
                         self.save()
                     else:
                         self.message = 'Invalid corners: press P to retry'

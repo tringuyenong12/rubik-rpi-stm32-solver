@@ -81,13 +81,13 @@ class TestScanTransition(unittest.TestCase):
         self.assertFalse(vision2.center_color_confident((vision_params.orange_L+.2, 180, 200), 'orange'))
         self.assertTrue(vision2.center_color_confident((0, 180, 200), 'red'))
 
-    def test_camera_requires_one_and_a_half_seconds_despite_many_fast_frames(self):
+    def test_camera_requires_full_hold_despite_many_fast_frames(self):
         scanner = new_camera_scanner()
         orange = [['orange'] * 3 for _ in range(3)]
         for index in range(30):
-            scanner.update(orange, now=index*.05)
+            scanner.update(orange, now=scanner.stable_seconds*index/30)
         self.assertFalse(scanner.snapshot()['faces'])
-        scanner.update(orange, now=1.5)
+        scanner.update(orange, now=scanner.stable_seconds)
         self.assertEqual(set(scanner.snapshot()['faces']), {'orange'})
 
     def test_red_to_orange_correction_gets_a_fresh_long_hold(self):
@@ -95,9 +95,10 @@ class TestScanTransition(unittest.TestCase):
         for index in range(16):
             scanner.update([['red'] * 3 for _ in range(3)], now=index*.05)
         for index in range(30):
-            scanner.update([['orange'] * 3 for _ in range(3)], now=.8+index*.05)
+            scanner.update([['orange'] * 3 for _ in range(3)],
+                           now=.8+scanner.stable_seconds*index/30)
         self.assertFalse(scanner.snapshot()['faces'])
-        scanner.update([['orange'] * 3 for _ in range(3)], now=2.31)
+        scanner.update([['orange'] * 3 for _ in range(3)], now=.81+scanner.stable_seconds)
         self.assertEqual(set(scanner.snapshot()['faces']), {'orange'})
 
 

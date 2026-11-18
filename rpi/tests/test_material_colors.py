@@ -9,6 +9,17 @@ from twophase import vision2, vision_params
 
 
 class TestMaterialColors(unittest.TestCase):
+    def test_measured_c270_red_glare_and_orange_remain_separate(self):
+        # Live C270 samples: red highlight H=7-8, orange H=10-11.
+        for hue, saturation, expected in ((7, 84, 'red'), (8, 84, 'red'),
+                                           (10, 255, 'orange'), (11, 255, 'orange')):
+            with self.subTest(hue=hue):
+                hsv = np.full((120, 120, 3), (hue, saturation, 152), dtype=np.float32)
+                with patch.multiple(vision2, hsv=hsv, width=120, height=120, create=True), \
+                        patch.object(vision_params, 'sat_W', 35), \
+                        patch.object(vision_params, 'orange_L', 9):
+                    self.assertEqual(vision2.getcolor((60, 60), radius=18)[1], expected)
+
     def classify(self, hsv):
         with patch.multiple(vision2, hsv=hsv, width=80, height=80, create=True), \
                 patch.object(vision_params, 'sat_W', 35), patch.object(vision_params, 'orange_L', 6):

@@ -22,6 +22,7 @@ performance_recorder = None
 camera_stop = Event()
 camera_error = ""
 face_rejection = ""
+face_stability_hsv = None
 face_centers = []
 face_boxes = []
 sticker_boxes = []
@@ -543,8 +544,9 @@ def detect_face(frame, roi=None, include_masks=True):
     """Detect only inside optional (x1, y1, x2, y2), returning full-frame geometry."""
     global width, height, hsv, cent, sticker_boxes, face_centers, face_boxes
     global color_mask, white_mask, black_mask
-    global face_rejection
+    global face_rejection, face_stability_hsv
     face_rejection = ''
+    face_stability_hsv = None
     if roi is None:
         return _detect_face(frame)
     if np.asarray(roi).shape == (4, 2):
@@ -644,14 +646,22 @@ def _prepare_calibrated_grid(frame, include_masks=True):
 def _sample_calibrated_grid(offset=(0, 0)):
     """Check nine patches without rebuilding full-image HSV or filter masks."""
     global cent, sticker_boxes, face_centers, face_boxes
-    global face_rejection
+    global face_rejection, face_stability_hsv
     face_rejection = ''
+    face_stability_hsv = None
     cent, sticker_boxes, face_centers, face_boxes = [], [], [], []
     samples = []
+    stability_samples = []
     for row in range(3):
         for col in range(3):
             x, y = col*120 + 60 + offset[0], row*120 + 60 + offset[1]
             patch = hsv[y-18:y+18, x-18:x+18]
+            stability_sample = np.median(patch.reshape(-1, 3), axis=0)
+            angles = patch[:, :, 0].astype(float) * np.pi / 90
+            weights = patch[:, :, 1].astype(float) + 1
+            stability_sample[0] = (np.arctan2(np.sum(np.sin(angles)*weights),
+                                            np.sum(np.cos(angles)*weights)) % (2*np.pi)) * 90 / np.pi
+            stability_samples.append(stability_sample)
             sample, color = getcolor((x, y), radius=18)
             location = f'Cell {row+1},{col+1}'
             measurement = 'HSV ' + '/'.join(str(round(float(value))) for value in sample)
@@ -688,6 +698,7 @@ def _sample_calibrated_grid(offset=(0, 0)):
             sticker_boxes.append(box)
             samples.append((sample, color))
     face_centers, face_boxes = list(cent), list(sticker_boxes)
+    face_stability_hsv = np.asarray(stability_samples).reshape(3, 3, 3)
     return ([[samples[row*3+col][0] for col in range(3)] for row in range(3)],
             [[samples[row*3+col][1] for col in range(3)] for row in range(3)])
 
@@ -778,6 +789,17 @@ def draw_scan_overlay(frame, colors, state, boxes_override=None):
     text = f"{len(state['faces'])}/6 faces | {detection} | {state['message']}"
     cv2.rectangle(frame, (0, frame.shape[0] - 24), (frame.shape[1], frame.shape[0]), (25, 25, 25), -1)
     cv2.putText(frame, text, (8, frame.shape[0] - 8), cv2.FONT_HERSHEY_SIMPLEX, .38, (240, 240, 240), 1, cv2.LINE_AA)
+    notice = state.get('capture_notice')
+    if notice:
+        # OpenCV's built-in font does not support Vietnamese accents.
+        heading, instruction = notice
+        banner_top = max(32, frame.shape[0] - 146)
+        cv2.rectangle(frame, (6, banner_top), (frame.shape[1] - 7, banner_top + 62), (30, 125, 30), -1)
+        for offset, text in ((25, heading), (49, instruction)):
+            scale = min(.65, (frame.shape[1] - 32) / max(1, cv2.getTextSize(
+                text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0][0]))
+            cv2.putText(frame, text, (16, banner_top + offset), cv2.FONT_HERSHEY_SIMPLEX,
+                        scale, (255, 255, 255), 2, cv2.LINE_AA)
     return frame
 
 
@@ -832,6 +854,9 @@ def grab_colors(camera_id=0, backend=None, show_masks=True, warmup_seconds=CAMER
         warmup_until = monotonic() + warmup_seconds
         windows_ready = False
         preview = StableScanPreview()
+        saved_centers = set(scanner.snapshot()['faces'])
+        capture_notice = None
+        notice_until = 0.0
         while not camera_stop.is_set():
             tick_start = perf_counter()
             ok, frame = cap.read()
@@ -863,8 +888,24 @@ def grab_colors(camera_id=0, backend=None, show_masks=True, warmup_seconds=CAMER
                 preview.reset()
             preview_colors, preview_boxes = preview.update(frame, vision_params.face_col, face_boxes,
                                                           roi, now=perf_counter())
-            scanner.update(vision_params.face_col, hsv_grid=vision_params.face_hsv, displayed_grid=preview_colors)
+            scanner.update(vision_params.face_col, hsv_grid=vision_params.face_hsv,
+                           displayed_grid=preview_colors, stability_hsv_grid=face_stability_hsv)
             state = scanner.snapshot()
+            centers = set(state['faces'])
+            added = centers - saved_centers
+            if saved_centers - centers:
+                capture_notice = None
+            if added:
+                names = {'yellow': 'VANG', 'green': 'XANH LA', 'red': 'DO',
+                         'white': 'TRANG', 'blue': 'XANH DUONG', 'orange': 'CAM'}
+                center = sorted(added)[-1]
+                capture_notice = (f"DA LUU MAT {names[center]} ({len(centers)}/6)",
+                                  'DA DU 6 MAT - DANG KIEM TRA' if len(centers) == 6
+                                  else 'XOAY MAT TIEP - KHONG CAN CHO')
+                notice_until = tick_start + 2.0
+            saved_centers = centers
+            if capture_notice and tick_start < notice_until:
+                state['capture_notice'] = capture_notice
             if remaining > 0:
                 state['message'] = f'Camera settling: {remaining:.1f}s - wait before scanning'
             elif (not vision_params.face_col and face_rejection

@@ -25,7 +25,9 @@ class FaceScanner:
         self.faces = {}
         self.hsv_faces = {}
         self.hsv_observations = deque(maxlen=max(7, min_samples))
+        self.stability_observations = deque(maxlen=max(7, min_samples))
         self.revision = 0
+        self._saved_signals = deque()
         self.current = ()
         self.current_hsv = None
         self.current_confirmed = False
@@ -37,8 +39,8 @@ class FaceScanner:
         self.progress = 0
         self.message = "Show a face and hold still"
 
-    def update(self, grid, now=None, hsv_grid=None, displayed_grid=None):
-        """Input: detected grid and optional clock. Output: update session state."""
+    def update(self, grid, now=None, hsv_grid=None, displayed_grid=None, stability_hsv_grid=None):
+        """Input: detected grid and optional clock. Output: True only when this frame saves a face."""
         now = monotonic() if now is None else now
         valid = len(grid) == 3 and all(len(row) == 3 for row in grid)
         face = tuple(color for row in grid for color in row) if valid else ()
@@ -46,6 +48,9 @@ class FaceScanner:
             face = ()
         numeric = np.asarray(hsv_grid, dtype=float) if hsv_grid is not None else np.asarray([])
         sample = numeric.reshape(9, 3) if numeric.shape == (3, 3, 3) and np.all(np.isfinite(numeric)) else None
+        stability = np.asarray(stability_hsv_grid, dtype=float) if stability_hsv_grid is not None else numeric
+        stability_sample = (stability.reshape(9, 3) if stability.shape == (3, 3, 3)
+                            and np.all(np.isfinite(stability)) else None)
         shown = (tuple(color for row in displayed_grid for color in row)
                  if displayed_grid is not None and len(displayed_grid) == 3
                  and all(len(row) == 3 for row in displayed_grid) else ())
@@ -61,11 +66,11 @@ class FaceScanner:
                 if now - self.last_valid > 0.25:
                     self._clear_hold()
                 self.message = "Looking for all 9 stickers"
-                return
+                return False
             self.missing_since = None
             if not self.enabled:
                 self.message = "Auto scan paused"
-                return
+                return False
             center = face[4]
             if self.require_transition:
                 # A center-label flicker cannot turn the same eight stickers
@@ -75,7 +80,7 @@ class FaceScanner:
                     if center != saved_center and differences <= 1:
                         self._clear_hold()
                         self.message = f'Center uncertain: still looks like {saved_center}'
-                        return
+                        return False
                 if self.last_captured and not self.transition_ready:
                     changes = sum(a != b for i, (a, b) in enumerate(zip(face, self.last_captured)) if i != 4)
                     if changes >= 3:
@@ -83,13 +88,13 @@ class FaceScanner:
                     else:
                         self._clear_hold()
                         self.message = 'Saved - turn to a different face before scanning again'
-                        return
+                        return False
             if center in self.faces:
                 self._clear_hold()
                 self.message = f"{center}: already saved - show another face"
                 if len(self.faces) == 6:
                     self.message = self._count_summary()
-                return
+                return False
             if not self.pending or center != self.pending[4]:
                 self._clear_hold()
                 self.pending, self.started, self.samples = face, now, 0
@@ -101,33 +106,34 @@ class FaceScanner:
                 # A persistent one-sticker change needs a fresh full hold too.
                 self._clear_hold()
                 self.pending, self.started = face, now
-            if self.require_transition and sample is not None and self.hsv_observations:
-                previous = self.hsv_observations[-1]
+            if self.require_transition and stability_sample is not None and self.stability_observations:
+                previous = self.stability_observations[-1]
                 if previous is not None:
-                    hue_change = abs((sample[4, 0] - previous[4, 0] + 90) % 180 - 90)
-                    sv_change = np.abs(sample[4, 1:] - previous[4, 1:])
-                    if ((min(sample[4, 1], previous[4, 1]) > 35 and hue_change > 5)
+                    hue_change = abs((stability_sample[4, 0] - previous[4, 0] + 90) % 180 - 90)
+                    sv_change = np.abs(stability_sample[4, 1:] - previous[4, 1:])
+                    if ((min(stability_sample[4, 1], previous[4, 1]) > 35 and hue_change > 5)
                             or sv_change[0] > 18 or sv_change[1] > 25):
                         self._clear_hold()
                         self.pending, self.started = face, now
             self.last_valid = now
             self.observations.append(face)
             self.hsv_observations.append(sample)
+            self.stability_observations.append(stability_sample)
             self.samples = len(self.observations)
             self.progress = min(99, int(100 * self.samples / self.min_samples))
             if self.stable_seconds > 0:
                 self.progress = min(self.progress, int(100 * max(0, now - self.started) / self.stable_seconds))
             self.message = f"Hold {center} still"
             if self.samples < self.min_samples or now - self.started < self.stable_seconds:
-                return
+                return False
             votes = [Counter(column).most_common(1)[0] for column in zip(*self.observations)]
             if any(count / self.samples < 0.8 for _, count in votes):
                 self.message = f"Checking {center} colors"
-                return
+                return False
             voted_face = tuple(color for color, _ in votes)
             if displayed_grid is not None and (not self.current_confirmed or voted_face != face):
                 self.message = f'Checking {center}: saved colors must match the current display'
-                return
+                return False
             samples = [sample for sample in self.hsv_observations if sample is not None]
             numeric_face = self._median_hsv(samples)
             if self._save_face(voted_face, numeric_face):
@@ -135,12 +141,24 @@ class FaceScanner:
                 self.transition_ready = False
                 self._clear_hold()
                 self.progress = 100
+                self._saved_signals.append(voted_face[4])
+                return True
+            return False
+
+    def consume_face_saved(self):
+        """Return True once per captured face; thread-safe for a controller loop."""
+        with self.lock:
+            if not self._saved_signals:
+                return False
+            self._saved_signals.popleft()
+            return True
 
     def _clear_hold(self):
         """Input: locked session. Output: clear the current voting window."""
         self.pending, self.samples, self.progress = (), 0, 0
         self.observations.clear()
         self.hsv_observations.clear()
+        self.stability_observations.clear()
 
     def _median_hsv(self, samples):
         """Input: HSV frame samples. Output: median S/V with circular mean hue."""
@@ -176,7 +194,11 @@ class FaceScanner:
         with self.lock:
             if not self.current or not self.current_confirmed:
                 return False
-            return self._save_face(self.current, self.current_hsv)
+            is_new = self.current[4] not in self.faces
+            saved = self._save_face(self.current, self.current_hsv)
+            if saved and is_new:
+                self._saved_signals.append(self.current[4])
+            return saved
 
     def edit(self, center, index, color):
         """Input: saved sticker/color. Output: apply a manual label correction, retaining center samples."""
@@ -191,6 +213,7 @@ class FaceScanner:
     def set_verified_faces(self, faces):
         """Input: a confirmed six-face model. Output: synchronize editor state after guidance."""
         with self.lock:
+            self._saved_signals.clear()
             self.faces = {center: tuple(values) for center, values in faces.items()}
             self.hsv_faces.clear()
             self.revision += 1
@@ -234,6 +257,7 @@ class FaceScanner:
     def reset(self):
         """Input: none. Output: clear captured faces and resume acquisition."""
         with self.lock:
+            self._saved_signals.clear()
             self.faces.clear()
             self.hsv_faces.clear()
             self.revision += 1
@@ -250,6 +274,7 @@ class FaceScanner:
     def forget(self, center):
         """Input: center color. Output: remove that face for another acquisition."""
         with self.lock:
+            self._saved_signals = deque(c for c in self._saved_signals if c != center)
             self.faces.pop(center, None)
             self.hsv_faces.pop(center, None)
             if self.last_captured and self.last_captured[4] == center:
@@ -260,8 +285,8 @@ class FaceScanner:
 
 
 def new_camera_scanner():
-    """Use a longer hold for camera startup and orange/red settling."""
-    return FaceScanner(stable_seconds=1.5, min_samples=12, require_transition=True)
+    """Capture at 80% of the original hold, rounding 9.6 samples up to 10."""
+    return FaceScanner(stable_seconds=1.2, min_samples=10, require_transition=True)
 
 
 scanner = new_camera_scanner()
