@@ -352,5 +352,5 @@ void UART_Accept(uint16_t id) { UART_Reply(id, "OK", NULL); }
 void UART_Done(uint16_t id) { UART_Reply(id, "DONE", NULL); }
 void UART_Error(uint16_t id, const char *error) { UART_Reply(id, "ERR", error); }
 void UART_Command_Stop(uint16_t id){
-
+    (void)id;
 }

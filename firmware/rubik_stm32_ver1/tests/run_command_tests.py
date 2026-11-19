@@ -27,3 +27,15 @@ with tempfile.TemporaryDirectory(prefix="rubik-command-tests-") as folder:
         "tests/test_commands.c", *sources, "-o", output,
     ], cwd=root, check=True)
     subprocess.run([output, *(["--scan-only"] if args.scan_only else [])], check=True)
+    if args.scan_only:
+        replay = str(Path(folder, "auto_solve_uart.exe"))
+        subprocess.run([
+            "gcc", "-std=c11", "-Wall", "-Wextra", "-Werror",
+            "-include", str(shim), "-include", "stdbool.h",
+            "-I" + folder, "-Itests/host", "-IHardware/UART_Handle",
+            "tests/test_auto_solve_uart.c",
+            "Hardware/UART_Handle/UART_Handle.c",
+            "Hardware/UART_Handle/Rubik_Command.c",
+            "Hardware/Rubik_Control/Rubik_Control.c", "-o", replay,
+        ], cwd=root, check=True)
+        subprocess.run([replay], check=True)

@@ -61,3 +61,20 @@ Kiểm thử C với servo giả lập từ thư mục gốc:
 ```text
 python firmware/rubik_stm32_ver1/tests/run_command_tests.py --scan-only
 ```
+
+Bài kiểm thử này phát lại lộ trình UART qua parser thật và kiểm tra lệnh
+`#9 RUBIK MOVE F` trả `OK` rồi `DONE`. Nếu Pi gửi đúng lệnh nhưng bo trả
+`BAD_ARG`, hãy build và nạp lại firmware từ mã nguồn đang dùng. File ELF
+lưu sẵn trong `Debug/` có thể thuộc lần build cũ.
+
+Có thể tạo ELF mới từ thư mục gốc bằng lệnh sau khi đã có `arm-none-eabi-gcc`
+trong PATH. Nếu dùng toolchain trong CubeIDE, thêm `--gcc` với đường dẫn đầy đủ
+đến chương trình GCC.
+
+```text
+python firmware/rubik_stm32_ver1/build_firmware.py --output artifacts/firmware/rubik_stm32_ver1-autosolve.elf
+```
+
+Mở file ELF vừa tạo trong STM32CubeProgrammer, kết nối ST-LINK qua SWD rồi
+chọn nạp và xác minh bản nạp. Sau khi reset, đóng ứng dụng Auto Solve trên Pi
+và thử một lệnh `RUBIK MOVE F` qua terminal UART với cơ cấu đã sẵn sàng xoay.
