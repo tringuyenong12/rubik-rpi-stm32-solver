@@ -6,10 +6,11 @@
 #include "../Hardware/Servo_Control/Servo_Control.h"
 
 typedef struct { char kind; int id; int position; } Event;
-static Event events[32];
+static Event events[64];
 static unsigned count, accepted, done, errors;
 static int fail_id = -1;
 static const char *last_error;
+Servo_t servo[SERVO_COUNT];
 
 static void record(char kind, int id, int position)
 {
@@ -43,6 +44,66 @@ static void rubik(char *move)
     char *args[] = {"15", "RUBIK", "MOVE", move};
     Rubik_CommandHandler(4, args, 15);
 }
+
+static void scan(char *action, char *face)
+{
+    char *args[] = {"15", "RUBIK", action, face};
+    Rubik_CommandHandler(face ? 4 : 3, args, 15);
+}
+
+static void scan_quarter(unsigned offset, bool lr, bool clockwise)
+{
+    int first = lr ? SERVO_ROTATE_LEFT : SERVO_ROTATE_FRONT;
+    int second = lr ? SERVO_ROTATE_RIGHT : SERVO_ROTATE_BACK;
+    int support1 = lr ? SERVO_MOVE_FRONT : SERVO_MOVE_LEFT;
+    int support2 = lr ? SERVO_MOVE_BACK : SERVO_MOVE_RIGHT;
+    expect(offset, 'M', first + 4, SERVO_MOVE_TIGHT_CLAMP);
+    expect(offset + 1, 'M', second + 4, SERVO_MOVE_TIGHT_CLAMP);
+    expect(offset + 3, 'M', support1, SERVO_MOVE_FULL_RELEASE);
+    expect(offset + 4, 'M', support2, SERVO_MOVE_FULL_RELEASE);
+    expect(offset + 6, 'R', first, clockwise ? SERVO_ROTATE_CLOCKWISE : SERVO_ROTATE_ANTICLOCKWISE);
+    expect(offset + 7, 'R', second, clockwise ? SERVO_ROTATE_ANTICLOCKWISE : SERVO_ROTATE_CLOCKWISE);
+    expect(offset + 9, 'M', support1, SERVO_MOVE_CLAMP);
+    expect(offset + 10, 'M', support2, SERVO_MOVE_CLAMP);
+    expect(offset + 12, 'M', first + 4, SERVO_MOVE_FULL_RELEASE);
+    expect(offset + 13, 'M', second + 4, SERVO_MOVE_FULL_RELEASE);
+    expect(offset + 15, 'R', first, SERVO_ROTATE_HOME);
+    expect(offset + 16, 'R', second, SERVO_ROTATE_HOME);
+    expect(offset + 18, 'M', first + 4, SERVO_MOVE_CLAMP);
+    expect(offset + 19, 'M', second + 4, SERVO_MOVE_CLAMP);
+    for (unsigned i = 2; i < 21; i += 3) expect(offset + i, 'W', -1, -1);
+}
+
+static void test_scan(void)
+{
+    reset(); scan("SCAN_POSE", "F");
+    assert(!accepted && !done && !count && errors == 1 && !strcmp(last_error, "SCAN_NOT_READY"));
+    reset(); scan("SCAN_BEGIN", NULL);
+    assert(accepted == 1 && done == 1 && !errors && count == 5);
+    for (unsigned i = 0; i < 4; ++i) expect(i, 'M', i + 4, SERVO_MOVE_CLAMP);
+    expect(4, 'W', -1, -1);
+    reset(); scan("SCAN_POSE", "XX");
+    assert(!accepted && !done && !count && errors == 1 && !strcmp(last_error, "BAD_SCAN_POSE"));
+    char *route[] = {"F", "D", "B", "U", "R", "L", "U"};
+    for (unsigned n = 0; n < sizeof(route) / sizeof(route[0]); ++n) {
+        reset(); scan("SCAN_POSE", route[n]);
+        assert(accepted == 1 && done == 1 && !errors);
+        assert(count == (n == 5 ? 42U : 21U));
+        scan_quarter(0, n < 4, false);
+        if (n == 5) scan_quarter(21, false, false);
+    }
+    reset(); scan("SCAN_POSE", "U");
+    assert(accepted == 1 && done == 1 && !errors && !count);
+    reset(); fail_id = SERVO_MOVE_RIGHT; scan("SCAN_POSE", "F");
+    assert(accepted == 1 && !done && errors == 1 && count == 2);
+    assert(!strcmp(last_error, "SCAN_EXEC_FAILED"));
+    reset(); scan("SCAN_POSE", "U");
+    assert(!accepted && !done && errors == 1 && !count);
+    servo[SERVO_ROTATE_FRONT].state.rotate.current_angle = 90.0f;
+    reset(); scan("SCAN_BEGIN", NULL);
+    assert(accepted == 1 && !done && errors == 1 && !count);
+    assert(!strcmp(last_error, "SCAN_PREPARE_FAILED"));
+}
 #endif
 static void control(char *ids, char *position)
 {
@@ -54,9 +115,14 @@ static void control_two(char *ids, char *first, char *second)
     char *args[] = {"15", "CONTROL", "SERVO", ids, first, second};
     Control_CommandHandler(6, args, 15);
 }
-int main(void)
+int main(int argc, char *argv[])
 {
 #ifndef CONTROL_ONLY
+    test_scan();
+    if (argc == 2 && !strcmp(argv[1], "--scan-only")) {
+        puts("Auto Solve firmware scan tests passed.");
+        return 0;
+    }
     char *moves[] = {"LR", "L_R", "FB", "F_B"};
     for (unsigned n = 0; n < 4; ++n) {
         int first = n < 2 ? SERVO_ROTATE_LEFT : SERVO_ROTATE_FRONT;
@@ -74,6 +140,8 @@ int main(void)
         for (unsigned i = 2; i < 12; i += 3) expect(i, 'W', -1, -1);
     }
 #endif
+    (void)argc;
+    (void)argv;
     char *pairs[] = {"02", "13", "46", "57"};
     char *rotate_positions[] = {"HOME", "CLOCK", "ANTI"};
     char *move_positions[] = {"FULL_RELEASE", "HALF_RELEASE", "CLAMP", "TIGHT_CLAMP"};

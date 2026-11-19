@@ -1,6 +1,6 @@
 """Check pose geometry, six-face transactions, cancellation and independent navigation."""
 
-from collections import Counter, deque
+from collections import Counter
 from itertools import permutations, product
 from threading import Event
 from types import SimpleNamespace
@@ -17,7 +17,6 @@ from rubik_robot.auto_solve import (AutoCamera, AutoSolveCancelled, FACE_COLORS,
 from rubik_robot.auto_solve_panel import AutoSolveWorkspace
 from rubik_robot.cube.state import SOLVED_CUBE
 from rubik_robot.scramble_panel import ScrambleWorkspace
-from rubik_robot.transport.serial_link import SerialLink
 from rubik_robot.vision.solve_guide import NORMALS, RIGHT, DOWN, apply_move, cube_faces
 
 
@@ -33,18 +32,27 @@ class TestAutoFlow(unittest.TestCase):
         self.cancel = Event()
         self.trace = []
         self.faces = cube_faces(SCRAMBLED)
+        self.physical_cube = SCRAMBLED
         self.link = Mock()
         self.link.request_completed.side_effect = self.complete
+        self.link.request_scan.side_effect = self.complete_scan
 
     def complete(self, command, timeout_s):
         """Input: frame. Output: matching simulated completion recorded before capture."""
         self.trace.append(('done', command.to_wire()))
+        if command.name == 'MOVE':
+            for face, turns in command.moves:
+                self.physical_cube = apply_move(self.physical_cube, face + {1: '', -1: "'", 2: '2'}[turns])
         return 'OK PONG' if command.name == 'PING' else f'DONE {command.name}'
+
+    def complete_scan(self, body):
+        self.trace.append(('done', body))
+        return 'DONE'
 
     def capture(self, pose, seen_centers=()):
         """Input: absolute camera pose. Output: corresponding raw optical colors/HSV."""
         self.trace.append(('capture', pose.face))
-        colors = rotate_grid(self.faces[FACE_COLORS[pose.face]], -pose.correction)
+        colors = rotate_grid(cube_faces(self.physical_cube)[FACE_COLORS[pose.face]], -pose.correction)
         return colors, tuple(PROTOTYPES[color] for color in colors)
 
     def emit(self, kind, value):
@@ -68,25 +76,25 @@ class TestAutoFlow(unittest.TestCase):
         """Input: all six raw camera views. Output: exact original state and verified TURN plan."""
         result = self.run_flow()
         self.assertEqual(result['cube'], SCRAMBLED)
-        self.assertEqual([value for kind, value in self.trace if kind == 'capture'], list('UFDBRL'))
+        self.assertEqual([value for kind, value in self.trace if kind == 'capture'], list('UFDBRL' * 2))
         for index, (kind, face) in enumerate(self.trace):
             if kind == 'capture':
                 self.assertEqual(self.trace[index-1], ('status', f'Capturing machine position {face} — any new center color accepted...'))
                 if face != 'U':
-                    self.assertEqual(self.trace[index-2], ('done', f'SCAN_POSE {face}'))
+                    self.assertEqual(self.trace[index-2], ('done', f'RUBIK SCAN_POSE {face}'))
         initial = next(i for i, item in enumerate(self.trace) if item == ('capture', 'U'))
         ping = next(i for i, item in enumerate(self.trace) if item == ('command', 'RUBIK PING'))
-        self.assertLess(initial, ping)
+        self.assertLess(ping, initial)
         solved_at = next(i for i, item in enumerate(self.trace) if item[0] == 'solve')
         previous_commands = [v for k, v in self.trace[:solved_at] if k == 'done']
-        self.assertEqual(previous_commands[-1], 'SCAN_POSE U')
+        self.assertEqual(previous_commands[-1], 'RUBIK SCAN_POSE U')
         self.assertTrue(any(k == 'scan_complete' for k, _ in self.trace[:solved_at]))
         exported = next(i for i, item in enumerate(self.trace) if item[0] == 'solution')
         first_turn = next(i for i, item in enumerate(self.trace) if item[0] == 'command' and item[1].startswith('RUBIK MOVE'))
         self.assertLess(exported, first_turn)
         self.assertEqual(len(result['uart'].splitlines()),
-                         sum(2 if token.endswith('2') else 1 for token in SOLUTION.split()) - 1)
-        self.assertIn('RUBIK MOVE FB', result['uart'].splitlines())
+                         sum(2 if token.endswith('2') else 1 for token in SOLUTION.split()))
+        self.assertIn('RUBIK MOVE F\nRUBIK MOVE B\n', result['uart'])
         self.assertEqual([v for k, v in self.trace if k == 'move'][-1][2], cube_faces(SOLVED_CUBE))
 
     def test_fixed_route_geometry_and_restore(self):
@@ -108,33 +116,32 @@ class TestAutoFlow(unittest.TestCase):
                     raw[xyz[2]+1, xyz[0]+1] = r*3+c
             restored = np.rot90(raw, -pose.correction)
             np.testing.assert_array_equal(restored, np.arange(9).reshape(3, 3))
-        self.assertEqual(scan_commands().splitlines(), ['SCAN_POSE '+f for f in 'FDBURLU'])
+        self.assertEqual(scan_commands().splitlines(), ['RUBIK SCAN_POSE '+f for f in 'FDBURLU'])
 
     def test_bad_grid_stops_before_uart(self):
         """Input: incomplete initial image. Output: no UART command or server request."""
         with self.assertRaisesRegex(ValueError, 'nine recognized'):
             self.run_flow(capture=lambda pose, **kw: (('red',)*8, None))
-        self.link.request_completed.assert_not_called()
+        self.link.request_completed.assert_called_once()
+        self.link.request_scan.assert_called_once_with('RUBIK SCAN_BEGIN')
 
     def test_duplicate_center_is_not_saved_twice(self):
         """Input: unchanged face after a pose command. Output: retain first face and stop safely."""
         with self.assertRaisesRegex(ValueError, 'already captured'):
             self.run_flow(capture=lambda pose, **kw: (('red',)*9, None))
-        self.assertEqual([v for k, v in self.trace if k == 'done'], ['RUBIK PING', 'SCAN_POSE F'])
-        saved = [v for k, v in self.trace if k == 'face']
+        self.assertEqual([v for k, v in self.trace if k == 'done'],
+                         ['RUBIK PING', 'RUBIK SCAN_BEGIN', 'RUBIK SCAN_POSE F'])
+        saved = [v for k, v in self.trace if k == 'face' and v]
         self.assertEqual(len(saved), 1)
         self.assertEqual(set(saved[0]), {'red'})
 
-    def test_first_face_is_published_before_uart_connection_failure(self):
-        """Input: disconnected UART. Output: initial image still captured and shown before failure."""
-        def connect():
-            """Input: saved first image. Output: simulate a missing serial device."""
-            self.assertEqual(set([v for k, v in self.trace if k == 'face'][-1]), {'yellow'})
-            raise OSError('COM unavailable')
-
+    def test_failed_ping_prevents_capture(self):
+        self.link.request_completed.side_effect = OSError('COM unavailable')
+        capture = Mock()
         with self.assertRaisesRegex(OSError, 'COM unavailable'):
-            self.run_flow(connect=connect)
-        self.link.request_completed.assert_not_called()
+            self.run_flow(capture=capture)
+        capture.assert_not_called()
+        self.link.request_scan.assert_not_called()
 
     def test_invalid_cube_cannot_send_solution(self):
         """Input: impossible color counts and no numeric samples. Output: stop after six captures."""
@@ -177,17 +184,17 @@ class TestAutoFlow(unittest.TestCase):
 
     def test_cancel_after_pose_does_not_capture_or_retry(self):
         """Input: stop while a pose is moving. Output: wait once, then stop before capture."""
-        def stop(command, timeout_s):
+        def stop(body):
             """Input: active command. Output: mark cancellation after its completion."""
-            value = self.complete(command, timeout_s)
-            if command.name == 'SCAN_POSE':
+            value = self.complete_scan(body)
+            if body == 'RUBIK SCAN_POSE F':
                 self.cancel.set()
             return value
 
-        self.link.request_completed.side_effect = stop
+        self.link.request_scan.side_effect = stop
         with self.assertRaises(AutoSolveCancelled):
             self.run_flow()
-        self.assertEqual(self.link.request_completed.call_count, 2)
+        self.assertEqual(self.link.request_scan.call_count, 2)
         self.assertEqual([v for k, v in self.trace if k == 'capture'], ['U'])
 
     def test_cancel_during_solver_prevents_all_turns(self):
@@ -203,19 +210,32 @@ class TestAutoFlow(unittest.TestCase):
 
     def test_failed_uart_pose_stops_without_capture(self):
         """Input: unsupported firmware pose. Output: no camera capture or later command."""
-        self.link.request_completed.side_effect = ['OK PONG', RuntimeError('ERR UNSUPPORTED')]
+        self.link.request_scan.side_effect = ['DONE', RuntimeError('ERR UNSUPPORTED')]
         with self.assertRaisesRegex(RuntimeError, 'UNSUPPORTED'):
             self.run_flow()
-        self.assertEqual(self.link.request_completed.call_count, 2)
+        self.assertEqual(self.link.request_scan.call_count, 2)
 
-    def test_unsupported_scan_stops_before_camera_or_uart(self):
-        link = SerialLink('COM_TEST')
+    def test_unsupported_scan_stops_before_capture(self):
+        self.link.request_scan.side_effect = RuntimeError('STM32 firmware does not support Auto Solve')
         capture = Mock()
-        with patch('serial.Serial') as serial:
-            with self.assertRaisesRegex(NotImplementedError, 'SCAN_POSE'):
-                self.run_flow(link=link, capture=capture)
-            capture.assert_not_called()
-            serial.assert_not_called()
+        with self.assertRaisesRegex(RuntimeError, 'firmware does not support'):
+            self.run_flow(capture=capture)
+        capture.assert_not_called()
+
+    def test_done_without_physical_moves_does_not_report_success(self):
+        self.link.request_completed.side_effect = lambda *args, **kwargs: 'DONE'
+        with self.assertRaisesRegex(ValueError, 'not solved'):
+            self.run_flow()
+        self.assertEqual(self.link.request_scan.call_count, 15)
+
+    def test_solved_cube_skips_solver_and_face_moves_but_still_verifies(self):
+        self.physical_cube = SOLVED_CUBE
+        solver = Mock()
+        result = self.run_flow(solver=solver)
+        solver.assert_not_called()
+        self.assertEqual(result['solution'], '')
+        self.link.request_completed.assert_called_once()
+        self.assertEqual(self.link.request_scan.call_count, 15)
 
     def test_all_24_placements_produce_matching_machine_turns(self):
         """Input: 24 spatial rotations of a real scramble. Output: complete scan and correct physical turns."""
@@ -244,10 +264,12 @@ class TestAutoFlow(unittest.TestCase):
                 labels = {color: face for face, color in centers.items()}
                 expected_cube = ''.join(labels[value] for face in 'URFDLB' for value in actual_faces[face])
                 expected_solution = ' '.join(face_map[token[0]]+token[1:] for token in SOLUTION.split())
+                verifying = False
 
                 def capture(pose, seen_centers=()):
                     """Input: known pose. Output: optical grid for this physical placement."""
-                    values = rotate_grid(actual_faces[pose.face], -pose.correction)
+                    values = ((centers[pose.face],) * 9 if verifying
+                              else rotate_grid(actual_faces[pose.face], -pose.correction))
                     self.assertNotIn(values[4], seen_centers)
                     return values, tuple(PROTOTYPES[value] for value in values)
 
@@ -258,11 +280,17 @@ class TestAutoFlow(unittest.TestCase):
 
                 trace = []
                 link = Mock()
+                def emit(kind, value):
+                    nonlocal verifying
+                    trace.append((kind, value))
+                    if kind == 'status' and value.startswith('Solution moves complete.'):
+                        verifying = True
+
                 result = self.run_flow(link=link, capture=capture, solver=solve,
-                                       emit=lambda kind, value: trace.append((kind, value)))
+                                       emit=emit)
                 self.assertEqual(result['position_colors'], centers)
                 self.assertEqual(result['solution'], expected_solution)
-                self.assertEqual(len([v for k, v in trace if k == 'face'][5]), 6)
+                self.assertEqual(len([v for k, v in trace if k == 'face'][-1]), 6)
                 final_faces = [v for k, v in trace if k == 'move'][-1][2]
                 self.assertTrue(all(values == (color,)*9 for color, values in final_faces.items()))
                 turns = [face + {1: '', -1: "'", 2: '2'}[count]

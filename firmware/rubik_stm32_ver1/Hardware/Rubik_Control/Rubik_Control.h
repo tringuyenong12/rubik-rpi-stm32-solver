@@ -29,4 +29,21 @@ void Rubik_Down_ToFront(void);
 void Rubik_Front_Back_Move_Full_Release(void);
 void Rubik_Left_Right_Move_Full_Release(void);
 
+void Rubik_LR(void);
+void Rubik_LR_(void);
+void Rubik_L_R(void);
+void Rubik_L_R_(void);
+void Rubik_FB(void);
+void Rubik_FB_(void);
+void Rubik_F_B(void);
+void Rubik_F_B_(void);
+void Rubik_Reset(void);
+void Rubik_Prepare(void);
+void Rubik_Put(void);
+
+/* Check commanded HOME positions and clamp the loaded cube. */
+bool Rubik_ScanPrepare(void);
+/* Rotate the entire clamped cube by a quarter turn and return all arms home. */
+bool Rubik_ScanQuarter(bool left_right_axis, bool first_clockwise);
+
 #endif /* RUBIK_CONTROL_RUBIK_CONTROL_H_ */

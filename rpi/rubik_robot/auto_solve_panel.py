@@ -50,7 +50,7 @@ class AutoSolveWorkspace:
     def _build(self):
         """Input: local state. Output: connection settings, preview, output and Start controls."""
         ttk.Label(self.frame, text='Auto Solve', font=('TkDefaultFont', 14, 'bold')).pack(anchor=tk.W)
-        ttk.Label(self.frame, text='Place any face up. The first face is captured immediately after Start. '
+        ttk.Label(self.frame, text='With the machine in its loading position, place any face up and align the layers. '
                   'Image top toward machine back; image right toward machine right.').pack(anchor=tk.W, pady=5)
         ttk.Label(self.frame, text='Fixed scan positions U → F → D → B → R → L, relative to placement at Start. '
                   'Faces are saved by their detected center colors.').pack(anchor=tk.W)
@@ -177,7 +177,7 @@ class AutoSolveWorkspace:
         self.cancel.clear()
         self.faces, self.solution_frames, self.position_colors = {}, '', {}
         self.scan_status.set('0/6 faces captured')
-        self.status.set('Opening camera and capturing the first visible face...')
+        self.status.set('Opening camera and checking the STM32 connection...')
         self.draw_cube()
         self.log('\n=== New Auto Solve session ===\n')
         self._controls()
@@ -199,12 +199,12 @@ class AutoSolveWorkspace:
 
         try:
             run_auto_solve(settings, self.cancel, emit, preview)
-            emit('finished', 'Auto Solve complete. All solution commands received DONE.')
+            emit('finished', 'Auto Solve complete. Camera verified six solid faces in the starting orientation.')
         except AutoSolveCancelled as error:
             emit('finished', str(error))
         except Exception as error:
-            emit('finished', f'Stopped: {error}. The last command may be unconfirmed. '
-                 'Check the machine and restore the initial placement before restarting.')
+            emit('finished', f'Stopped: {error}. Check the cube and machine. Restore the arms to '
+                 'the loading position before starting a new scan.')
 
     def stop(self):
         """Input: stop request. Output: block subsequent commands while current operation finishes."""

@@ -18,6 +18,78 @@
 
 enum { RUBIK_UNKNOWN, RUBIK_PING, RUBIK_RESET, RUBIK_MOVE, RUBIK_STOP, RUBIK_PREPARE, RUBIK_PUT };
 
+/* Orientations relative to SCAN_BEGIN, including the camera's image roll.
+ * F/D/B are successive positive steps on the left/right axis.
+ * R/L are +1/-1 on the front/back axis. */
+static char scan_pose;
+
+static int scan_angle(char face, bool left_right_axis)
+{
+    if (left_right_axis)
+        return face == 'F' ? 1 : face == 'D' ? 2 : face == 'B' ? 3 : 0;
+    return face == 'R' ? 1 : face == 'L' ? 3 : 0;
+}
+
+static bool scan_rotate(bool left_right_axis, int turns)
+{
+    turns = (turns + 4) % 4;
+    if (turns == 0) return true;
+    /* F up reverses the existing UpToFront roll. R up is CCW at Front. */
+    if (!Rubik_ScanQuarter(left_right_axis, turns == 3)) return false;
+    return turns != 2 || Rubik_ScanQuarter(left_right_axis, false);
+}
+
+static bool scan_to(char from, char to)
+{
+    int old_x = scan_angle(from, true);
+    int new_x = scan_angle(to, true);
+    int old_z = scan_angle(from, false);
+    int new_z = scan_angle(to, false);
+    if (old_z && new_x)
+        return scan_rotate(false, -old_z) && scan_rotate(true, new_x);
+    return scan_rotate(true, new_x - old_x) && scan_rotate(false, new_z - old_z);
+}
+
+static bool handle_scan(uint8_t argc, char *argv[], uint16_t id)
+{
+    if (strcmp(argv[2], "SCAN_BEGIN") == 0)
+    {
+        if (argc != 3U) UART_Error(id, "BAD_ARG");
+        else
+        {
+            scan_pose = 0;
+            UART_Accept(id);
+            if (!Rubik_ScanPrepare()) UART_Error(id, "SCAN_PREPARE_FAILED");
+            else
+            {
+                scan_pose = 'U';
+                UART_Done(id);
+            }
+        }
+        return true;
+    }
+    if (strcmp(argv[2], "SCAN_POSE") != 0) return false;
+    if (argc != 4U || strlen(argv[3]) != 1U || strchr("URFDLB", argv[3][0]) == NULL)
+        UART_Error(id, "BAD_SCAN_POSE");
+    else if (!scan_pose)
+        UART_Error(id, "SCAN_NOT_READY");
+    else
+    {
+        char target = argv[3][0];
+        UART_Accept(id);
+        if (!scan_to(scan_pose, target))
+        {
+            scan_pose = 0;
+            UART_Error(id, "SCAN_EXEC_FAILED");
+        }
+        else
+        {
+            scan_pose = target;
+            UART_Done(id);
+        }
+    }
+    return true;
+}
 
 void Rubik_CommandHandler(uint8_t argc, char *argv[], uint16_t command_id)
 {
@@ -28,6 +100,7 @@ void Rubik_CommandHandler(uint8_t argc, char *argv[], uint16_t command_id)
          return;
      }
     const char *action = argv[2];
+    if (handle_scan(argc, argv, command_id)) return;
     int code = RUBIK_UNKNOWN;
     if (strcmp(action, "PING") == 0) code = RUBIK_PING;
     else if (strcmp(action, "RESET") == 0) code = RUBIK_RESET;

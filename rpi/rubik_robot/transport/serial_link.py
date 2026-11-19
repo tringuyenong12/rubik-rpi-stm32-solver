@@ -29,11 +29,21 @@ class SerialLink:
     def __exit__(self, exc_type, exc, tb):
         self.close()
 
-    @staticmethod
-    def require_scan_support():
-        raise NotImplementedError(
-            "STM32 firmware has no SCAN_POSE command. Scan manually, then use "
-            "scripts/run_solver.py with the scanned cube or saved solution JSON.")
+    def request_scan(self, command, timeout_s=30):
+        """Send Auto Solve scan commands without changing the shared move path."""
+        if self.session is None:
+            raise RuntimeError("SerialLink is not open")
+        if command == "RUBIK SCAN_BEGIN":
+            try:
+                return self.session.request(command, timeout_s)
+            except RuntimeError as error:
+                if str(error).endswith(": UNKNOWN_CMD"):
+                    raise RuntimeError("STM32 firmware does not support Auto Solve scan commands; "
+                                       "flash the updated firmware") from error
+                raise
+        if command not in {f"RUBIK SCAN_POSE {face}" for face in "URFDLB"}:
+            raise ValueError("Invalid Auto Solve scan command")
+        return self.session.request(command, timeout_s)
 
     def open(self):
         if self.session is None:

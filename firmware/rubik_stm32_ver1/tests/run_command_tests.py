@@ -6,7 +6,9 @@ import tempfile
 
 root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
-parser.add_argument("--control-only", action="store_true")
+mode = parser.add_mutually_exclusive_group()
+mode.add_argument("--control-only", action="store_true")
+mode.add_argument("--scan-only", action="store_true")
 args = parser.parse_args()
 with tempfile.TemporaryDirectory(prefix="rubik-command-tests-") as folder:
     Path(folder, "main.h").write_text("/* Host test: no board peripherals. */\n")
@@ -24,4 +26,4 @@ with tempfile.TemporaryDirectory(prefix="rubik-command-tests-") as folder:
         "-I" + folder, "-Itests/host", "-IHardware/UART_Handle",
         "tests/test_commands.c", *sources, "-o", output,
     ], cwd=root, check=True)
-    subprocess.run([output], check=True)
+    subprocess.run([output, *(["--scan-only"] if args.scan_only else [])], check=True)

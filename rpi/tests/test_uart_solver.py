@@ -133,14 +133,23 @@ class TestUARTSolver(unittest.TestCase):
             for command in (Command('SCAN_POSE', ('F',)), Command('STOP'), Command('HOME')):
                 with self.assertRaises(ValueError):
                     link.request_completed(command)
-            with self.assertRaises(NotImplementedError):
-                link.require_scan_support()
+            with self.assertRaises(ValueError):
+                link.request_scan('RUBIK SCAN_POSE X')
             with self.assertRaises(ValueError):
                 link.session.request('RUBIK MOVE F\nRUBIK MOVE R')
             link.session.command_id = 65535
             with self.assertRaises(RuntimeError):
                 link.request_completed(Command('PING'))
         self.assertFalse(device.writes)
+
+    def test_scan_transactions_use_the_same_uart_ids_and_acknowledgements(self):
+        device = Device()
+        with patch('serial.Serial', return_value=device), SerialLink('COM_TEST') as link:
+            link.request_completed(Command('PING'))
+            self.assertEqual(link.request_scan('RUBIK SCAN_BEGIN'), '>#2 DONE')
+            self.assertEqual(link.request_scan('RUBIK SCAN_POSE F'), '>#3 DONE')
+        self.assertEqual(device.writes, [b'#1 RUBIK PING\n', b'#2 RUBIK SCAN_BEGIN\n',
+                                        b'#3 RUBIK SCAN_POSE F\n'])
 
     def test_verified_solution_and_rejected_wrong_solution(self):
         cube = CubieCube()

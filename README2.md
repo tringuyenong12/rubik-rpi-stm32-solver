@@ -15,7 +15,7 @@ Các lệnh dưới đây chạy trên terminal Linux của Pi. Phần cài đ�
 | Đọc trạng thái/công thức đã lưu | `scripts/run_solver.py --input ...json` | Có |
 | Tạo và gửi công thức trộn Rubik | `scripts/run_scramble.py` | Có |
 | Camera nhận màu, người dùng đổi mặt bằng tay, hiển thị lời giải | `scripts/run_vision_gui.py` | Có; cần Desktop và camera |
-| Robot tự đổi tư thế để chụp đủ sáu mặt rồi giải | Chế độ `Auto Solve` | Đang chặn: firmware chưa có `SCAN_POSE` |
+| Robot tự đổi tư thế để quét, giải và xác nhận | Chế độ `Auto Solve` | Cần firmware mới, xem [Auto Solve](docs/AUTO_SOLVE.md) |
 | Calibration servo | `rpi/Rubik_Cube/Calibration/` | Giữ nguyên; không thuộc hướng dẫn chuyển solver này |
 
 **Auto scan của camera không đồng nghĩa với robot tự xoay khối để quét.** Camera có thể tự lưu một mặt khi ảnh ổn định, nhưng bạn vẫn phải đưa từng mặt vào camera ở luồng quét thủ công.
@@ -367,7 +367,7 @@ Thay đường dẫn nếu dự án được lưu ở vị trí khác. Một l�
 |---|---|
 | **Solve Guide** | Quét sáu mặt bằng camera, tìm công thức và xem hình hướng dẫn từng bước |
 | **Scramble** | Tạo đề theo độ khó, xem công thức và gửi lệnh trộn đến STM32 |
-| **Auto Solve** | Hiện báo chưa hỗ trợ `SCAN_POSE`; chưa thực hiện robot tự quét và giải |
+| **Auto Solve** | Tự quét, giải và quét xác nhận với firmware mới |
 
 **Tạo đề và chạy trộn trên GUI:**
 
@@ -443,7 +443,7 @@ Thao tác thông thường:
 5. Đặt cube vào máy đúng hướng, không làm thay đổi trạng thái các lớp trong quá trình chuyển.
 6. Dùng `run_solver.py` gửi lời giải đã kiểm tra.
 
-**Solve Guide hiển thị công thức, không tự gửi các nước đó đến STM32.** Chế độ Scramble trong GUI có luồng gửi riêng. Chế độ robot Auto Solve hiện báo chưa hỗ trợ SCAN_POSE.
+**Solve Guide hiển thị công thức, không tự gửi các nước đó đến STM32.** Chế độ Scramble trong GUI có luồng gửi riêng. Xem cách chạy [Auto Solve](docs/AUTO_SOLVE.md).
 
 ### 9.1. Lấy cube từ bản ghi quét
 
@@ -601,7 +601,7 @@ Bỏ `-k "not Workspace"` khi muốn chạy cả kiểm thử giao diện và m�
 | `BAD_RUBIK_MOVE_ARG` | Firmware phải hỗ trợ token được gửi; LR/UD và dạng ghép hiện chưa hỗ trợ |
 | `Solution does not solve...` | Công thức không khớp cube; kiểm tra dữ liệu đã lưu và chiều/hướng mặt |
 | GUI lỗi display/Tcl | Chạy trong Desktop/VNC; kiểm tra `python3-tk`; CLI vẫn dùng được qua SSH |
-| Auto Solve báo SCAN_POSE | Giới hạn hiện tại của firmware; dùng quét thủ công và run_solver.py |
+| Auto Solve báo thiếu lệnh quét | Kiểm tra đã nạp firmware mới và đang dùng đúng cổng UART |
 | Servo xoay nhưng cube không đúng | Đối chiếu hướng đặt khối, quy ước mặt, chiều xoay và dữ liệu quét thực tế |
 
 ## 14. Trình tự chạy hằng ngày

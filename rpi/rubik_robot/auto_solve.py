@@ -1,7 +1,6 @@
 """Host-side six-pose capture, Two-Phase solving and acknowledged UART execution."""
 
 from dataclasses import dataclass
-from contextlib import ExitStack
 from threading import Condition, Event, Thread
 from time import monotonic
 
@@ -33,8 +32,7 @@ class ScanPose:
     correction: int = 0
 
     def command(self):
-        """Input: pose. Output: existing SCAN_POSE protocol command."""
-        return Command('SCAN_POSE', (self.face,))
+        return f'RUBIK SCAN_POSE {self.face}'
 
 
 # Positions refer to the machine at Start, independently of sticker colors.
@@ -46,7 +44,7 @@ SCAN_ROUTE = (ScanPose('U'), ScanPose('F'), ScanPose('D'), ScanPose('B', correct
 
 def scan_commands():
     """Input: none. Output: newline-terminated fixed scan route, excluding capture gates."""
-    return ''.join(pose.command().to_wire() + '\n' for pose in SCAN_ROUTE[1:])
+    return ''.join(pose.command() + '\n' for pose in SCAN_ROUTE[1:])
 
 
 class AutoSolveCancelled(Exception):
@@ -101,56 +99,55 @@ def prepare_machine_cube(faces, samples, position_colors, allow_color_correction
     return corrected, machine_faces(corrected, position_colors), note
 
 
-def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_solution, connect=None):
-    """Input: open UART, capture(pose), server, cancellation/event callbacks. Output: solved plan.
-
-    Capture(pose, seen_centers=...) returns colors/HSV. Optional connect opens UART
-    after the first face is saved. No command is retried.
-    """
-    link.require_scan_support()
-
+def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_solution):
+    """Scan, solve, execute and verify the cube through an open UART session."""
     def send(command):
-        """Input: one command. Output: await its completion before continuing."""
         check_cancel(cancel)
         emit('command', command.to_wire())
         link.request_completed(command, timeout_s=15)
         check_cancel(cancel)
 
-    faces, samples, position_colors = {}, {}, {}
-    emit('route', scan_commands())
-    for index, pose in enumerate(SCAN_ROUTE):
-        if index:
-            emit('status', f'Moving original machine position {pose.face} toward camera...')
-            send(pose.command())
-        if not pose.capture:
-            continue
-        emit('status', f'Capturing machine position {pose.face} — any new center color accepted...')
-        colors, hsv = capture(pose, seen_centers=tuple(faces))
+    def send_scan(body):
         check_cancel(cancel)
-        if len(colors) != 9 or any(color not in COLORS for color in colors):
-            raise ValueError(f'Position {pose.face}: expected nine recognized sticker colors')
-        center = colors[4]
-        if center in faces:
-            raise ValueError(f'Center {center} was already captured. Check the machine pose movement.')
-        position_colors[pose.face] = center
-        faces[center] = rotate_grid(colors, pose.correction)
-        if hsv is not None:
-            samples[center] = rotate_grid(hsv, pose.correction)
-        emit('orientation', dict(position_colors))
-        emit('face', dict(faces))
-        emit('status', f'Saved {center} at machine position {pose.face} ({len(faces)}/6).')
-        if index == 0:
+        emit('command', body)
+        link.request_scan(body)
+        check_cancel(cancel)
+
+    def scan_cube():
+        faces, position_colors = {}, {}
+        emit('face', {})
+        for index, pose in enumerate(SCAN_ROUTE):
+            if index:
+                emit('status', f'Moving original machine position {pose.face} toward camera...')
+                send_scan(pose.command())
+            if not pose.capture:
+                continue
+            emit('status', f'Capturing machine position {pose.face} — any new center color accepted...')
+            colors, _ = capture(pose, seen_centers=tuple(faces))
             check_cancel(cancel)
-            emit('status', 'First face saved. Connecting UART and checking PING...')
-            if connect is not None:
-                connect()
-            send(Command('PING'))
+            if len(colors) != 9 or any(color not in COLORS for color in colors):
+                raise ValueError(f'Position {pose.face}: expected nine recognized sticker colors')
+            center = colors[4]
+            if center in faces:
+                raise ValueError(f'Center {center} was already captured. Check the machine pose movement.')
+            position_colors[pose.face] = center
+            faces[center] = rotate_grid(colors, pose.correction)
+            emit('orientation', dict(position_colors))
+            emit('face', dict(faces))
+            emit('status', f'Saved {center} at machine position {pose.face} ({len(faces)}/6).')
+        return faces, position_colors
+
+    emit('status', 'Checking UART and establishing the starting pose...')
+    send(Command('PING'))
+    send_scan('RUBIK SCAN_BEGIN')
+    emit('route', scan_commands())
+    faces, position_colors = scan_cube()
     emit('scan_complete', '6/6 faces captured. Initial pose restored. Checking cube...')
     check_cancel(cancel)
-    cube, canonical, note = prepare_machine_cube(faces, samples, position_colors)
+    cube, canonical, note = prepare_machine_cube(faces, {}, position_colors)
     emit('face', canonical)
     emit('status', 'Six faces validated. Solving with Two-Phase... ' + note)
-    solution = solver(host, port, cube)
+    solution = '' if cube == SOLVED_CUBE else solver(host, port, cube)
     check_cancel(cancel)
     # Independently validate the server plan before any solving movement.
     predicted = cube
@@ -158,7 +155,10 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
         predicted = apply_move(predicted, token)
     if predicted != SOLVED_CUBE:
         raise ValueError('Server solution does not solve the scanned cube')
-    actions = MotionPlanner().plan(solution)
+    # Some existing paired moves leave arms released. Use the single-face
+    # primitives so the next action and the verification scan start clamped.
+    planner = MotionPlanner()
+    actions = [planner.plan(token)[0] for token in solution.split()]
     frames = ''.join(action.to_wire() + '\n' for action in actions)
     result = {'cube': cube, 'solution': solution, 'uart': frames, 'position_colors': dict(position_colors)}
     emit('solution', result)
@@ -171,7 +171,15 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
         for move in tokens:
             cube = apply_move(cube, move)
         emit('move', (index, len(actions), machine_faces(cube, position_colors)))
-    emit('status', 'AUTO SOLVE COMPLETE — all solution commands confirmed by DONE.')
+    emit('status', 'Solution moves complete. Verifying the physical cube with a second scan...')
+    try:
+        verified_faces, verified_positions = scan_cube()
+    except (OSError, RuntimeError, ValueError) as error:
+        raise RuntimeError(f'Physical result could not be verified: {error}') from error
+    if any(any(color != center for color in grid) for center, grid in verified_faces.items()):
+        raise ValueError('Verification found a cube that is not solved')
+    if verified_positions != position_colors:
+        raise ValueError('Verification found a solved cube in a different orientation. Check the motion mapping.')
     return result
 
 
@@ -295,13 +303,7 @@ class AutoCamera:
 
 def run_auto_solve(settings, cancel, emit, preview):
     """Input: frozen UI settings and callbacks. Output: close camera/UART after the entire flow."""
-    SerialLink.require_scan_support()
-    with AutoCamera(settings['camera'], cancel, preview) as camera, ExitStack() as resources:
-        link = SerialLink(settings['port'], settings['baud'], timeout_s=15)
-
-        def connect():
-            """Input: first face already saved. Output: open UART within the session cleanup scope."""
-            resources.enter_context(link)
-
+    with AutoCamera(settings['camera'], cancel, preview) as camera, \
+            SerialLink(settings['port'], settings['baud'], timeout_s=15) as link:
         return execute_auto_solve(link, camera.capture, settings['host'], settings['server_port'],
-                                  cancel, emit, connect=connect)
+                                  cancel, emit)

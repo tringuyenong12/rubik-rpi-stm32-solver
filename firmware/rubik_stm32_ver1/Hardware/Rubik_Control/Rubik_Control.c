@@ -6,6 +6,50 @@
  */
 
 #include "Rubik_Control.h"
+
+bool Rubik_ScanPrepare(void)
+{
+    /* Check the last commanded angle before clamping. No position sensors. */
+    for (int id = SERVO_ROTATE_FRONT; id <= SERVO_ROTATE_LEFT; ++id)
+    {
+        const Servo_Rotate_t *rotate = &servo[id].state.rotate;
+        float home = rotate->home_angle + rotate->offset_calib_home_angle;
+        if (home < 0.0f) home = 0.0f;
+        if (home > 180.0f) home = 180.0f;
+        if (rotate->current_angle != home) return false;
+    }
+    for (int id = SERVO_MOVE_FRONT; id <= SERVO_MOVE_LEFT; ++id)
+        if (!Servo_Move((Servo_ID_t)id, SERVO_MOVE_CLAMP)) return false;
+    return waitUntilServosDone();
+}
+
+bool Rubik_ScanQuarter(bool left_right_axis, bool first_clockwise)
+{
+    const Servo_ID_t first = left_right_axis ? SERVO_ROTATE_LEFT : SERVO_ROTATE_FRONT;
+    const Servo_ID_t second = left_right_axis ? SERVO_ROTATE_RIGHT : SERVO_ROTATE_BACK;
+    const Servo_ID_t support1 = left_right_axis ? SERVO_MOVE_FRONT : SERVO_MOVE_LEFT;
+    const Servo_ID_t support2 = left_right_axis ? SERVO_MOVE_BACK : SERVO_MOVE_RIGHT;
+    const Servo_ID_t grip1 = (Servo_ID_t)(first + SERVO_MOVE_FRONT);
+    const Servo_ID_t grip2 = (Servo_ID_t)(second + SERVO_MOVE_FRONT);
+    const Servo_Rotate_Position_t cw = SERVO_ROTATE_CLOCKWISE;
+    const Servo_Rotate_Position_t ccw = SERVO_ROTATE_ANTICLOCKWISE;
+
+    /* Keep one pair on the cube throughout each handoff. */
+    return Servo_Move(grip1, SERVO_MOVE_TIGHT_CLAMP)
+        && Servo_Move(grip2, SERVO_MOVE_TIGHT_CLAMP) && waitUntilServosDone()
+        && Servo_Move(support1, SERVO_MOVE_FULL_RELEASE)
+        && Servo_Move(support2, SERVO_MOVE_FULL_RELEASE) && waitUntilServosDone()
+        && Servo_Rotate(first, first_clockwise ? cw : ccw)
+        && Servo_Rotate(second, first_clockwise ? ccw : cw) && waitUntilServosDone()
+        && Servo_Move(support1, SERVO_MOVE_CLAMP)
+        && Servo_Move(support2, SERVO_MOVE_CLAMP) && waitUntilServosDone()
+        && Servo_Move(grip1, SERVO_MOVE_FULL_RELEASE)
+        && Servo_Move(grip2, SERVO_MOVE_FULL_RELEASE) && waitUntilServosDone()
+        && Servo_Rotate(first, SERVO_ROTATE_HOME)
+        && Servo_Rotate(second, SERVO_ROTATE_HOME) && waitUntilServosDone()
+        && Servo_Move(grip1, SERVO_MOVE_CLAMP)
+        && Servo_Move(grip2, SERVO_MOVE_CLAMP) && waitUntilServosDone();
+}
 #include "main.h"
 
 // L, R, U, D, F, B         Quay chieu kim dong ho

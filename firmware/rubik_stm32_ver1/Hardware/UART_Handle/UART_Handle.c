@@ -1,4 +1,8 @@
 #include "UART_Handle.h"
+#include "Calibration_Command.h"
+#include "Control_Command.h"
+#include "Rubik_Command.h"
+#include <stdio.h>
 #include "../Rubik_Control/Rubik_Control.h"
 #include <string.h>
 
@@ -230,13 +234,14 @@ UART_Command_t UART_Get_Command(const char *str)
 
 
 
-static void UART_ParseCommand(const char *command)
+static void UART_ParseCommand(char *command)
 {
 
-    unsigned int command_id;
+    uint16_t command_id;
 
-    argc_parse = UART_Split_Command(cmd_buffer);
+    argc_parse = UART_Split_Command(command);
 
+    if (!argc_parse) return;
     if (!UART_ParseId(argv_parse[0], &command_id)) return;
 
     // Yeu cau dung 4 thanh phan

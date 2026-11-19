@@ -66,9 +66,8 @@ Rubik rồi đóng/tạo lại phiên. ID dùng 1..65535, không quay vòng tron
 Hàm gọi trực tiếp `move_Front()` vẫn trả bool; solver truyền session để nhận
 thông tin lỗi và tiến độ chi tiết.
 
-Firmware chưa có SCAN_POSE: chế độ quét tự động bị chặn trước khi mở camera
-hay UART. Có thể quét thủ công rồi đưa chuỗi trạng thái vào script trên.
-Không thay thao tác đổi tư thế toàn khối bằng phép xoay mặt.
+Auto Solve dùng `RUBIK SCAN_BEGIN` và `RUBIK SCAN_POSE <face>` để chuẩn bị
+và đổi tư thế toàn khối. Xem [cách chạy Auto Solve](AUTO_SOLVE.md).
 Các hàm ghép LR/UD vẫn bị từ chối vì handler firmware chưa hỗ trợ.
 RUBIK STOP chưa được triển khai trong C; nút Stop hủy các lệnh tiếp theo.
 
