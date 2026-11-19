@@ -44,13 +44,14 @@ class TestScanIntegrity(unittest.TestCase):
         scanner = new_camera_scanner()
         blue = [['blue']*3 for _ in range(3)]
         for index in range(28):
-            scanner.update(blue, now=index*.05)
+            scanner.update(blue, now=.8*scanner.stable_seconds*index/28)
         changed = [['blue']*3 for _ in range(3)]
         changed[0][2] = 'white'
+        change_start = scanner.stable_seconds * .85
         for index in range(29):
-            scanner.update(changed, now=1.4+index*.05)
+            scanner.update(changed, now=change_start+scanner.stable_seconds*index/29)
         self.assertFalse(scanner.snapshot()['faces'])
-        scanner.update(changed, now=3.05)
+        scanner.update(changed, now=change_start+.1+scanner.stable_seconds)
         self.assertEqual(scanner.snapshot()['faces']['blue'][2], 'white')
 
     def test_default_solver_preparation_cannot_recolor_a_blue_white_error(self):

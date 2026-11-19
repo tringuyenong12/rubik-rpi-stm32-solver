@@ -21,7 +21,8 @@
       "val_W": 100,
       "rgb_L": 35,
       "orange_min_V": 110,
-      "yellow_min_V": 110
+      "yellow_min_V": 110,
+      "orange_L": 9
     },
     "capture_by_platform": {
       "linux": {
@@ -29,19 +30,19 @@
         "EXPOSURE": 60,
         "GAIN": 0,
         "AUTO_WB": 0,
-        "WB_TEMPERATURE": 3500
+        "WB_TEMPERATURE": 6000
       }
     },
     "v4l2_controls": {
       "auto_exposure": 1,
       "white_balance_automatic": 0,
       "exposure_time_absolute": 60,
-      "white_balance_temperature": 3500,
+      "white_balance_temperature": 6000,
       "backlight_compensation": 0,
       "power_line_frequency": 1,
       "exposure_dynamic_framerate": 0,
       "gain": 0
     },
-    "note": "C270 Linux measured live: manual exposure 60 (6 ms), gain 0, WB 3500 K, 50 Hz. ROI measured from pi_colors_03."
+    "note": "C270 Linux live calibrated 2026-11-18: manual exposure 60, gain 0, WB 6000 K, 50 Hz. White S=7-10 vs blue S=193-201 under current lighting. Recheck WB when lighting changes. Live recheck: red glints H=7-8 versus orange H=10-11; red/orange split 9."
   }
 }
