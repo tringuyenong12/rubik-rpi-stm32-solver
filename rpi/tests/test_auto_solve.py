@@ -76,7 +76,7 @@ class TestAutoFlow(unittest.TestCase):
         """Input: all six raw camera views. Output: exact original state and verified TURN plan."""
         result = self.run_flow()
         self.assertEqual(result['cube'], SCRAMBLED)
-        self.assertEqual([value for kind, value in self.trace if kind == 'capture'], list('UFDBRL' * 2))
+        self.assertEqual([value for kind, value in self.trace if kind == 'capture'], list('URFDLB' * 2))
         for index, (kind, face) in enumerate(self.trace):
             if kind == 'capture':
                 self.assertEqual(self.trace[index-1], ('status', f'Capturing machine position {face} — any new center color accepted...'))
@@ -101,8 +101,8 @@ class TestAutoFlow(unittest.TestCase):
         """Input: signed whole-cube X/Z rotations. Output: correct face-up and image corrections."""
         rx = np.array(((1, 0, 0), (0, 0, 1), (0, -1, 0)))  # -90 about +X
         rz = np.array(((0, 1, 0), (-1, 0, 0), (0, 0, 1)))  # -90 about +Z
-        transforms = (np.eye(3, dtype=int), rx, rx@rx, rx@rx@rx,
-                      rx@rx@rx@rx, rz.T, rz, np.eye(3, dtype=int))
+        transforms = (np.eye(3, dtype=int), rz.T, rx, rx@rx,
+                      rz, rx@rx@rx, np.eye(3, dtype=int))
         for pose, rotation in zip(SCAN_ROUTE, transforms):
             index = 'URFDLB'.index(pose.face)
             np.testing.assert_array_equal(rotation@NORMALS[index], (0, 1, 0))
@@ -116,7 +116,7 @@ class TestAutoFlow(unittest.TestCase):
                     raw[xyz[2]+1, xyz[0]+1] = r*3+c
             restored = np.rot90(raw, -pose.correction)
             np.testing.assert_array_equal(restored, np.arange(9).reshape(3, 3))
-        self.assertEqual(scan_commands().splitlines(), ['RUBIK SCAN_POSE '+f for f in 'FDBURLU'])
+        self.assertEqual(scan_commands().splitlines(), ['RUBIK SCAN_POSE '+f for f in 'RFDLBU'])
 
     def test_bad_grid_stops_before_uart(self):
         """Input: incomplete initial image. Output: no UART command or server request."""
@@ -130,7 +130,7 @@ class TestAutoFlow(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'already captured'):
             self.run_flow(capture=lambda pose, **kw: (('red',)*9, None))
         self.assertEqual([v for k, v in self.trace if k == 'done'],
-                         ['RUBIK PING', 'RUBIK SCAN_BEGIN', 'RUBIK SCAN_POSE F'])
+                         ['RUBIK PING', 'RUBIK SCAN_BEGIN', 'RUBIK SCAN_POSE R'])
         saved = [v for k, v in self.trace if k == 'face' and v]
         self.assertEqual(len(saved), 1)
         self.assertEqual(set(saved[0]), {'red'})
@@ -187,7 +187,7 @@ class TestAutoFlow(unittest.TestCase):
         def stop(body):
             """Input: active command. Output: mark cancellation after its completion."""
             value = self.complete_scan(body)
-            if body == 'RUBIK SCAN_POSE F':
+            if body == 'RUBIK SCAN_POSE R':
                 self.cancel.set()
             return value
 
@@ -226,7 +226,7 @@ class TestAutoFlow(unittest.TestCase):
         self.link.request_completed.side_effect = lambda *args, **kwargs: 'DONE'
         with self.assertRaisesRegex(ValueError, 'not solved'):
             self.run_flow()
-        self.assertEqual(self.link.request_scan.call_count, 15)
+        self.assertEqual(self.link.request_scan.call_count, 13)
 
     def test_solved_cube_skips_solver_and_face_moves_but_still_verifies(self):
         self.physical_cube = SOLVED_CUBE
@@ -235,7 +235,7 @@ class TestAutoFlow(unittest.TestCase):
         solver.assert_not_called()
         self.assertEqual(result['solution'], '')
         self.link.request_completed.assert_called_once()
-        self.assertEqual(self.link.request_scan.call_count, 15)
+        self.assertEqual(self.link.request_scan.call_count, 13)
 
     def test_all_24_placements_produce_matching_machine_turns(self):
         """Input: 24 spatial rotations of a real scramble. Output: complete scan and correct physical turns."""

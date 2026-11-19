@@ -20,13 +20,23 @@ Pi mở camera, gửi PING rồi gửi `RUBIK SCAN_BEGIN`. STM32 kiểm tra góc
 | Bước | Nội dung lệnh UART | Mặt chụp | Sửa hướng ảnh |
 |---|---|---|---|
 | 1 | `RUBIK SCAN_BEGIN` | U tại chỗ | 0° |
-| 2 | `RUBIK SCAN_POSE F` | F | 0° |
-| 3 | `RUBIK SCAN_POSE D` | D | 0° |
-| 4 | `RUBIK SCAN_POSE B` | B | 180° |
-| 5 | `RUBIK SCAN_POSE U` | Trở về mốc | |
-| 6 | `RUBIK SCAN_POSE R` | R | 90° thuận chiều |
-| 7 | `RUBIK SCAN_POSE L` | L | 90° ngược chiều |
-| 8 | `RUBIK SCAN_POSE U` | Trở về mốc | |
+| 2 | `RUBIK SCAN_POSE R` | R | 90° thuận chiều |
+| 3 | `RUBIK SCAN_POSE F` | F | 0° |
+| 4 | `RUBIK SCAN_POSE D` | D | 0° |
+| 5 | `RUBIK SCAN_POSE L` | L | 90° ngược chiều |
+| 6 | `RUBIK SCAN_POSE B` | B | 180° |
+| 7 | `RUBIK SCAN_POSE U` | Trở về mốc | |
+
+Thứ tự chụp là **U → R → F → D → L → B** ở cả lượt đầu và lượt xác nhận.
+U đầu tiên được chụp tại chỗ sau SCAN_BEGIN. Sáu lệnh đổi tư thế sau đó là
+R, F, D, L, B, U. Chỉ tư thế U cuối cùng bỏ qua chụp.
+
+Mỗi SCAN_POSE vẫn chỉ tư thế tuyệt đối so với Begin, bao gồm hướng của mặt
+trong ảnh. Firmware hiện dùng các phép lật quanh hai trục có sẵn và có thể đi
+qua tư thế trung gian trong một lệnh. Ví dụ D → L dùng ba lần lật 90°, nhưng
+chỉ báo DONE và chụp khi đã tới L. Lộ trình này thay thứ tự thu ảnh, chưa
+thay bằng chuỗi servo riêng được tối ưu trên phần cứng khác. Nếu bổ sung
+chuỗi servo trực tiếp, cần giữ đúng cả mặt hướng camera và góc ảnh ở bảng trên.
 
 Các chữ U/R/F/D/L/B chỉ vị trí ở thời điểm bắt đầu. Ví dụ nếu tâm đỏ ở trên và tâm xanh biển ở trước, mọi ô đỏ được mã hóa thành U và mọi ô xanh biển thành F trong lượt đó. Pi kiểm tra đủ sáu tâm khác nhau và trạng thái Rubik hợp lệ, rồi kiểm tra công thức trên mô hình. Khi thực thi, mỗi nước đơn gửi dưới dạng `#ID RUBIK MOVE <token>`. Ví dụ `R'` dùng `R_`, và `R2` dùng hai giao dịch riêng. Auto Solve dùng nước đơn để mỗi thao tác kết thúc với các tay kẹp sẵn sàng cho bước sau.
 

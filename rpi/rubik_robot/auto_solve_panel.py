@@ -10,7 +10,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from serial.tools import list_ports
 
-from rubik_robot.auto_solve import AutoSolveCancelled, run_auto_solve, scan_commands
+from rubik_robot.auto_solve import AutoSolveCancelled, SCAN_ROUTE, run_auto_solve, scan_commands
 from rubik_robot.scramble_panel import FACE_POSITIONS
 
 
@@ -52,7 +52,8 @@ class AutoSolveWorkspace:
         ttk.Label(self.frame, text='Auto Solve', font=('TkDefaultFont', 14, 'bold')).pack(anchor=tk.W)
         ttk.Label(self.frame, text='With the machine in its loading position, place any face up and align the layers. '
                   'Image top toward machine back; image right toward machine right.').pack(anchor=tk.W, pady=5)
-        ttk.Label(self.frame, text='Fixed scan positions U → F → D → B → R → L, relative to placement at Start. '
+        route = ' → '.join(pose.face for pose in SCAN_ROUTE if pose.capture)
+        ttk.Label(self.frame, text=f'Fixed scan positions {route}, relative to placement at Start. '
                   'Faces are saved by their detected center colors.').pack(anchor=tk.W)
         row = ttk.Frame(self.frame)
         row.pack(fill=tk.X, pady=8)

@@ -37,9 +37,9 @@ class ScanPose:
 
 # Positions refer to the machine at Start, independently of sticker colors.
 # The first U is captured in place. Later U commands restore that placement.
-SCAN_ROUTE = (ScanPose('U'), ScanPose('F'), ScanPose('D'), ScanPose('B', correction=2),
-              ScanPose('U', False), ScanPose('R', correction=1),
-              ScanPose('L', correction=3), ScanPose('U', False))
+SCAN_ROUTE = (ScanPose('U'), ScanPose('R', correction=1), ScanPose('F'),
+              ScanPose('D'), ScanPose('L', correction=3),
+              ScanPose('B', correction=2), ScanPose('U', False))
 
 
 def scan_commands():

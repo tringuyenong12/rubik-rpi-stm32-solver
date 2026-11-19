@@ -84,13 +84,19 @@ static void test_scan(void)
     expect(4, 'W', -1, -1);
     reset(); scan("SCAN_POSE", "XX");
     assert(!accepted && !done && !count && errors == 1 && !strcmp(last_error, "BAD_SCAN_POSE"));
-    char *route[] = {"F", "D", "B", "U", "R", "L", "U"};
+    char *route[] = {"R", "F", "D", "L", "B", "U"};
+    const unsigned quarters[] = {1, 2, 1, 3, 2, 1};
+    /* Expected axis/direction for every quarter turn of each transition. */
+    const bool axes[][3] = {{false}, {false, true}, {true},
+                            {true, true, false}, {false, true}, {true}};
+    const bool clockwise[][3] = {{false}, {true, false}, {false},
+                                 {false, false, true}, {false, true}, {false}};
     for (unsigned n = 0; n < sizeof(route) / sizeof(route[0]); ++n) {
         reset(); scan("SCAN_POSE", route[n]);
         assert(accepted == 1 && done == 1 && !errors);
-        assert(count == (n == 5 ? 42U : 21U));
-        scan_quarter(0, n < 4, false);
-        if (n == 5) scan_quarter(21, false, false);
+        assert(count == quarters[n] * 21U);
+        for (unsigned q = 0; q < quarters[n]; ++q)
+            scan_quarter(q * 21U, axes[n][q], clockwise[n][q]);
     }
     reset(); scan("SCAN_POSE", "U");
     assert(accepted == 1 && done == 1 && !errors && !count);
