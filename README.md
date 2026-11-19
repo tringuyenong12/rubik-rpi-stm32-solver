@@ -327,8 +327,8 @@ Gửi trực tiếp qua cổng COM đã chọn.
 Nạp firmware mới từ `firmware/rubik_stm32_ver1`, mở Solver Client và chọn
 `Auto Solve`. Đặt Rubik ngay ngắn ở tư thế nạp khối với màu trên và trước tùy ý,
 chọn UART 115200 rồi bấm `Start`. Máy tự kẹp, quét sáu mặt, đưa khối về hướng
-ban đầu và gửi lời giải theo tọa độ máy bằng `RUBIK MOVE`. Lượt quét cuối xác nhận
-sáu mặt đồng màu trước khi báo thành công.
+ban đầu, xuất công thức và thực hiện lời giải theo tọa độ máy bằng `RUBIK MOVE`.
+Phiên kết thúc khi tất cả lệnh giải nhận DONE.
 
 Xem cách chạy trên Raspberry Pi, cách lắp camera và trình tự kiểm thử cơ khí
 trong [AUTO_SOLVE.md](docs/AUTO_SOLVE.md).

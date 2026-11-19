@@ -200,7 +200,7 @@ class AutoSolveWorkspace:
 
         try:
             run_auto_solve(settings, self.cancel, emit, preview)
-            emit('finished', 'Auto Solve complete. Camera verified six solid faces in the starting orientation.')
+            emit('finished', 'Auto Solve complete. All solution commands received DONE.')
         except AutoSolveCancelled as error:
             emit('finished', str(error))
         except Exception as error:

@@ -100,7 +100,7 @@ def prepare_machine_cube(faces, samples, position_colors, allow_color_correction
 
 
 def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_solution):
-    """Scan, solve, execute and verify the cube through an open UART session."""
+    """Scan six faces, publish the solution and execute it through an open UART."""
     def send(command):
         check_cancel(cancel)
         emit('command', command.to_wire())
@@ -156,7 +156,7 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
     if predicted != SOLVED_CUBE:
         raise ValueError('Server solution does not solve the scanned cube')
     # Some existing paired moves leave arms released. Use the single-face
-    # primitives so the next action and the verification scan start clamped.
+    # primitives so each subsequent action starts clamped.
     planner = MotionPlanner()
     actions = [planner.plan(token)[0] for token in solution.split()]
     frames = ''.join(action.to_wire() + '\n' for action in actions)
@@ -171,15 +171,6 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
         for move in tokens:
             cube = apply_move(cube, move)
         emit('move', (index, len(actions), machine_faces(cube, position_colors)))
-    emit('status', 'Solution moves complete. Verifying the physical cube with a second scan...')
-    try:
-        verified_faces, verified_positions = scan_cube()
-    except (OSError, RuntimeError, ValueError) as error:
-        raise RuntimeError(f'Physical result could not be verified: {error}') from error
-    if any(any(color != center for color in grid) for center, grid in verified_faces.items()):
-        raise ValueError('Verification found a cube that is not solved')
-    if verified_positions != position_colors:
-        raise ValueError('Verification found a solved cube in a different orientation. Check the motion mapping.')
     return result
 
 

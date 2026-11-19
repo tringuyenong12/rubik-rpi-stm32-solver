@@ -76,7 +76,7 @@ class TestAutoFlow(unittest.TestCase):
         """Input: all six raw camera views. Output: exact original state and verified TURN plan."""
         result = self.run_flow()
         self.assertEqual(result['cube'], SCRAMBLED)
-        self.assertEqual([value for kind, value in self.trace if kind == 'capture'], list('URFDLB' * 2))
+        self.assertEqual([value for kind, value in self.trace if kind == 'capture'], list('URFDLB'))
         for index, (kind, face) in enumerate(self.trace):
             if kind == 'capture':
                 self.assertEqual(self.trace[index-1], ('status', f'Capturing machine position {face} — any new center color accepted...'))
@@ -222,20 +222,24 @@ class TestAutoFlow(unittest.TestCase):
             self.run_flow(capture=capture)
         capture.assert_not_called()
 
-    def test_done_without_physical_moves_does_not_report_success(self):
+    def test_completion_uses_done_without_rescanning_the_physical_cube(self):
         self.link.request_completed.side_effect = lambda *args, **kwargs: 'DONE'
-        with self.assertRaisesRegex(ValueError, 'not solved'):
-            self.run_flow()
-        self.assertEqual(self.link.request_scan.call_count, 13)
+        result = self.run_flow()
+        self.assertEqual(result['solution'], SOLUTION)
+        self.assertEqual(self.link.request_scan.call_count, 7)
+        captures = [v for k, v in self.trace if k == 'capture']
+        self.assertEqual(captures, list('URFDLB'))
+        solution_at = next(i for i, (k, _) in enumerate(self.trace) if k == 'solution')
+        self.assertFalse(any(k == 'capture' for k, _ in self.trace[solution_at:]))
 
-    def test_solved_cube_skips_solver_and_face_moves_but_still_verifies(self):
+    def test_solved_cube_finishes_after_initial_scan_without_face_moves(self):
         self.physical_cube = SOLVED_CUBE
         solver = Mock()
         result = self.run_flow(solver=solver)
         solver.assert_not_called()
         self.assertEqual(result['solution'], '')
         self.link.request_completed.assert_called_once()
-        self.assertEqual(self.link.request_scan.call_count, 13)
+        self.assertEqual(self.link.request_scan.call_count, 7)
 
     def test_all_24_placements_produce_matching_machine_turns(self):
         """Input: 24 spatial rotations of a real scramble. Output: complete scan and correct physical turns."""
@@ -264,12 +268,10 @@ class TestAutoFlow(unittest.TestCase):
                 labels = {color: face for face, color in centers.items()}
                 expected_cube = ''.join(labels[value] for face in 'URFDLB' for value in actual_faces[face])
                 expected_solution = ' '.join(face_map[token[0]]+token[1:] for token in SOLUTION.split())
-                verifying = False
 
                 def capture(pose, seen_centers=()):
                     """Input: known pose. Output: optical grid for this physical placement."""
-                    values = ((centers[pose.face],) * 9 if verifying
-                              else rotate_grid(actual_faces[pose.face], -pose.correction))
+                    values = rotate_grid(actual_faces[pose.face], -pose.correction)
                     self.assertNotIn(values[4], seen_centers)
                     return values, tuple(PROTOTYPES[value] for value in values)
 
@@ -280,14 +282,8 @@ class TestAutoFlow(unittest.TestCase):
 
                 trace = []
                 link = Mock()
-                def emit(kind, value):
-                    nonlocal verifying
-                    trace.append((kind, value))
-                    if kind == 'status' and value.startswith('Solution moves complete.'):
-                        verifying = True
-
                 result = self.run_flow(link=link, capture=capture, solver=solve,
-                                       emit=emit)
+                                       emit=lambda kind, value: trace.append((kind, value)))
                 self.assertEqual(result['position_colors'], centers)
                 self.assertEqual(result['solution'], expected_solution)
                 self.assertEqual(len([v for k, v in trace if k == 'face'][-1]), 6)

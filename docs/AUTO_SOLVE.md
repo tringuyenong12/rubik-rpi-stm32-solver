@@ -27,7 +27,7 @@ Pi mở camera, gửi PING rồi gửi `RUBIK SCAN_BEGIN`. STM32 kiểm tra góc
 | 6 | `RUBIK SCAN_POSE B` | B | 180° |
 | 7 | `RUBIK SCAN_POSE U` | Trở về mốc | |
 
-Thứ tự chụp là **U → R → F → D → L → B** ở cả lượt đầu và lượt xác nhận.
+Thứ tự chụp là **U → R → F → D → L → B**, thực hiện một lượt trước khi giải.
 U đầu tiên được chụp tại chỗ sau SCAN_BEGIN. Sáu lệnh đổi tư thế sau đó là
 R, F, D, L, B, U. Chỉ tư thế U cuối cùng bỏ qua chụp.
 
@@ -40,7 +40,12 @@ chuỗi servo trực tiếp, cần giữ đúng cả mặt hướng camera và g
 
 Các chữ U/R/F/D/L/B chỉ vị trí ở thời điểm bắt đầu. Ví dụ nếu tâm đỏ ở trên và tâm xanh biển ở trước, mọi ô đỏ được mã hóa thành U và mọi ô xanh biển thành F trong lượt đó. Pi kiểm tra đủ sáu tâm khác nhau và trạng thái Rubik hợp lệ, rồi kiểm tra công thức trên mô hình. Khi thực thi, mỗi nước đơn gửi dưới dạng `#ID RUBIK MOVE <token>`. Ví dụ `R'` dùng `R_`, và `R2` dùng hai giao dịch riêng. Auto Solve dùng nước đơn để mỗi thao tác kết thúc với các tay kẹp sẵn sàng cho bước sau.
 
-Sau khi giải, robot lặp lại lộ trình quét. App chỉ báo hoàn thành khi camera đọc được sáu mặt đồng màu và màu tâm ở từng vị trí vẫn khớp với lượt đầu. Nếu khối đã giải từ đầu, app bỏ qua phần tìm công thức và xoay lớp.
+Sau khi quét đủ sáu mặt và trở về U, Pi kiểm tra dữ liệu cube, tìm công thức
+và kiểm chứng công thức trên mô hình trước khi gửi chuyển động. App hiển thị
+cube, công thức và lệnh UART trong khung kết quả, rồi thực thi từng nước.
+Khi mọi lệnh giải đã nhận DONE, phiên kết thúc và báo hoàn thành thực thi.
+Kết quả này dựa trên phản hồi STM32. Người dùng quan sát khối thật sau khi chạy.
+Nếu khối đã giải từ đầu, app kết thúc sau lượt quét đầu và bỏ qua xoay lớp.
 
 Mỗi lệnh chờ `>#ID OK` rồi `>#ID DONE`. Hạn chờ OK là 1 giây, hạn chờ DONE là 30 giây cho lệnh quét và 15 giây cho từng giao dịch xoay lớp. Khi Stop, ứng dụng ngừng gửi sau thao tác đang chạy. Sau lỗi hoặc Stop, kiểm tra vị trí thật của khối và tay kẹp, rồi đưa máy về tư thế nạp khối trước khi khởi tạo lại. App không tự gửi lại lệnh chuyển động.
 

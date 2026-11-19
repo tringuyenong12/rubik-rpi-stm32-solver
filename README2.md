@@ -15,7 +15,7 @@ Các lệnh dưới đây chạy trên terminal Linux của Pi. Phần cài đ�
 | Đọc trạng thái/công thức đã lưu | `scripts/run_solver.py --input ...json` | Có |
 | Tạo và gửi công thức trộn Rubik | `scripts/run_scramble.py` | Có |
 | Camera nhận màu, người dùng đổi mặt bằng tay, hiển thị lời giải | `scripts/run_vision_gui.py` | Có; cần Desktop và camera |
-| Robot tự đổi tư thế để quét, giải và xác nhận | Chế độ `Auto Solve` | Cần firmware mới, xem [Auto Solve](docs/AUTO_SOLVE.md) |
+| Robot tự đổi tư thế để quét và thực thi lời giải | Chế độ `Auto Solve` | Cần firmware mới, xem [Auto Solve](docs/AUTO_SOLVE.md) |
 | Calibration servo | `rpi/Rubik_Cube/Calibration/` | Giữ nguyên; không thuộc hướng dẫn chuyển solver này |
 
 **Auto scan của camera không đồng nghĩa với robot tự xoay khối để quét.** Camera có thể tự lưu một mặt khi ảnh ổn định, nhưng bạn vẫn phải đưa từng mặt vào camera ở luồng quét thủ công.
@@ -367,7 +367,7 @@ Thay đường dẫn nếu dự án được lưu ở vị trí khác. Một l�
 |---|---|
 | **Solve Guide** | Quét sáu mặt bằng camera, tìm công thức và xem hình hướng dẫn từng bước |
 | **Scramble** | Tạo đề theo độ khó, xem công thức và gửi lệnh trộn đến STM32 |
-| **Auto Solve** | Tự quét, giải và quét xác nhận với firmware mới |
+| **Auto Solve** | Quét sáu mặt, xuất công thức và thực thi đến khi nhận đủ DONE |
 
 **Tạo đề và chạy trộn trên GUI:**
 
