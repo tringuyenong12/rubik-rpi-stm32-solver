@@ -16,7 +16,7 @@ from rubik_robot.transport.serial_link import SerialLink
 from rubik_robot.vision.face_scanner import COLORS, new_camera_scanner
 from rubik_robot.vision.solve_guide import (
     apply_move, color_cost, face_definition, hsv_to_lab, minimum_assignment,
-    request_solution, valid_cube,
+    orient_faces, request_solution, valid_cube,
 )
 
 
@@ -76,12 +76,22 @@ def prepare_machine_cube(faces, samples, position_colors, allow_color_correction
     virtual_colors = {actual: FACE_COLORS[face] for face, actual in position_colors.items()}
     virtual_faces = {virtual_colors[center]: tuple(virtual_colors[color] for color in values)
                      for center, values in faces.items()}
-    virtual_samples = {virtual_colors[center]: values for center, values in samples.items()}
     cube = face_definition(virtual_faces)
     if valid_cube(cube):
         return cube, machine_faces(cube, position_colors), 'Machine-relative scan validated'
-    if not allow_color_correction or set(virtual_samples) != set(COLORS):
-        raise ValueError('Colors or machine face directions are inconsistent. Rescan the cube.')
+
+    # Use the guide's unique-orientation search, keeping each face at its
+    # original machine position so the solver's moves still address the robot.
+    try:
+        oriented = orient_faces(virtual_faces)
+    except ValueError:
+        if not allow_color_correction or set(samples) != set(position_colors.values()):
+            raise
+    else:
+        return (oriented, machine_faces(oriented, position_colors),
+                'Machine-relative scan validated after correcting face directions')
+
+    virtual_samples = {virtual_colors[center]: values for center, values in samples.items()}
     numeric = hsv_to_lab([sample for center in COLORS for sample in virtual_samples[center]])
     if numeric.shape != (54, 3):
         raise ValueError('Expected 54 camera samples')
@@ -145,6 +155,7 @@ def execute_auto_solve(link, capture, host, port, cancel, emit, solver=request_s
     emit('scan_complete', '6/6 faces captured. Initial pose restored. Checking cube...')
     check_cancel(cancel)
     cube, canonical, note = prepare_machine_cube(faces, {}, position_colors)
+    check_cancel(cancel)
     emit('face', canonical)
     emit('status', 'Six faces validated. Solving with Two-Phase... ' + note)
     solution = '' if cube == SOLVED_CUBE else solver(host, port, cube)

@@ -175,12 +175,29 @@ class TestAutoFlow(unittest.TestCase):
         self.assertEqual(recovered, self.faces)
         self.assertIn('corrected 1 stickers', note)
 
-    def test_misrotated_scan_is_rejected_instead_of_rotating_faces_silently(self):
-        """Input: incorrect camera/pose roll. Output: reject before producing a physical plan."""
-        faces = dict(self.faces)
-        faces['yellow'] = rotate_grid(faces['yellow'], 1)
-        with self.assertRaisesRegex(ValueError, 'directions are inconsistent'):
-            prepare_machine_cube(faces, {}, FACE_COLORS)
+    def test_recovered_scan_from_robot_is_solved_and_sent_to_uart(self):
+        # The failed scan transcribed from the GUI, in URFDLB after pose correction.
+        observed = 'LRLFUUDRRURRDRFUDDFBRFFUFBUURFLDBLLBBFBLLLDDDLDRUBUBBF'
+        expected = 'DFLRURRULUDUDRRDFRUBFUFFRBFBLLBDLFRUBFBLLLDDDBULBBDFUR'
+        formula = "R' U' R L B2 U2 F' D L' B U R2 U' D' F2 U2 F2 L2 F2 B2"
+        centers = dict(zip('URFDLB', ('blue', 'orange', 'yellow', 'green', 'red', 'white')))
+        self.physical_cube = expected
+        solver = Mock(return_value=formula)
+
+        def capture(pose, seen_centers=()):
+            index = 'URFDLB'.index(pose.face) * 9
+            colors = tuple(centers[label] for label in observed[index:index + 9])
+            return rotate_grid(colors, -pose.correction), None
+
+        result = self.run_flow(capture=capture, solver=solver)
+        solver.assert_called_once_with('localhost', 8080, expected)
+        self.assertEqual(result['position_colors'], centers)
+        self.assertEqual(self.physical_cube, SOLVED_CUBE)
+        self.assertTrue(result['uart'].startswith("RUBIK MOVE R_\n"))
+        self.assertIn(('solution', result), self.trace)
+        exported = self.trace.index(('solution', result))
+        first_move = self.trace.index(('command', 'RUBIK MOVE R_'))
+        self.assertLess(exported, first_move)
 
     def test_cancel_after_pose_does_not_capture_or_retry(self):
         """Input: stop while a pose is moving. Output: wait once, then stop before capture."""

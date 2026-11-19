@@ -43,6 +43,11 @@ Các chữ U/R/F/D/L/B chỉ vị trí ở thời điểm bắt đầu. Ví dụ
 Sau khi quét đủ sáu mặt và trở về U, Pi kiểm tra dữ liệu cube, tìm công thức
 và kiểm chứng công thức trên mô hình trước khi gửi chuyển động. App hiển thị
 cube, công thức và lệnh UART trong khung kết quả, rồi thực thi từng nước.
+Nếu cube ghép theo góc mặc định chưa hợp lệ, Pi dùng cách tìm hướng của Solve
+Guide để thử xoay lưới ảnh từng mặt. Pi giữ nguyên màu đã đọc và vị trí mỗi mặt
+trong máy. Phiên chỉ tiếp tục nếu tìm được đúng một trạng thái hợp lệ. Nếu
+không có trạng thái phù hợp hoặc có nhiều trạng thái, Pi báo lỗi trước khi
+gửi nước giải.
 Khi mọi lệnh giải đã nhận DONE, phiên kết thúc và báo hoàn thành thực thi.
 Kết quả này dựa trên phản hồi STM32. Người dùng quan sát khối thật sau khi chạy.
 Nếu khối đã giải từ đầu, app kết thúc sau lượt quét đầu và bỏ qua xoay lớp.
